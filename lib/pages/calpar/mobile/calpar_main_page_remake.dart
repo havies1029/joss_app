@@ -825,6 +825,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                                 onPressed: state.isProcessing
                                     ? null
                                     : () {
+                                  if (calpar1Id == null || calpar1Id!.isEmpty) {
+                                    return;
+                                  }
                                   _showGlobalLoading();
                                   onLanjutkanPressed();
                                 },
@@ -996,17 +999,47 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       return;
     }
 
-    if (context.read<AuthenticationBloc>().state
-        is AuthenticationAuthenticated) {
-      User user = (context.read<AuthenticationBloc>().state
-              as AuthenticationAuthenticated)
-          .user;
-      if (user.userType == "C") {
+    final authState = context.read<AuthenticationBloc>().state;
+    final userType = authState is AuthenticationAuthenticated
+        ? authState.user.userType.trim().toUpperCase()
+        : "";
+
+    if (authState is! AuthenticationAuthenticated || userType != "C") {
+      _hideGlobalLoading();
+      showDialog(
+        context: context,
+        barrierDismissible: true, // klik luar = close
+        barrierColor:
+            Colors.black.withOpacity(0.6), // background gelap transparan
+        builder: (context) => RegisterClientPopUp(
+          header: 'Data Klien Belum Terdaftar!',
+          description:
+              'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
+          buttonText: 'Daftar Klien',
+          onPressed: () {
+            _pendingAutoConfirm = true;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      RegisterClient(requestFrom: 'calpar_page')),
+            );
+          },
+        ),
+      );
+
+      debugPrint("RegisterClient : calpar_page");
+      return;
+    }
+
+    User user = authState.user;
+    if (user.userType == "C") {
         if (mjenisClient == "10") {
           final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
 
           if (!idvState.isDataComplete) {
             debugPrint("MRekanGeneralIdvPopUpPage : calpar_page");
+            _hideGlobalLoading();
             showDialog(
               context: context,
               barrierDismissible: true,
@@ -1033,6 +1066,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
 
           if (!cmpState.isDataComplete) {
+            _hideGlobalLoading();
             showDialog(
               context: context,
               barrierDismissible: true,
@@ -1057,36 +1091,14 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           }
         }
         _continueToRegPar();
-      } else {
-        showDialog(
-          context: context,
-          barrierDismissible: true, // klik luar = close
-          barrierColor:
-              Colors.black.withOpacity(0.6), // background gelap transparan
-          builder: (context) => RegisterClientPopUp(
-            header: 'Data Klien Belum Terdaftar!',
-            description:
-                'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
-            buttonText: 'Daftar Klien',
-            onPressed: () {
-              _pendingAutoConfirm = true;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        RegisterClient(requestFrom: 'calpar_page')),
-              );
-            },
-          ),
-        );
-
-        debugPrint("RegisterClient : calpar_page");
-      }
     }
   }
 
   void _continueToRegPar() {
-    if (calpar1Id == null || calpar1Id!.isEmpty) return;
+    if (calpar1Id == null || calpar1Id!.isEmpty) {
+      _hideGlobalLoading();
+      return;
+    }
     context.read<Calpar1ListBloc>().add(
           CalPar2RegParEvent(calpar1Id: calpar1Id!),
         );

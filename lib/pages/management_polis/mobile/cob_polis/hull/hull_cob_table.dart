@@ -61,6 +61,12 @@ class _HullCobTableState extends State<HullCobTable> {
   String formatNum(num? value) =>
       NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
 
+  String _selectionId(AsethullCariModel d) {
+    final prosesId = d.prosesId.trim();
+    if (widget.statusId == "10002" && prosesId.isNotEmpty) return prosesId;
+    return d.asetHullId;
+  }
+
   @override
   Widget build(BuildContext context) {
     final showColumn = widget.statusId == "10002";
@@ -68,7 +74,7 @@ class _HullCobTableState extends State<HullCobTable> {
     return CobPolicyTable<AsethullCariModel>(
       items: widget.items,
       selectedIds: widget.selectedIds,
-      idGetter: (d) => d.asetHullId,
+      idGetter: _selectionId,
       nomorGetter: (d, index) => (index + 1).toString(),
 
       title: widget.title,

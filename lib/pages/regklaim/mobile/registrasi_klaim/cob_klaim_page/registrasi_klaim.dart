@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
@@ -76,6 +77,14 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
     }
 
     return "";
+  }
+
+  String _resolveUserType(BuildContext context) {
+    final authState = context.read<AuthenticationBloc>().state;
+    if (authState is! AuthenticationAuthenticated) {
+      return "";
+    }
+    return authState.user.userType.trim().toUpperCase();
   }
 
   late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
@@ -352,6 +361,8 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
 
   @override
   Widget build(BuildContext context) {
+    final userType = _resolveUserType(context);
+
     return SafeArea(
       child: BaseBackgroundSidePage(
         title: widget.cobKlaimNama,
@@ -379,6 +390,7 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
                     BasePolisPage(
                       cobKlaimId: widget.cobKlaimId,
                       cobKlaimNama: widget.cobKlaimNama,
+                      userType: userType,
                       selectedPolis: _selectedPolis,
                       onPolisChanged: (value) {
                         setState(() {
@@ -406,6 +418,10 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
           bottomNavigationBar:
               BlocBuilder<PolissourcecariBloc, PolissourcecariState>(
             builder: (context, state) {
+              if (userType.isEmpty) {
+                return const SizedBox.shrink();
+              }
+
               if (state.status != ListStatus.success) {
                 return const SizedBox.shrink();
               }

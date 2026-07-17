@@ -1795,20 +1795,24 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       ok = false;
     }
 
-    bool validateMoneyNonNegativeRequired({
-      required String key,
-      required TextEditingController controller,
-    }) {
+    double parseOrZeroAutoFill(TextEditingController controller) {
       final raw = controller.text.trim();
       if (raw.isEmpty) {
-        setErr(key, kStringNullError);
-        return false;
+        controller.text = '0';
+        return 0;
       }
 
       final clean = raw.replaceAll(",", "");
-      final x = double.tryParse(clean);
+      return double.tryParse(clean) ?? double.nan;
+    }
 
-      if (x == null) {
+    bool optionalPositiveNumAutoZero({
+      required String key,
+      required TextEditingController controller,
+    }) {
+      final x = parseOrZeroAutoFill(controller);
+
+      if (x.isNaN) {
         setErr(key, "Format tidak valid");
         return false;
       }
@@ -1818,47 +1822,68 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         return false;
       }
 
+      final clean = controller.text.trim().replaceAll(",", "");
       if (hasLeadingZero(clean)) {
         setErr(key, "Format tidak disarankan (diawali 0)");
       }
 
-      return true; // >= 0 OK
+      return true;
     }
 
-    // SI fields (required, >= 0)
-    if (!validateMoneyNonNegativeRequired(
+    // SI fields are optional individually, but at least one must be > 0.
+    if (!optionalPositiveNumAutoZero(
       key: 'form4.siBuilding',
       controller: fieldSiBuildingController,
     )) {
       ok = false;
     }
 
-    if (!validateMoneyNonNegativeRequired(
+    if (!optionalPositiveNumAutoZero(
       key: 'form4.siContent',
       controller: fieldSiContentController,
     )) {
       ok = false;
     }
 
-    if (!validateMoneyNonNegativeRequired(
+    if (!optionalPositiveNumAutoZero(
       key: 'form4.siMachinery',
       controller: fieldSiMachineryController,
     )) {
       ok = false;
     }
 
-    if (!validateMoneyNonNegativeRequired(
+    if (!optionalPositiveNumAutoZero(
       key: 'form4.siOther',
       controller: fieldSiOtherController,
     )) {
       ok = false;
     }
 
-    if (!validateMoneyNonNegativeRequired(
+    if (!optionalPositiveNumAutoZero(
       key: 'form4.siStock',
       controller: fieldSiStockController,
     )) {
       ok = false;
+    }
+
+    if (ok) {
+      final vBuilding = parseOrZeroAutoFill(fieldSiBuildingController);
+      final vContent = parseOrZeroAutoFill(fieldSiContentController);
+      final vMachinery = parseOrZeroAutoFill(fieldSiMachineryController);
+      final vOther = parseOrZeroAutoFill(fieldSiOtherController);
+      final vStock = parseOrZeroAutoFill(fieldSiStockController);
+
+      final anyGreaterThanZero = vBuilding > 0 ||
+          vContent > 0 ||
+          vMachinery > 0 ||
+          vOther > 0 ||
+          vStock > 0;
+
+      if (!anyGreaterThanZero) {
+        setErr(
+            'form4.siMachinery', 'Minimal salah satu nilai harus lebih dari 0');
+        ok = false;
+      }
     }
 
     if (!ok) {

@@ -275,11 +275,10 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 			SelectHullDetailEvent event,
 			Emitter<AsethullCariState> emit,
 			) async {
-		final updatedSelectedIds = Set<String>.from(state.selectedIds)
-			..add(event.asetHullId);
-
 		emit(state.copyWith(
-			selectedIds: updatedSelectedIds,
+			selectedIds: <String>{event.asetHullId},
+			selectedId: event.asetHullId,
+			activeAsetHullId: event.asetHullId,
 		));
 
 		_recomputeActiveAndFile(
@@ -292,22 +291,18 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 			UnselectHullDetailEvent event,
 			Emitter<AsethullCariState> emit,
 			) async {
-		final updatedSelectedIds = Set<String>.from(state.selectedIds)
-			..remove(event.asetHullId);
+		if (!state.selectedIds.contains(event.asetHullId) &&
+				state.selectedId != event.asetHullId &&
+				state.activeAsetHullId != event.asetHullId) {
+			return;
+		}
 
 		emit(state.copyWith(
-			selectedIds: updatedSelectedIds,
+			selectedIds: <String>{},
+			selectedId: "",
+			activeAsetHullId: "",
+			selectedFilePolisId: "",
 		));
-
-		final preferFallback =
-		(state.activeAsetHullId == event.asetHullId)
-				? null
-				: state.activeAsetHullId;
-
-		_recomputeActiveAndFile(
-			emit,
-			preferId: preferFallback,
-		);
 	}
 
 	Future<void> onClearSelection(

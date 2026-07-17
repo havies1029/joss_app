@@ -58,6 +58,12 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
   String formatNum(num? value) =>
       NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
 
+  String _selectionId(AsetParCariModel d) {
+    final prosesId = d.prosesId.trim();
+    if (widget.statusId == "10002" && prosesId.isNotEmpty) return prosesId;
+    return d.asetParId;
+  }
+
   @override
   Widget build(BuildContext context) {
     final showColumn = widget.statusId == "10002";
@@ -65,7 +71,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
     return CobPolicyTable<AsetParCariModel>(
       items: widget.items,
       selectedIds: widget.selectedIds,
-      idGetter: (d) => d.asetParId,
+      idGetter: _selectionId,
       nomorGetter: (d, index) => d.nomor.toString(),
 
       title: widget.title,
@@ -84,6 +90,10 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
       onClearSelectedItem: widget.onClearSelectedItem,
 
       onSelectExtra: (d) {
+        if (d.prosesId.isNotEmpty) {
+          widget.selectedProsesId(d.prosesId);
+        }
+
         if (d.filePolisParId.isNotEmpty) {
           widget.onSelectFilePolisParId(d.filePolisParId);
         }

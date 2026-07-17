@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/services.dart';
 import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import 'package:joss_app/pages/home/draggable_chat_button.dart';
 import 'package:joss_app/pages/literasi/mobile/literasi_page.dart';
@@ -183,11 +184,24 @@ class HomeTabWidgetState extends State<HomeTabWidget> {
     );
   }
 
+  String _resolveUserType(BuildContext context) {
+    final authState = context.read<AuthenticationBloc>().state;
+    if (authState is! AuthenticationAuthenticated) {
+      return "";
+    }
+    return authState.user.userType.trim();
+  }
+
   Future<void> handleLogout(BuildContext context) async {
     final shouldLogout = await showLogoutConfirmDialog(context);
     if (!context.mounted) return;
 
     if (shouldLogout == true) {
+      if (_resolveUserType(context).isEmpty) {
+        await SystemNavigator.pop();
+        return;
+      }
+
       context.read<AuthenticationBloc>().add(LoggedOut());
       context.read<ProfileDownloadFotoBloc>().add(ClearSecureImage());
       ChatInitService.I.dispose();

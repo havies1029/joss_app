@@ -56,12 +56,30 @@ class _HeroPageState extends State<HeroPage> {
                           if (userType == 'C') {
                             return BlocBuilder<MRekan1CrudBloc, MRekan1CrudState>(
                               buildWhen: (prev, curr) =>
-                              prev.record?.rekanNama != curr.record?.rekanNama,
+                              prev.record?.rekanNama != curr.record?.rekanNama ||
+                                  prev.record?.mjnsclientId !=
+                                      curr.record?.mjnsclientId,
                               builder: (context, rekanState) {
-                                final nama = rekanState.record?.rekanNama.trim();
-                                final displayName = (nama != null && nama.isNotEmpty)
-                                    ? nama
-                                    : AppData.user.nama ?? "Klien Baru";
+                                final mjenisClient =
+                                    rekanState.record?.mjnsclientId.trim() ?? '';
+                                final userNama =
+                                    AppData.user.nama?.trim() ?? '';
+                                final rekanNama =
+                                    rekanState.record?.rekanNama.trim() ?? '';
+
+                                final displayName = mjenisClient == '10'
+                                    ? (userNama.isNotEmpty
+                                        ? userNama
+                                        : "Klien Baru")
+                                    : mjenisClient == '20'
+                                        ? (rekanNama.isNotEmpty
+                                            ? rekanNama
+                                            : "Klien Baru")
+                                        : (rekanNama.isNotEmpty
+                                            ? rekanNama
+                                            : (userNama.isNotEmpty
+                                                ? userNama
+                                                : "Klien Baru"));
 
                                 return _buildHeroContent(
                                   context,

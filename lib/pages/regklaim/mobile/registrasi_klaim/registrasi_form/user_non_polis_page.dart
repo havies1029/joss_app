@@ -16,10 +16,12 @@ import '../../../../../common/constants.dart';
 import '../../../../../common/loading_indicator.dart';
 import '../../../../../common/plat_nomor_formatter.dart';
 import '../../../../../models/combobox/combominsurance_model.dart';
+import '../../../../../models/combobox/combominsurance2_model.dart';
 import '../../../../../models/combobox/combomjenisrugimv_model.dart';
 import '../../../../../models/regklaim/attachment_item.dart';
 import '../../../../../models/regklaim/regklaim1crud_model.dart';
 import '../../../../../repositories/combobox/combominsurance_repository.dart';
+import '../../../../../repositories/combobox/combominsurance2_repository.dart';
 import '../../../../../repositories/combobox/combomjenisrugimv_repository.dart';
 import '../../../../../repositories/regklaim/picker_repository.dart';
 import '../../../../../repositories/regklaim/upload_repository.dart';
@@ -119,8 +121,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   Future<void> _initDefaultInsurance() async {
     if (!_isAutoInsurance || _insuranceInitialized) return;
 
-    final data = await ComboMInsuranceRepository().getComboMInsurance("");
-    final filtered = _filterInsurance(data);
+    final filtered = await _loadInsurance("");
 
     if (!mounted) return;
 
@@ -131,6 +132,36 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       });
       clearErr('form1.kategoryInsurance');
     }
+  }
+
+  String _resolveUserType() {
+    final authState = context.read<AuthenticationBloc>().state;
+    if (authState is! AuthenticationAuthenticated) {
+      return "";
+    }
+    return authState.user.userType.trim().toUpperCase();
+  }
+
+  ComboMInsuranceModel _fromInsurance2(ComboMInsurance2Model item) {
+    return ComboMInsuranceModel(
+      minsuranceId: item.minsuranceId,
+      insuranceName: item.insuranceName,
+      singkatan: item.singkatan,
+    );
+  }
+
+  Future<List<ComboMInsuranceModel>> _loadInsurance(String searchText) async {
+    if (_resolveUserType().isEmpty) {
+      final data = await ComboMInsurance2Repository().getComboMInsurance2(
+        searchText,
+      );
+      return _filterInsurance(data.map(_fromInsurance2).toList());
+    }
+
+    final data = await ComboMInsuranceRepository().getComboMInsurance(
+      searchText,
+    );
+    return _filterInsurance(data);
   }
 
   @override
@@ -652,10 +683,9 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
         expandText: (count) => "Lihat $count Kategori Lainnya",
         collapseText: "Tampilkan Lebih Sedikit",
         loader: (q) async {
-          final data = await ComboMInsuranceRepository().getComboMInsurance(
+          return _loadInsurance(
             q.searchText,
           );
-          return _filterInsurance(data);
         },
         clientSideSearch: true,
         displayText: (item) => item.insuranceName,

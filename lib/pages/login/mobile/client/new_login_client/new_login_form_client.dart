@@ -15,7 +15,12 @@ import 'package:joss_app/pages/login/welcome_header.dart';
 import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
 
 class NewLoginFormClient extends StatefulWidget {
-  const NewLoginFormClient({super.key});
+  final String requestFrom;
+
+  const NewLoginFormClient({
+    super.key,
+    this.requestFrom = '',
+  });
 
   @override
   State<NewLoginFormClient> createState() => _NewLoginFormClientState();
@@ -110,11 +115,18 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
         );
   }
 
-  void _goBackToFirstRoute() {
+  void _handleBack() {
     _clearEmailStateAndController();
     context.read<EmailVerificationBloc>().add(
           ClearEmailVerificationEvent(),
         );
+
+    if (widget.requestFrom.isNotEmpty &&
+        widget.requestFrom != 'daftarclient_page' &&
+        Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+      return;
+    }
 
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
@@ -247,7 +259,7 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
   Widget build(BuildContext context) {
     return IosLeftEdgeSwipe(
       onSwipeBack: () async {
-        _goBackToFirstRoute();
+        _handleBack();
       },
       child: PopScope(
         canPop: Platform.isAndroid ? false : true,
@@ -255,7 +267,7 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
           if (Platform.isIOS) return;
           if (didPop) return;
 
-          _goBackToFirstRoute();
+          _handleBack();
         },
         child: MultiBlocListener(
           listeners: [
@@ -327,7 +339,7 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 4),
                                 child: TextButton.icon(
-                                  onPressed: _goBackToFirstRoute,
+                                  onPressed: _handleBack,
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
                                     minimumSize: const Size(0, 0),
@@ -471,12 +483,15 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
                                         ),
                                         GestureDetector(
                                           onTap: () {
-                                            Navigator.of(context).push(
+                                            Navigator.of(context)
+                                                .pushReplacement(
                                               MaterialPageRoute(
                                                 builder: (_) =>
-                                                    const RegisterClient(
+                                                    RegisterClient(
                                                   requestFrom:
-                                                      'daftarclient_page',
+                                                      widget.requestFrom.isEmpty
+                                                      ? 'daftarclient_page'
+                                                      : widget.requestFrom,
                                                 ),
                                               ),
                                             );

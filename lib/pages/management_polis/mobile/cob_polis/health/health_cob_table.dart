@@ -61,6 +61,12 @@ class _HealthCobTableState extends State<HealthCobTable> {
     return DateFormat('dd MMM yyyy').format(date);
   }
 
+  String _selectionId(AsetHealthCariModel d) {
+    final prosesId = d.prosesId.trim();
+    if (widget.statusId == "10002" && prosesId.isNotEmpty) return prosesId;
+    return d.asethealthId;
+  }
+
   @override
   Widget build(BuildContext context) {
     final showColumn = widget.statusId == "10002";
@@ -68,7 +74,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
     return CobPolicyTable<AsetHealthCariModel>(
       items: widget.items,
       selectedIds: widget.selectedIds,
-      idGetter: (d) => d.asethealthId,
+      idGetter: _selectionId,
       nomorGetter: (d, index) => d.nomor.toString(),
 
       title: widget.title,

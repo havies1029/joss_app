@@ -28,7 +28,6 @@
 
 
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/combobox/combomjnscoverpar_model.dart';
@@ -41,10 +40,6 @@ class ComboMJnscoverParAPI {
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint);
 
-		debugPrint("=== getComboMJnscoverParAPI ===");
-		debugPrint("URL: $uri");
-		debugPrint("Token: ${AppData.userToken.substring(0, 10)}..."); // potong token biar aman
-
 		final http.Response response = await http.get(
 			uri,
 			headers: <String, String>{
@@ -54,24 +49,16 @@ class ComboMJnscoverParAPI {
 			},
 		);
 
-		debugPrint("Status Code: ${response.statusCode}");
-		debugPrint("Response Body (raw): ${response.body}");
-
 		if (response.statusCode == 200) {
 			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
-
-			debugPrint("Parsed length: ${parsed.length}");
 
 			final result = parsed
 					.map<ComboMJnscoverParModel>(
 							(json) => ComboMJnscoverParModel.fromJson(json))
 					.toList();
 
-			debugPrint("Mapping success: ${result.length} items");
-
 			return result;
 		} else {
-			debugPrint("ERROR Response: ${response.body}");
 			throw Exception("Failed to load data. Status: ${response.statusCode}");
 		}
 	}

@@ -55,7 +55,6 @@ class CalmvMainPageRemake extends StatefulWidget {
 
 class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   List<bool> expanded = [true, false, false];
-  //untuk detect form mana yang terakhir dibuka
   int? lastOpenedIndex;
   int? currentOpenedIndex;
   int getOpenedIndex() => expanded.indexWhere((e) => e);
@@ -668,6 +667,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                                 onPressed: state.isProcessing
                                     ? null
                                     : () {
+                                  if (calmv1Id == null || calmv1Id!.isEmpty) {
+                                    return;
+                                  }
                                   _showGlobalLoading();
                                   onLanjutkanPressed();
                                 },
@@ -1028,16 +1030,43 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     final mjenisClient =
         context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
     if (context.read<Calmv1ListBloc>().state.isProcessing) return;
-    if (context.read<AuthenticationBloc>().state
-        is AuthenticationAuthenticated) {
-      User user = (context.read<AuthenticationBloc>().state
-              as AuthenticationAuthenticated)
-          .user;
-      if (user.userType == "C") {
+    final authState = context.read<AuthenticationBloc>().state;
+    final userType = authState is AuthenticationAuthenticated
+        ? authState.user.userType.trim().toUpperCase()
+        : "";
+
+    if (authState is! AuthenticationAuthenticated || userType != "C") {
+      _hideGlobalLoading();
+      showDialog(
+        context: context,
+        barrierDismissible: true, // klik luar = close
+        barrierColor:
+            Colors.black.withOpacity(0.6), // background gelap transparan
+        builder: (context) => RegisterClientPopUp(
+          header: 'Data Klien Belum Terdaftar!',
+          description:
+              'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
+          buttonText: 'Daftar Klien',
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      RegisterClient(requestFrom: 'calmv_page')),
+            );
+          },
+        ),
+      );
+      return;
+    }
+
+    User user = authState.user;
+    if (user.userType == "C") {
         if (mjenisClient == "10") {
           final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
 
           if (!idvState.isDataComplete) {
+            _hideGlobalLoading();
             showDialog(
               context: context,
               barrierDismissible: true,
@@ -1064,6 +1093,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
           final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
 
           if (!cmpState.isDataComplete) {
+            _hideGlobalLoading();
             showDialog(
               context: context,
               barrierDismissible: true,
@@ -1088,33 +1118,12 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
           }
         }
         _continueToRegMv();
-      } else {
-        showDialog(
-          context: context,
-          barrierDismissible: true, // klik luar = close
-          barrierColor:
-              Colors.black.withOpacity(0.6), // background gelap transparan
-          builder: (context) => RegisterClientPopUp(
-            header: 'Data Klien Belum Terdaftar!',
-            description:
-                'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
-            buttonText: 'Daftar Klien',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        RegisterClient(requestFrom: 'calmv_page')),
-              );
-            },
-          ),
-        );
-      }
     }
   }
 
   void _continueToRegMv() {
     if (calmv1Id == null || calmv1Id!.isEmpty) {
+      _hideGlobalLoading();
       return;
     }
 

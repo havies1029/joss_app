@@ -53,6 +53,12 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
   String formatNum(num? value) =>
       NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
 
+  String _selectionId(AsetMvCariModel d) {
+    final prosesId = d.prosesId.trim();
+    if (widget.statusId == "10002" && prosesId.isNotEmpty) return prosesId;
+    return d.asetMvId;
+  }
+
   @override
   Widget build(BuildContext context) {
     final showColumn = widget.statusId == "10002";
@@ -60,7 +66,7 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
     return CobPolicyTable<AsetMvCariModel>(
       items: widget.items,
       selectedIds: widget.selectedIds,
-      idGetter: (d) => d.asetMvId,
+      idGetter: _selectionId,
       nomorGetter: (d, index) => d.nomor.toString(),
 
       title: widget.title,

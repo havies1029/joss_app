@@ -298,4 +298,5 @@ const singlePopPages = [
   "regisnonpolis_page",
   "regispolis_page",
   "regother_page",
+  "daftarclient_page",
 ];

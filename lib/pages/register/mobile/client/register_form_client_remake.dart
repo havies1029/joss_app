@@ -299,9 +299,11 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         ),
         GestureDetector(
           onTap: () {
-            Navigator.of(context).push(
+            Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (_) => const NewLoginClient(),
+                builder: (_) => NewLoginClient(
+                  requestFrom: widget.requestFrom,
+                ),
               ),
             );
           },
@@ -315,6 +317,16 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   }
 
   void handleBack() {
+    if (widget.requestFrom == 'daftarclient_page') {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      return;
+    }
+
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+      return;
+    }
+
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 

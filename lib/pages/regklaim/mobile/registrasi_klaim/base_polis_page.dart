@@ -12,6 +12,7 @@ import 'button_klaim/button_polis_source.dart';
 class BasePolisPage extends StatelessWidget {
   final String cobKlaimId;
   final String cobKlaimNama;
+  final String userType;
 
   final SppapoliscariModel? selectedPolis;
   final ValueChanged<SppapoliscariModel?> onPolisChanged;
@@ -26,6 +27,7 @@ class BasePolisPage extends StatelessWidget {
     super.key,
     required this.cobKlaimId,
     required this.cobKlaimNama,
+    required this.userType,
     required this.selectedPolis,
     required this.onPolisChanged,
     required this.selectedJenisKerugian,
@@ -67,6 +69,14 @@ class BasePolisPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (userType.trim().isEmpty) {
+      return UserNonPolisPage(
+        key: ValueKey('user_non_polis_${cobKlaimId}_guest'),
+        cobKlaimId: cobKlaimId,
+        cobKlaimNama: cobKlaimNama,
+      );
+    }
+
     return BlocListener<PolissourcecariBloc, PolissourcecariState>(
       listenWhen: (previous, current) {
         return previous.selectedPolissourceId != current.selectedPolissourceId;

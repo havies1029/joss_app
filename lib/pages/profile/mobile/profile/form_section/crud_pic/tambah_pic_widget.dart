@@ -123,323 +123,306 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-    return Scaffold(
-      backgroundColor: secondaryBlackColor,
-      body: SafeArea(
-        child: BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
-          listener: (context, state) async {
-            if (state.isSaving) {
-              setState(() {
-                _saving = true;
-              });
-              return;
-            }
+    return BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
+      listener: (context, state) async {
+        if (state.isSaving) {
+          setState(() {
+            _saving = true;
+          });
+          return;
+        }
 
-            if (state.hasFailure) {
+        if (state.hasFailure) {
+          setState(() {
+            _saving = false;
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            errorSnackBar(
+              state.message?.isNotEmpty == true
+                  ? state.message!
+                  : 'Gagal menyimpan data PIC.',
+            ),
+          );
+          return;
+        }
+
+        if (state.isSaved == true) {
+          try {
+            final picId = (state.savedId ?? '').trim();
+            final cobRepo = RekanPicCobCariRepository();
+
+            final selectedCobItems =
+                context.read<RekanPicCobCariBloc>().state.selectedItems;
+
+            final listCheckbox = selectedCobItems
+                .map(
+                  (e) => RekanPicCobCariCheckboxModel(
+                    mcobId: e.mcobId,
+                    isChecked: e.isChecked,
+                  ),
+                )
+                .toList();
+
+            final cobResult = await cobRepo.rekanPicCobUpdateList(
+              picId,
+              listCheckbox,
+            );
+
+            if (!context.mounted) return;
+
+            if (cobResult.success) {
               setState(() {
                 _saving = false;
               });
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar(
-                  state.message?.isNotEmpty == true
-                      ? state.message!
-                      : 'Gagal menyimpan data PIC.',
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => PaymentSuccess(
+                    display: 'PIC Berhasil Ditambahkan',
+                    description:
+                        'PIC telah berhasil dibuat dan dapat digunakan sesuai hak akses yang diberikan.',
+                    displayButton: 'Kembali',
+                    onButtonPressed: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (_) => const RekanPicWidgetPage(),
+                        ),
+                        (route) => route.isFirst,
+                      );
+                    },
+                  ),
                 ),
               );
-              return;
+            } else {
+              setState(() {
+                _saving = false;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                  errorSnackBar('PIC tersimpan, tapi gagal update COB.'));
             }
+          } catch (e) {
+            if (!context.mounted) return;
 
-            if (state.isSaved == true) {
-              try {
-                final picId = (state.savedId ?? '').trim();
-                final cobRepo = RekanPicCobCariRepository();
+            setState(() {
+              _saving = false;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(
+                'PIC tersimpan, tapi terjadi error saat update COB.'));
+          }
+        }
+      },
+      child: BaseBackgroundSidePage(
+        title: 'Tambah PIC',
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final mjnsclientId = context.select(
+              (RegUserBloc b) => b.state.record?.jnsClientId,
+            );
 
-                final selectedCobItems =
-                    context.read<RekanPicCobCariBloc>().state.selectedItems;
-
-                final listCheckbox = selectedCobItems
-                    .map(
-                      (e) => RekanPicCobCariCheckboxModel(
-                        mcobId: e.mcobId,
-                        isChecked: e.isChecked,
-                      ),
-                    )
-                    .toList();
-
-                final cobResult = await cobRepo.rekanPicCobUpdateList(
-                  picId,
-                  listCheckbox,
-                );
-
-                if (!context.mounted) return;
-
-                if (cobResult.success) {
-                  setState(() {
-                    _saving = false;
-                  });
-
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => PaymentSuccess(
-                        display: 'PIC Berhasil Ditambahkan',
-                        description:
-                            'PIC telah berhasil dibuat dan dapat digunakan sesuai hak akses yang diberikan.',
-                        displayButton: 'Kembali',
-                        onButtonPressed: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                              builder: (_) => const RekanPicWidgetPage(),
-                            ),
-                            (route) => route.isFirst,
-                          );
-                        },
-                      ),
+            return SingleChildScrollView(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              child: Container(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                color: secondaryBlackColor,
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  horizontal: hPadding * 1.5,
+                  vertical: 24,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Di sini Anda dapat mengelola dan menambahkan PIC yang akan diundang melalui email untuk setiap asuransi Anda.",
+                      style: bodyTextStyle(
+                        context,
+                        fontSize: getResponsiveFont(context, 16),
+                      ).copyWith(color: primaryLightColor),
                     ),
-                  );
-                } else {
-                  setState(() {
-                    _saving = false;
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      errorSnackBar('PIC tersimpan, tapi gagal update COB.'));
-                }
-              } catch (e) {
-                if (!context.mounted) return;
+                    SizedBox(height: hPadding),
+                    Card(
+                      color: pGrey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(cardBorderRadius),
+                        side: const BorderSide(color: sGrey),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Form(
+                          key: _formKey,
+                          autovalidateMode: _showErrors
+                              ? AutovalidateMode.always
+                              : AutovalidateMode.disabled,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Form Tambah PIC',
+                                style: headingStyle(context, fontSize: 20),
+                              ),
+                              const SizedBox(height: vPadding),
 
-                setState(() {
-                  _saving = false;
-                });
-                ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(
-                    'PIC tersimpan, tapi terjadi error saat update COB.'));
-              }
-            }
-          },
-          child: BaseBackgroundSidePage(
-            title: 'Tambah PIC',
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final mjnsclientId = context.select(
-                  (RegUserBloc b) => b.state.record?.jnsClientId,
-                );
+                              buildFieldRekanNama(),
+                              const SizedBox(height: vPadding),
 
-                return SingleChildScrollView(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-                  ),
-                  child: Container(
-                    constraints:
-                        BoxConstraints(minHeight: constraints.maxHeight),
-                    color: secondaryBlackColor,
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: hPadding * 1.5,
-                      vertical: 24,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Di sini Anda dapat mengelola dan menambahkan PIC yang akan diundang melalui email untuk setiap asuransi Anda.",
-                          style: bodyTextStyle(
-                            context,
-                            fontSize: getResponsiveFont(context, 16),
-                          ).copyWith(color: primaryLightColor),
-                        ),
-                        SizedBox(height: hPadding),
-                        Card(
-                          color: pGrey,
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
-                            side: const BorderSide(color: sGrey),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Form(
-                              key: _formKey,
-                              autovalidateMode: _showErrors
-                                  ? AutovalidateMode.always
-                                  : AutovalidateMode.disabled,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'Form Tambah PIC',
-                                    style: headingStyle(context, fontSize: 20),
-                                  ),
-                                  const SizedBox(height: vPadding),
+                              buildFieldAlamat1(),
+                              const SizedBox(height: vPadding),
 
-                                  buildFieldRekanNama(),
-                                  const SizedBox(height: vPadding),
+                              buildFieldEmail(),
+                              const SizedBox(height: vPadding),
 
-                                  buildFieldAlamat1(),
-                                  const SizedBox(height: vPadding),
+                              buildFiledTelp(),
+                              const SizedBox(height: vPadding),
 
-                                  buildFieldEmail(),
-                                  const SizedBox(height: vPadding),
+                              if (mjnsclientId != '10') buildFieldjabatanDesc(),
+                              const SizedBox(height: vPadding),
 
-                                  buildFiledTelp(),
-                                  const SizedBox(height: vPadding),
+                              buildFieldJabatan(),
+                              const SizedBox(height: vPadding),
 
-                                  if (mjnsclientId != '10')
-                                    buildFieldjabatanDesc(),
-                                  const SizedBox(height: vPadding),
+                              // CheckboxListTile(
+                              //   value: _isDefault,
+                              //   onChanged: (v) => setState(
+                              //         () => _isDefault = v ?? false,
+                              //   ),
+                              //   title: Text(
+                              //     'Jadikan sebagai PIC default',
+                              //     style: bodyTextStyle(context),
+                              //   ),
+                              //   dense: true,
+                              //   activeColor: primaryColor,
+                              //   controlAffinity:
+                              //   ListTileControlAffinity.leading,
+                              //   contentPadding: EdgeInsets.zero,
+                              // ),
+                              //
+                              // const SizedBox(height: hPadding),
 
-                                  buildFieldJabatan(),
-                                  const SizedBox(height: vPadding),
-
-                                  // CheckboxListTile(
-                                  //   value: _isDefault,
-                                  //   onChanged: (v) => setState(
-                                  //         () => _isDefault = v ?? false,
-                                  //   ),
-                                  //   title: Text(
-                                  //     'Jadikan sebagai PIC default',
-                                  //     style: bodyTextStyle(context),
-                                  //   ),
-                                  //   dense: true,
-                                  //   activeColor: primaryColor,
-                                  //   controlAffinity:
-                                  //   ListTileControlAffinity.leading,
-                                  //   contentPadding: EdgeInsets.zero,
-                                  // ),
-                                  //
-                                  // const SizedBox(height: hPadding),
-
-                                  GestureDetector(
-                                    onTap: _openCobPicker,
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.shade800,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: SvgPicture.asset(
-                                            'assets/icons/list_cob_icon.svg',
-                                            width: 20,
-                                            height: 20,
-                                            colorFilter: const ColorFilter.mode(
-                                              Colors.white,
-                                              BlendMode.srcIn,
+                              GestureDetector(
+                                onTap: _openCobPicker,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade800,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: SvgPicture.asset(
+                                        'assets/icons/list_cob_icon.svg',
+                                        width: 20,
+                                        height: 20,
+                                        colorFilter: const ColorFilter.mode(
+                                          Colors.white,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'COB yang bisa diakses:',
+                                            style:
+                                                bodyTextStyle(context).copyWith(
+                                              color: Colors.white70,
+                                              fontSize: 13,
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'COB yang bisa diakses:',
-                                                style: bodyTextStyle(context)
-                                                    .copyWith(
-                                                  color: Colors.white70,
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              BlocBuilder<RekanPicCobCariBloc,
-                                                  RekanPicCobCariState>(
-                                                builder: (context, cobState) {
-                                                  if (cobState
-                                                      .selectedItems.isEmpty) {
-                                                    return const Text(
-                                                      'Pilih Daftar COB',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontSize: 15,
-                                                      ),
-                                                    );
-                                                  }
+                                          const SizedBox(height: 4),
+                                          BlocBuilder<RekanPicCobCariBloc,
+                                              RekanPicCobCariState>(
+                                            builder: (context, cobState) {
+                                              if (cobState
+                                                  .selectedItems.isEmpty) {
+                                                return const Text(
+                                                  'Pilih Daftar COB',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 15,
+                                                  ),
+                                                );
+                                              }
 
-                                                  return Wrap(
-                                                    spacing: 6,
-                                                    runSpacing: 6,
-                                                    children: cobState
-                                                        .selectedItems
-                                                        .map(
-                                                          (e) => Container(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                              horizontal: 10,
-                                                              vertical: 6,
-                                                            ),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color:
-                                                                  const Color(
-                                                                0xFFFF9D00,
-                                                              ),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                8,
-                                                              ),
-                                                            ),
-                                                            child: Text(
-                                                              e.cobNama,
-                                                              style:
-                                                                  const TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontSize: 13,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                              ),
-                                                            ),
+                                              return Wrap(
+                                                spacing: 6,
+                                                runSpacing: 6,
+                                                children: cobState.selectedItems
+                                                    .map(
+                                                      (e) => Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                          horizontal: 10,
+                                                          vertical: 6,
+                                                        ),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: const Color(
+                                                            0xFFFF9D00,
                                                           ),
-                                                        )
-                                                        .toList(),
-                                                  );
-                                                },
-                                              ),
-                                            ],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                            8,
+                                                          ),
+                                                        ),
+                                                        child: Text(
+                                                          e.cobNama,
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 13,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                    .toList(),
+                                              );
+                                            },
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-
-                                  const SizedBox(height: 16),
-
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: BlocBuilder<MRekanPicCrudBloc,
-                                        MRekanPicCrudState>(
-                                      builder: (context, crudState) {
-                                        return AppButton.primary(
-                                          text: 'Simpan',
-                                          onPressed:
-                                              crudState.isSaving ? null : _save,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
+
+                              const SizedBox(height: 16),
+
+                              SizedBox(
+                                width: double.infinity,
+                                child: AppButton.primary(
+                                  text: 'Simpan',
+                                  isLoading: _saving,
+                                  backgroundColor: _saving
+                                      ? secondaryBlackColor
+                                      : primaryColor,
+                                  onPressed: _saving ? null : _save,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                );
-              },
-            ),
-          ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

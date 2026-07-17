@@ -667,6 +667,18 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
 
   String fmtMoney(String curr, num? value) => "$curr ${formatNum(value)}";
 
+  String _selectionId({
+    required String statusId,
+    required String assetId,
+    required String prosesId,
+  }) {
+    final cleanProsesId = prosesId.trim();
+    if (statusId == "10002" && cleanProsesId.isNotEmpty) {
+      return cleanProsesId;
+    }
+    return assetId;
+  }
+
   List<Map<String, dynamic>> _exportRows() {
     final cobId = _cobId();
 
@@ -674,7 +686,11 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       final st = context.read<AsetParCariBloc>().state;
 
       final dataSource = st.selectedIds.isNotEmpty
-          ? st.items.where((x) => st.selectedIds.contains(x.asetParId))
+          ? st.items.where((x) => st.selectedIds.contains(_selectionId(
+                statusId: st.statusId,
+                assetId: x.asetParId,
+                prosesId: x.prosesId,
+              )))
           : st.items;
 
       return dataSource
@@ -695,7 +711,11 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       final st = context.read<AsetMvCariBloc>().state;
 
       final dataSource = st.selectedIds.isNotEmpty
-          ? st.items.where((x) => st.selectedIds.contains(x.asetMvId))
+          ? st.items.where((x) => st.selectedIds.contains(_selectionId(
+                statusId: st.statusId,
+                assetId: x.asetMvId,
+                prosesId: x.prosesId,
+              )))
           : st.items;
 
       return dataSource
@@ -716,7 +736,11 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       final st = context.read<AsethullCariBloc>().state;
 
       final dataSource = st.selectedIds.isNotEmpty
-          ? st.items.where((x) => st.selectedIds.contains(x.asetHullId))
+          ? st.items.where((x) => st.selectedIds.contains(_selectionId(
+                statusId: st.statusId,
+                assetId: x.asetHullId,
+                prosesId: x.prosesId,
+              )))
           : st.items;
 
       return dataSource
@@ -735,7 +759,11 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       final st = context.read<AsetHealthCariBloc>().state;
 
       final dataSource = st.selectedIds.isNotEmpty
-          ? st.items.where((x) => st.selectedIds.contains(x.asethealthId))
+          ? st.items.where((x) => st.selectedIds.contains(_selectionId(
+                statusId: st.statusId,
+                assetId: x.asethealthId,
+                prosesId: x.prosesId,
+              )))
           : st.items;
 
       return dataSource
@@ -765,7 +793,11 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     final st = context.read<AsetothersCariBloc>().state;
 
     final dataSource = st.selectedIds.isNotEmpty
-        ? st.items.where((x) => st.selectedIds.contains(x.asetOthersId))
+        ? st.items.where((x) => st.selectedIds.contains(_selectionId(
+              statusId: st.statusId,
+              assetId: x.asetOthersId,
+              prosesId: x.prosesId,
+            )))
         : st.items;
 
     return dataSource

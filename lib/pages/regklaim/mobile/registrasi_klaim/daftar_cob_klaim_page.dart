@@ -9,6 +9,7 @@ import '../../../base/base_background_firstpage.dart';
 import '../../../base/base_background_sidepage.dart';
 import 'button_klaim/button_cob_klaim.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 enum DaftarCobKlaimType { page, menu }
 
 class DaftarCobKlaimWidget extends StatefulWidget {

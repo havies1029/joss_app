@@ -239,395 +239,375 @@ class _EditPicWidgetState extends State<EditPicWidget> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-    return Scaffold(
-      backgroundColor: secondaryBlackColor,
-      body: SafeArea(
-        child: MultiBlocListener(
-          listeners: [
-            BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
-              listenWhen: (prev, curr) {
-                return prev.isSaving != curr.isSaving ||
-                    prev.isSaved != curr.isSaved ||
-                    prev.hasFailure != curr.hasFailure ||
-                    prev.isLoaded != curr.isLoaded ||
-                    prev.record != curr.record;
-              },
-              listener: (context, state) async {
-                // ===== LOAD DATA EFFECT =====
-                if (!_payloadInjected &&
-                    state.isLoaded == true &&
-                    state.record != null &&
-                    !_saving) {
-                  _injectPayload(state.record!);
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
+          listenWhen: (prev, curr) {
+            return prev.isSaving != curr.isSaving ||
+                prev.isSaved != curr.isSaved ||
+                prev.hasFailure != curr.hasFailure ||
+                prev.isLoaded != curr.isLoaded ||
+                prev.record != curr.record;
+          },
+          listener: (context, state) async {
+            // ===== LOAD DATA EFFECT =====
+            if (!_payloadInjected &&
+                state.isLoaded == true &&
+                state.record != null &&
+                !_saving) {
+              _injectPayload(state.record!);
 
-                  _initialRecord = MRekanPicCrudModel(
-                    mrekanpicId: (state.record!.mrekanpicId ?? '').trim(),
-                    picNama: (state.record!.picNama ?? '').trim(),
-                    picEmail:
-                        (state.record!.picEmail ?? '').trim().toLowerCase(),
-                    picHp: _toNormalizedPhone62(
-                        (state.record!.picHp ?? '').trim()),
-                    jabatanDesc: (state.record!.jabatanDesc ?? '').trim(),
-                    mjabatanId: (state.record!.mjabatanId ?? ''),
-                    alamat1: (state.record!.alamat1 ?? '').trim(),
-                    alamat2: (state.record!.alamat2 ?? '').trim(),
-                    isDefault: state.record!.isDefault ?? false,
-                  );
+              _initialRecord = MRekanPicCrudModel(
+                mrekanpicId: (state.record!.mrekanpicId ?? '').trim(),
+                picNama: (state.record!.picNama ?? '').trim(),
+                picEmail: (state.record!.picEmail ?? '').trim().toLowerCase(),
+                picHp: _toNormalizedPhone62((state.record!.picHp ?? '').trim()),
+                jabatanDesc: (state.record!.jabatanDesc ?? '').trim(),
+                mjabatanId: (state.record!.mjabatanId ?? ''),
+                alamat1: (state.record!.alamat1 ?? '').trim(),
+                alamat2: (state.record!.alamat2 ?? '').trim(),
+                isDefault: state.record!.isDefault ?? false,
+              );
 
-                  _payloadInjected = true;
-                  return;
-                }
+              _payloadInjected = true;
+              return;
+            }
 
-                // ===== SAVE START EFFECT =====
-                if (state.isSaving == true) {
-                  if (!_saving) {
-                    setState(() => _saving = true);
-                  }
-                  return;
-                }
+            // ===== SAVE START EFFECT =====
+            if (state.isSaving == true) {
+              if (!_saving) {
+                setState(() => _saving = true);
+              }
+              return;
+            }
 
-                // Jangan proses saved/failure kalau bukan dari tombol simpan widget ini
-                if (!_saving) return;
+            // Jangan proses saved/failure kalau bukan dari tombol simpan widget ini
+            if (!_saving) return;
 
-                // ===== SAVE SUCCESS EFFECT =====
-                if (state.isSaved == true) {
-                  try {
-                    final picId = widget.mrekanpicId.trim();
-                    final cobRepo = RekanPicCobCariRepository();
+            // ===== SAVE SUCCESS EFFECT =====
+            if (state.isSaved == true) {
+              try {
+                final picId = widget.mrekanpicId.trim();
+                final cobRepo = RekanPicCobCariRepository();
 
-                    final selectedCobItems =
-                        context.read<RekanPicCobCariBloc>().state.selectedItems;
+                final selectedCobItems =
+                    context.read<RekanPicCobCariBloc>().state.selectedItems;
 
-                    final listCheckbox = selectedCobItems
-                        .map(
-                          (e) => RekanPicCobCariCheckboxModel(
-                            mcobId: e.mcobId,
-                            isChecked: e.isChecked,
-                          ),
-                        )
-                        .toList();
+                final listCheckbox = selectedCobItems
+                    .map(
+                      (e) => RekanPicCobCariCheckboxModel(
+                        mcobId: e.mcobId,
+                        isChecked: e.isChecked,
+                      ),
+                    )
+                    .toList();
 
-                    final cobResult = await cobRepo.rekanPicCobUpdateList(
-                      picId,
-                      listCheckbox,
-                    );
-
-                    if (!context.mounted) return;
-
-                    setState(() => _saving = false);
-
-                    if (cobResult.success) {
-                      hakaksesCrudBloc.add(HakaksesCrudLihatEvent());
-
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => PaymentSuccess(
-                            display: 'PIC Berhasil Diperbarui',
-                            description:
-                                'PIC telah berhasil diperbarui dan dapat digunakan sesuai hak akses yang diberikan.',
-                            displayButton: 'Kembali',
-                            onButtonPressed: () {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (_) => const RekanPicWidgetPage(),
-                                ),
-                                (route) => route.isFirst,
-                              );
-                            },
-                          ),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        errorSnackBar('PIC tersimpan, tapi gagal update COB.'),
-                      );
-                    }
-                  } catch (e) {
-                    if (!context.mounted) return;
-
-                    setState(() => _saving = false);
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      errorSnackBar(
-                          'PIC tersimpan, tapi terjadi error saat update COB.'),
-                    );
-                  }
-
-                  return;
-                }
-
-                // ===== SAVE FAILURE EFFECT =====
-                if (state.hasFailure == true) {
-                  setState(() => _saving = false);
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    errorSnackBar(
-                      (state.message ?? '').trim().isNotEmpty
-                          ? state.message!
-                          : 'Gagal menyimpan perubahan. Coba lagi.',
-                    ),
-                  );
-
-                  return;
-                }
-              },
-            ),
-          ],
-          child: BaseBackgroundSidePage(
-            title: 'Edit PIC',
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final mjnsclientId = context.select(
-                  (RegUserBloc b) => b.state.record?.jnsClientId,
+                final cobResult = await cobRepo.rekanPicCobUpdateList(
+                  picId,
+                  listCheckbox,
                 );
 
-                return SingleChildScrollView(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-                  ),
-                  child: Container(
-                    constraints:
-                        BoxConstraints(minHeight: constraints.maxHeight),
-                    color: secondaryBlackColor,
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: hPadding * 1.5,
-                      vertical: 24,
+                if (!context.mounted) return;
+
+                setState(() => _saving = false);
+
+                if (cobResult.success) {
+                  hakaksesCrudBloc.add(HakaksesCrudLihatEvent());
+
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => PaymentSuccess(
+                        display: 'PIC Berhasil Diperbarui',
+                        description:
+                            'PIC telah berhasil diperbarui dan dapat digunakan sesuai hak akses yang diberikan.',
+                        displayButton: 'Kembali',
+                        onButtonPressed: () {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (_) => const RekanPicWidgetPage(),
+                            ),
+                            (route) => route.isFirst,
+                          );
+                        },
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Di sini Anda dapat mengelola dan menambahkan PIC yang akan diundang melalui email untuk setiap asuransi Anda.",
-                          style: bodyTextStyle(
-                            context,
-                            fontSize: getResponsiveFont(context, 16),
-                          ).copyWith(color: primaryLightColor),
-                        ),
-                        SizedBox(height: hPadding),
-                        Card(
-                          color: pGrey,
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
-                            side: const BorderSide(color: sGrey),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Form(
-                              key: _formKey,
-                              autovalidateMode: _showErrors
-                                  ? AutovalidateMode.always
-                                  : AutovalidateMode.disabled,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'Form Edit PIC',
-                                    style: headingStyle(context, fontSize: 20),
-                                  ),
-                                  const SizedBox(height: vPadding),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    errorSnackBar('PIC tersimpan, tapi gagal update COB.'),
+                  );
+                }
+              } catch (e) {
+                if (!context.mounted) return;
 
-                                  buildFieldRekanNama(),
-                                  const SizedBox(height: vPadding),
+                setState(() => _saving = false);
 
-                                  buildFieldAlamat(),
-                                  const SizedBox(height: vPadding),
+                ScaffoldMessenger.of(context).showSnackBar(
+                  errorSnackBar(
+                      'PIC tersimpan, tapi terjadi error saat update COB.'),
+                );
+              }
 
-                                  buildFieldEmail(),
-                                  const SizedBox(height: vPadding),
+              return;
+            }
 
-                                  buildFiledTelp(),
-                                  const SizedBox(height: vPadding),
+            // ===== SAVE FAILURE EFFECT =====
+            if (state.hasFailure == true) {
+              setState(() => _saving = false);
 
-                                  if (mjnsclientId != '10') ...[
-                                    buildFieldjabatanDesc(),
-                                    const SizedBox(height: vPadding),
-                                  ],
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(
+                  (state.message ?? '').trim().isNotEmpty
+                      ? state.message!
+                      : 'Gagal menyimpan perubahan. Coba lagi.',
+                ),
+              );
 
-                                  buildFieldJabatan(),
-                                  const SizedBox(height: vPadding),
+              return;
+            }
+          },
+        ),
+      ],
+      child: BaseBackgroundSidePage(
+        title: 'Edit PIC',
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final mjnsclientId = context.select(
+              (RegUserBloc b) => b.state.record?.jnsClientId,
+            );
 
-                                  // CheckboxListTile(
-                                  //   value: _isDefault,
-                                  //   onChanged: (v) => setState(
-                                  //         () => _isDefault = v ?? false,
-                                  //   ),
-                                  //   title: Text(
-                                  //     'Jadikan sebagai PIC default',
-                                  //     style: bodyTextStyle(context),
-                                  //   ),
-                                  //   dense: true,
-                                  //   activeColor: primaryColor,
-                                  //   controlAffinity:
-                                  //   ListTileControlAffinity.leading,
-                                  //   contentPadding: EdgeInsets.zero,
-                                  // ),
-                                  //
-                                  // const SizedBox(height: vPadding),
+            return SingleChildScrollView(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              child: Container(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                color: secondaryBlackColor,
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  horizontal: hPadding * 1.5,
+                  vertical: 24,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Di sini Anda dapat mengelola dan menambahkan PIC yang akan diundang melalui email untuk setiap asuransi Anda.",
+                      style: bodyTextStyle(
+                        context,
+                        fontSize: getResponsiveFont(context, 16),
+                      ).copyWith(color: primaryLightColor),
+                    ),
+                    SizedBox(height: hPadding),
+                    Card(
+                      color: pGrey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(cardBorderRadius),
+                        side: const BorderSide(color: sGrey),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Form(
+                          key: _formKey,
+                          autovalidateMode: _showErrors
+                              ? AutovalidateMode.always
+                              : AutovalidateMode.disabled,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Form Edit PIC',
+                                style: headingStyle(context, fontSize: 20),
+                              ),
+                              const SizedBox(height: vPadding),
 
-                                  GestureDetector(
-                                    onTap: _openCobPicker,
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.shade800,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: SvgPicture.asset(
-                                            'assets/icons/list_cob_icon.svg',
-                                            width: 20,
-                                            height: 20,
-                                            colorFilter: const ColorFilter.mode(
-                                              Colors.white,
-                                              BlendMode.srcIn,
+                              buildFieldRekanNama(),
+                              const SizedBox(height: vPadding),
+
+                              buildFieldAlamat(),
+                              const SizedBox(height: vPadding),
+
+                              buildFieldEmail(),
+                              const SizedBox(height: vPadding),
+
+                              buildFiledTelp(),
+                              const SizedBox(height: vPadding),
+
+                              if (mjnsclientId != '10') ...[
+                                buildFieldjabatanDesc(),
+                                const SizedBox(height: vPadding),
+                              ],
+
+                              buildFieldJabatan(),
+                              const SizedBox(height: vPadding),
+
+                              // CheckboxListTile(
+                              //   value: _isDefault,
+                              //   onChanged: (v) => setState(
+                              //         () => _isDefault = v ?? false,
+                              //   ),
+                              //   title: Text(
+                              //     'Jadikan sebagai PIC default',
+                              //     style: bodyTextStyle(context),
+                              //   ),
+                              //   dense: true,
+                              //   activeColor: primaryColor,
+                              //   controlAffinity:
+                              //   ListTileControlAffinity.leading,
+                              //   contentPadding: EdgeInsets.zero,
+                              // ),
+                              //
+                              // const SizedBox(height: vPadding),
+
+                              GestureDetector(
+                                onTap: _openCobPicker,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade800,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: SvgPicture.asset(
+                                        'assets/icons/list_cob_icon.svg',
+                                        width: 20,
+                                        height: 20,
+                                        colorFilter: const ColorFilter.mode(
+                                          Colors.white,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'COB yang bisa diakses:',
+                                            style:
+                                                bodyTextStyle(context).copyWith(
+                                              color: Colors.white70,
+                                              fontSize: 13,
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'COB yang bisa diakses:',
-                                                style: bodyTextStyle(context)
-                                                    .copyWith(
-                                                  color: Colors.white70,
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              BlocBuilder<RekanPicCobCariBloc,
-                                                  RekanPicCobCariState>(
-                                                builder: (context, cobState) {
-                                                  final isInitialLoading =
-                                                      cobState.status ==
-                                                              ListStatus
-                                                                  .initial &&
-                                                          cobState
-                                                              .items.isEmpty &&
-                                                          cobState.selectedItems
-                                                              .isEmpty;
+                                          const SizedBox(height: 4),
+                                          BlocBuilder<RekanPicCobCariBloc,
+                                              RekanPicCobCariState>(
+                                            builder: (context, cobState) {
+                                              final isInitialLoading =
+                                                  cobState.status ==
+                                                          ListStatus.initial &&
+                                                      cobState.items.isEmpty &&
+                                                      cobState.selectedItems
+                                                          .isEmpty;
 
-                                                  if (cobState
-                                                      .selectedItems.isEmpty) {
-                                                    return const Text(
-                                                      'Pilih Daftar COB',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontSize: 15,
-                                                      ),
-                                                    );
-                                                  }
+                                              if (cobState
+                                                  .selectedItems.isEmpty) {
+                                                return const Text(
+                                                  'Pilih Daftar COB',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 15,
+                                                  ),
+                                                );
+                                              }
 
-                                                  if (isInitialLoading) {
-                                                    return const Center(
-                                                      child: LoadingIndicator(),
-                                                    );
-                                                  }
+                                              if (isInitialLoading) {
+                                                return const Center(
+                                                  child: LoadingIndicator(),
+                                                );
+                                              }
 
-                                                  return Wrap(
-                                                    spacing: 6,
-                                                    runSpacing: 6,
-                                                    children: cobState
-                                                        .selectedItems
-                                                        .map(
-                                                          (e) => Container(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                              horizontal: 10,
-                                                              vertical: 6,
-                                                            ),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color:
-                                                                  const Color(
-                                                                0xFFFF9D00,
-                                                              ),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                8,
-                                                              ),
-                                                            ),
-                                                            child: Text(
-                                                              e.cobNama,
-                                                              style:
-                                                                  const TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontSize: 13,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                              ),
-                                                            ),
+                                              return Wrap(
+                                                spacing: 6,
+                                                runSpacing: 6,
+                                                children: cobState.selectedItems
+                                                    .map(
+                                                      (e) => Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                          horizontal: 10,
+                                                          vertical: 6,
+                                                        ),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: const Color(
+                                                            0xFFFF9D00,
                                                           ),
-                                                        )
-                                                        .toList(),
-                                                  );
-                                                },
-                                              ),
-                                            ],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                            8,
+                                                          ),
+                                                        ),
+                                                        child: Text(
+                                                          e.cobNama,
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 13,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                    .toList(),
+                                              );
+                                            },
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const SizedBox(height: vPadding),
+
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: AppButton.primary(
+                                      text: "Batal",
+                                      backgroundColor: sGrey.withOpacity(0.25),
+                                      textColor: primaryLightColor,
+                                      onPressed: _saving
+                                          ? null
+                                          : () => Navigator.pop(context, false),
                                     ),
                                   ),
-
-                                  const SizedBox(height: vPadding),
-
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: AppButton.primary(
-                                          text: "Batal",
-                                          backgroundColor:
-                                              sGrey.withOpacity(0.25),
-                                          textColor: primaryLightColor,
-                                          onPressed: _saving
-                                              ? null
-                                              : () =>
-                                                  Navigator.pop(context, false),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: AppButton.primary(
-                                          text: "Simpan",
-                                          isLoading: _saving,
-                                          backgroundColor: _saving
-                                              ? secondaryBlackColor
-                                              : primaryColor,
-                                          onPressed: _saving ? null : _save,
-                                        ),
-                                      ),
-                                    ],
-                                  )
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: AppButton.primary(
+                                      text: "Simpan",
+                                      isLoading: _saving,
+                                      backgroundColor: _saving
+                                          ? secondaryBlackColor
+                                          : primaryColor,
+                                      onPressed: _saving ? null : _save,
+                                    ),
+                                  ),
                                 ],
-                              ),
-                            ),
+                              )
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                );
-              },
-            ),
-          ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

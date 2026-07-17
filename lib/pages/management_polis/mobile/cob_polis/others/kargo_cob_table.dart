@@ -63,6 +63,12 @@ class _KargoCobTableState extends State<KargoCobTable> {
     return DateFormat('dd MMM yyyy').format(date);
   }
 
+  String _selectionId(AsetothersCariModel d) {
+    final prosesId = d.prosesId.trim();
+    if (widget.statusId == "10002" && prosesId.isNotEmpty) return prosesId;
+    return d.asetOthersId;
+  }
+
   @override
   Widget build(BuildContext context) {
     final showColumn = widget.statusId == "10002";
@@ -70,7 +76,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
     return CobPolicyTable<AsetothersCariModel>(
       items: widget.items,
       selectedIds: widget.selectedIds,
-      idGetter: (d) => d.asetOthersId,
+      idGetter: _selectionId,
       nomorGetter: (d, index) => d.nomor.toString(),
 
       title: widget.title,

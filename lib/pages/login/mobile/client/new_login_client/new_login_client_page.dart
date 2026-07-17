@@ -4,7 +4,12 @@ import 'package:joss_app/pages/base/base_background_firstpage.dart';
 import 'package:joss_app/pages/login/mobile/client/new_login_client/new_login_form_client.dart';
 
 class NewLoginClient extends StatelessWidget {
-  const NewLoginClient({super.key});
+  final String requestFrom;
+
+  const NewLoginClient({
+    super.key,
+    this.requestFrom = '',
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +30,7 @@ class NewLoginClient extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SizedBox(height: headerSpacing),
-                        const NewLoginFormClient(),
+                        NewLoginFormClient(requestFrom: requestFrom),
                       ],
                     ),
                   ),
