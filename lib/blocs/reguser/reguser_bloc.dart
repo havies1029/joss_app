@@ -10,8 +10,6 @@ import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/reguser/reguser_model.dart';
 import 'package:joss_app/repositories/reguser/reguser_repository.dart';
 
-import '../../common/constants.dart';
-
 part 'reguser_event.dart';
 part 'reguser_state.dart';
 
@@ -41,9 +39,9 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
   }
 
   void _onClearRequestFrom(
-      ClearRequestFromEvent event,
-      Emitter<RegUserState> emit,
-      ) {
+    ClearRequestFromEvent event,
+    Emitter<RegUserState> emit,
+  ) {
     emit(state.copyWith(
       requestFrom: '',
       isOtpClient: false,
@@ -61,10 +59,59 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     emit(state.copyWith(isEmail: event.isEmail));
   }
 
+  bool _isClientLoginTokenInfo(List<String> info) {
+    return info.length > 8 && info[0].isNotEmpty && info[8].isNotEmpty;
+  }
+
+  Future<bool> _tryAuthenticateClientFromTokenInfo(
+    String tokeninfo,
+    String authenticatedFrom,
+  ) async {
+    final info = tokeninfo.split(";");
+
+    if (!_isClientLoginTokenInfo(info)) {
+      return false;
+    }
+
+    try {
+      final username = info[8];
+      final token = Token.split(username, tokeninfo);
+
+      final user = User(
+        id: 0,
+        token: token.token,
+        username: username,
+        nama: info[2],
+        hp: info[4],
+        email: info[5],
+        userCabang: info[1],
+        userType: "C",
+        cstType: info[6],
+      );
+
+      AppData.user = user;
+      AppData.userToken = user.token!;
+
+      final userRepository = UserRepository();
+      await userRepository.persistToken(userToken: user.token ?? "");
+
+      authenticationBloc.add(
+        UserRoleChanged(
+          user: user,
+          authenticatedFrom: authenticatedFrom,
+        ),
+      );
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> onTambahRegUser(
-      RegUserTambahEvent event,
-      Emitter<RegUserState> emit,
-      ) async {
+    RegUserTambahEvent event,
+    Emitter<RegUserState> emit,
+  ) async {
     ReturnDataAPI returnData;
     bool hasFailure = true;
 
@@ -81,9 +128,12 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
 
     final String dataString = returnData.data.toString();
     List<String> info = dataString.split(';');
-    event.record.reguserId = info.isNotEmpty ? info[0] : '';
 
     hasFailure = !returnData.success;
+
+    if (!hasFailure && !_isClientLoginTokenInfo(info)) {
+      event.record.reguserId = info.isNotEmpty ? info[0] : '';
+    }
 
     List<String> errors = [];
     if (hasFailure) {
@@ -97,20 +147,15 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
         record: event.record,
         errors: errors,
         hasFailure: hasFailure,
-        sentTo: event.pinSentTo,
-        sentVia: event.pinSentVia,
+        sentTo: '',
+        sentVia: '',
         isRegisterSuccess: !hasFailure,
         isOtpClient: false,
       ),
     );
 
-    if (!hasFailure && !singlePopPages.contains(event.requestFrom)) {
-      authenticationBloc.add(
-        RequirePinHPVerification(
-          sentTo: event.pinSentTo,
-          sentVia: event.pinSentVia,
-        ),
-      );
+    if (!hasFailure) {
+      await _tryAuthenticateClientFromTokenInfo(dataString, event.requestFrom);
     }
   }
 
@@ -138,9 +183,9 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
   }
 
   Future<void> onValidasiPinHP(
-      ValidasiPinHPEvent event,
-      Emitter<RegUserState> emit,
-      ) async {
+    ValidasiPinHPEvent event,
+    Emitter<RegUserState> emit,
+  ) async {
     debugPrint("OTP START - requestFrom before emit: ${state.requestFrom}");
 
     emit(state.copyWith(
@@ -151,10 +196,11 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
       errors: const [],
     ));
 
-    debugPrint("OTP START - requestFrom after first emit: ${state.requestFrom}");
+    debugPrint(
+        "OTP START - requestFrom after first emit: ${state.requestFrom}");
 
     ReturnDataAPI returnData =
-    await repository.validasiPinHP(event.record, state.requestFrom);
+        await repository.validasiPinHP(event.record, state.requestFrom);
 
     final bool hasFailure = !returnData.success;
     final List<String> errors = [];
@@ -173,47 +219,28 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
       isRegisterSuccess: false,
     ));
 
-    debugPrint("OTP END - requestFrom after success/fail emit: ${state.requestFrom}");
+    debugPrint(
+        "OTP END - requestFrom after success/fail emit: ${state.requestFrom}");
     if (!hasFailure) {
-      debugPrint("OTP SUCCESS - requestFrom before UserRoleChanged: ${state.requestFrom}");
+      debugPrint(
+          "OTP SUCCESS - requestFrom before UserRoleChanged: ${state.requestFrom}");
 
       authenticationBloc.add(PhonePinVerified());
-
-      String tokeninfo = returnData.data;
-      List<String> info = tokeninfo.split(";");
-      String username = info[8];
-
-      Token token = Token.split(username, tokeninfo);
-
-      User user = User(
-        id: 0,
-        token: token.token,
-        username: username,
-        nama: info[2],
-        hp: info[4],
-        email: info[5],
-        userCabang: info[1],
-        userType: "C",
-      );
-
-      AppData.user = user;
-      AppData.userToken = user.token!;
-
-      UserRepository userRepository = UserRepository();
-      userRepository.persistToken(userToken: user.token ?? "");
-
-      authenticationBloc.add(
-        UserRoleChanged(
-          user: user,
-          authenticatedFrom: state.requestFrom,
-        ),
-      );
+      await _tryAuthenticateClientFromTokenInfo(
+          returnData.data, state.requestFrom);
     }
   }
 
-  Future<void> onResendOtp(ResendOtpEvent event, Emitter<RegUserState> emit) async {
-    emit(state.copyWith(isSaving: true, isSaved: false, isResendOtp: true, verificationFailed: false, errors: const []));
-    ReturnDataAPI returnData = await repository.regUserResendOtp(event.reguserId);
+  Future<void> onResendOtp(
+      ResendOtpEvent event, Emitter<RegUserState> emit) async {
+    emit(state.copyWith(
+        isSaving: true,
+        isSaved: false,
+        isResendOtp: true,
+        verificationFailed: false,
+        errors: const []));
+    ReturnDataAPI returnData =
+        await repository.regUserResendOtp(event.reguserId);
     bool hasFailure = !returnData.success;
     List<String> errors = [];
     if (hasFailure) {
@@ -221,13 +248,12 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     }
 
     emit(state.copyWith(
-      isSaving: false,
-      isSaved: false,
-      hasFailure: hasFailure,
-      verificationFailed: false,
-      errors: errors,
-      isResendOtp: false,
-      record: state.record?.copyWith(reguserId: returnData.data)
-    ));
+        isSaving: false,
+        isSaved: false,
+        hasFailure: hasFailure,
+        verificationFailed: false,
+        errors: errors,
+        isResendOtp: false,
+        record: state.record?.copyWith(reguserId: returnData.data)));
   }
 }

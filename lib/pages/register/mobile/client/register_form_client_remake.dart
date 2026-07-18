@@ -4,12 +4,11 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/common/app_data.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 import 'package:joss_app/helper/ios_left_edge_swipe.dart';
-import 'package:joss_app/models/user/user_model.dart';
 import 'package:joss_app/pages/login/mobile/client/new_login_client/new_login_client_page.dart';
-import '../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
+import '../../../../blocs/reguser_otp/reguser_otp_bloc.dart';
 import '../../../../helper/indo_phone_result.dart';
 import '../../../../models/combobox/combomjnsclient_model.dart';
 import '../../../../models/combobox/combomreferral_model.dart';
@@ -17,9 +16,9 @@ import '../../../../models/reguser/reguser_model.dart';
 import '../../../../repositories/combobox/combomjnsclient_repository.dart';
 import '../../../../repositories/combobox/combomreferral_repository.dart';
 import '../../../../widgets/apptheme/dropdown2.dart';
-import '../../../login/mobile/client/widget/otp_client_widget.dart';
 import '../../../login/welcome_header.dart';
 import '../../../../common/constants.dart';
+import 'widget/register_otp_popup_widget.dart';
 
 class RegisterFormClientRemake extends StatefulWidget {
   final String requestFrom;
@@ -31,12 +30,12 @@ class RegisterFormClientRemake extends StatefulWidget {
 }
 
 class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
-  var lastLoginBy = "";
   final fieldNameController = TextEditingController();
   final fieldPasswordController = TextEditingController();
   final fieldTeleponController = TextEditingController();
   final fieldKonfirmasiPasswordController = TextEditingController();
   final fieldEmailController = TextEditingController();
+  final fieldCompanyNamaController = TextEditingController();
   ComboMJnsclientModel? fieldComboJnsClient;
   ComboMReferralModel? fieldComboMReferral;
 
@@ -44,14 +43,18 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   bool _obscureConfirm = true;
   bool isSubmitting = false;
   int _submitAttempt = 0;
-
-  late EmailVerificationBloc emailVerificationBloc;
+  String _pendingOpenOtpFor = '';
+  bool _isDialogLoadingShown = false;
 
   late final RegUserModel? record;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
+    });
   }
 
   @override
@@ -61,7 +64,39 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     fieldTeleponController.dispose();
     fieldEmailController.dispose();
     fieldKonfirmasiPasswordController.dispose();
+    fieldCompanyNamaController.dispose();
     super.dispose();
+  }
+
+  void _showGlobalLoading() {
+    if (!mounted || _isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return const PopScope(
+          canPop: false,
+          child: Center(
+            child: LoadingIndicator(),
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideGlobalLoading() {
+    if (!mounted || !_isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = false;
+
+    final navigator = Navigator.of(context, rootNavigator: true);
+    if (navigator.canPop()) {
+      navigator.pop();
+    }
   }
 
   String? _validatePasswordRules(String pass) {
@@ -92,29 +127,33 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       ok = false;
     }
 
-    if (lastLoginBy == 'hp') {
-      final email = fieldEmailController.text.trim();
-      if (email.isEmpty) {
-        setErr('form1.email', kStringNullError);
+    final isCompanyClient = fieldComboJnsClient?.mjnsclientId == '20';
+    final companyNama = fieldCompanyNamaController.text.trim();
+    if (isCompanyClient && companyNama.isEmpty) {
+      setErr('form1.companyNama', kStringNullError);
+      ok = false;
+    }
+
+    final email = fieldEmailController.text.trim();
+    if (email.isEmpty) {
+      setErr('form1.email', kStringNullError);
+      ok = false;
+    } else {
+      if (!EmailValidator.validate(email)) {
+        setErr('form1.email', "Format tidak valid");
         ok = false;
-      } else {
-        if (!EmailValidator.validate(email)) {
-          setErr('form1.email', "Format tidak valid");
-          ok = false;
-        }
       }
     }
-    if (lastLoginBy == 'email') {
-      final telp = fieldTeleponController.text.trim();
-      if (telp.isEmpty) {
-        setErr('form1.telepon', kStringNullError);
+
+    final telp = fieldTeleponController.text.trim();
+    if (telp.isEmpty) {
+      setErr('form1.telepon', kStringNullError);
+      ok = false;
+    } else {
+      final phoneRes = IndoPhoneHelper.normalize(telp);
+      if (!phoneRes.isValid) {
+        setErr('form1.telepon', phoneRes.error ?? "Format tidak valid");
         ok = false;
-      } else {
-        final phoneRes = IndoPhoneHelper.normalize(telp);
-        if (!phoneRes.isValid) {
-          setErr('form1.telepon', phoneRes.error ?? "Format tidak valid");
-          ok = false;
-        }
       }
     }
 
@@ -211,40 +250,122 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         },
       );
 
-  Widget _buildTeleponField() => appTextField(
-        label: "No. HP",
-        hint: "Masukkan nomor telepon",
-        controller: fieldTeleponController,
-        keyboardType: TextInputType.phone,
-        prefix: Text(
-          "+62 | ",
-          style: inputTextStyle(context, color: primaryLightColor),
-        ),
-        errorText: err('form1.telepon'),
-        validator: (_) => err('form1.telepon'),
-        onChanged: (v) {
-          if (v.trim().isNotEmpty) {
-            clearErr('form1.telepon');
-          }
-        },
-      );
+  Widget _buildTeleponField(RegUserOtpState otpState) {
+    final isVerified = otpState.isHpVerified;
 
-  Widget _buildEmailField() => appTextField(
-        label: "Email",
-        hint: "Masukkan alamat email",
-        controller: fieldEmailController,
-        keyboardType: TextInputType.emailAddress,
-        inputFormatters: [
-          FilteringTextInputFormatter.deny(RegExp(r"\s")),
-        ],
-        errorText: err('form1.email'),
-        validator: (_) => err('form1.email'),
-        onChanged: (v) {
-          if (v.trim().isNotEmpty) {
-            clearErr('form1.email');
-          }
-        },
-      );
+    return appTextField(
+      label: "No. HP",
+      hint: "Masukkan nomor telepon",
+      controller: fieldTeleponController,
+      keyboardType: TextInputType.phone,
+      prefix: Text(
+        "+62 | ",
+        style: inputTextStyle(context, color: primaryLightColor),
+      ),
+      errorText: isVerified ? null : err('form1.telepon'),
+      helperText: isVerified ? 'No telepon ini telah diverifikasi' : null,
+      helperStyle: bodyTextStyle(context, fontSize: 12).copyWith(
+        color: successGreen,
+      ),
+      borderColor: isVerified ? successGreen : null,
+      focusedBorderColor: isVerified ? successGreen : null,
+      validator: (_) => err('form1.telepon'),
+      onChanged: (v) {
+        if (v.trim().isNotEmpty) {
+          clearErr('form1.telepon');
+        }
+        if (isVerified) {
+          context.read<RegUserOtpBloc>().add(const RegUserOtpResetHpEvent());
+        }
+      },
+    );
+  }
+
+  Widget _buildEmailField(RegUserOtpState otpState) {
+    final isVerified = otpState.isEmailVerified;
+
+    return appTextField(
+      label: "Email",
+      hint: "Masukkan alamat email",
+      controller: fieldEmailController,
+      keyboardType: TextInputType.emailAddress,
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r"\s")),
+      ],
+      errorText: isVerified ? null : err('form1.email'),
+      helperText: isVerified ? 'Email ini telah diverifikasi' : null,
+      helperStyle: bodyTextStyle(context, fontSize: 12).copyWith(
+        color: successGreen,
+      ),
+      borderColor: isVerified ? successGreen : null,
+      focusedBorderColor: isVerified ? successGreen : null,
+      validator: (_) => err('form1.email'),
+      onChanged: (v) {
+        if (v.trim().isNotEmpty) {
+          clearErr('form1.email');
+        }
+        if (isVerified) {
+          context.read<RegUserOtpBloc>().add(const RegUserOtpResetEmailEvent());
+        }
+      },
+    );
+  }
+
+  Widget _buildEmailOtpRow(RegUserOtpState otpState) {
+    if (otpState.isEmailVerified) {
+      return _buildEmailField(otpState);
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 8,
+          child: _buildEmailField(otpState),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          flex: 2,
+          child: AppButton.primary(
+            text: 'Kirim OTP',
+            isLoading: otpState.isEmailSending,
+            backgroundColor:
+                otpState.isEmailSending ? secondaryBlackColor : primaryColor,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            onPressed: otpState.isEmailSending ? null : _sendEmailOtp,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTeleponOtpRow(RegUserOtpState otpState) {
+    if (otpState.isHpVerified) {
+      return _buildTeleponField(otpState);
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 8,
+          child: _buildTeleponField(otpState),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          flex: 2,
+          child: AppButton.primary(
+            text: 'Kirim OTP',
+            isLoading: otpState.isHpSending,
+            backgroundColor:
+                otpState.isHpSending ? secondaryBlackColor : primaryColor,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            onPressed: otpState.isHpSending ? null : _sendHpOtp,
+          ),
+        ),
+      ],
+    );
+  }
 
   Widget buildFieldComboMJnsclient() =>
       ReusableComboBoxV2<ComboMJnsclientModel>(
@@ -259,12 +380,30 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboJnsClient = v;
+            if (v?.mjnsclientId != '20') {
+              fieldCompanyNamaController.clear();
+              fieldErrors.remove('form1.companyNama');
+            }
             if (v != null) {
               clearErr('form1.jenisClient');
             }
           });
         },
         onSaveCallback: (value) => fieldComboJnsClient = value,
+      );
+
+  Widget _buildCompanyNamaField() => appTextField(
+        label: "Nama Perusahaan",
+        hint: "Masukkan nama perusahaan",
+        controller: fieldCompanyNamaController,
+        keyboardType: TextInputType.text,
+        errorText: err('form1.companyNama'),
+        validator: (_) => err('form1.companyNama'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) {
+            clearErr('form1.companyNama');
+          }
+        },
       );
 
   Widget _buildReferralField() => ReusableComboBoxV2<ComboMReferralModel>(
@@ -332,10 +471,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
 
   @override
   Widget build(BuildContext context) {
-    var email = AppData.user.email ?? "";
-    final isEmail = EmailValidator.validate(email.trim());
-    lastLoginBy = isEmail ? "email" : "hp";
-
     return IosLeftEdgeSwipe(
       onSwipeBack: () async {
         handleBack();
@@ -348,192 +483,208 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
 
           handleBack();
         },
-        child: BlocConsumer<RegUserBloc, RegUserState>(
-          listenWhen: (previous, current) {
-            return previous.isSaved != current.isSaved ||
-                previous.hasFailure != current.hasFailure ||
-                previous.isOtpClient != current.isOtpClient ||
-                previous.isRegisterSuccess != current.isRegisterSuccess;
-          },
-          listener: (context, state) {
-            if (state.hasFailure && state.errors.isNotEmpty) {
-              if (mounted) {
-                setState(() {
-                  isSubmitting = false;
-                });
+        child: MultiBlocListener(
+          listeners: [
+            BlocListener<RegUserOtpBloc, RegUserOtpState>(
+              listener: _handleOtpStateChanged,
+            ),
+          ],
+          child: BlocConsumer<RegUserBloc, RegUserState>(
+            listenWhen: (previous, current) {
+              return previous.isSaved != current.isSaved ||
+                  previous.hasFailure != current.hasFailure ||
+                  previous.isOtpClient != current.isOtpClient ||
+                  previous.isRegisterSuccess != current.isRegisterSuccess;
+            },
+            listener: (context, state) {
+              if (state.hasFailure && state.errors.isNotEmpty) {
+                _hideGlobalLoading();
+
+                if (mounted) {
+                  setState(() {
+                    isSubmitting = false;
+                  });
+                }
+
+                final msg = state.errors.first;
+                ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(msg));
+                return;
               }
 
-              final msg = state.errors.first;
-              ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(msg));
-              return;
-            }
-
-            if (!state.hasFailure &&
-                state.isSaved &&
-                state.isRegisterSuccess &&
-                singlePopPages.contains(widget.requestFrom) &&
-                !state.isOtpClient) {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => PopupClientWidget(
-                    sentTo: state.sentTo,
-                    sentVia: state.sentVia,
-                  ),
-                ),
-              );
-              if (mounted) {
-                setState(() {
-                  isSubmitting = false;
-                });
+              if (!state.hasFailure &&
+                  state.isSaved &&
+                  state.isRegisterSuccess) {
+                _showGlobalLoading();
+                context
+                    .read<RegUserOtpBloc>()
+                    .add(const RegUserOtpClearEvent());
               }
-            }
-          },
-          builder: (context, state) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height,
-                ),
-                child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 15,
-                          vertical: vPadding,
-                        ),
+            },
+            builder: (context, state) {
+              return BlocBuilder<RegUserOtpBloc, RegUserOtpState>(
+                builder: (context, otpState) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height,
+                      ),
+                      child: IntrinsicHeight(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Image.asset(
-                              'assets/images/logo.png',
-                              height: isDesktop(context)
-                                  ? 56
-                                  : isTablet(context)
-                                      ? 48
-                                      : 42,
-                              width: isDesktop(context)
-                                  ? 180
-                                  : isTablet(context)
-                                      ? 140
-                                      : 120,
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 15,
+                                vertical: vPadding,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/logo.png',
+                                    height: isDesktop(context)
+                                        ? 56
+                                        : isTablet(context)
+                                            ? 48
+                                            : 42,
+                                    width: isDesktop(context)
+                                        ? 180
+                                        : isTablet(context)
+                                            ? 140
+                                            : 120,
+                                  ),
+                                  SizedBox(height: vPadding * 0.6),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 4),
+                                      child: TextButton.icon(
+                                        onPressed: handleBack,
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.zero,
+                                          minimumSize: const Size(0, 0),
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                        ),
+                                        icon: Icon(
+                                          Icons.arrow_back_ios_new,
+                                          color: primaryColor,
+                                          size: getResponsiveFont(context, 18),
+                                        ),
+                                        label: Text(
+                                          "Kembali",
+                                          style: bodyTextStyle(context)
+                                              .copyWith(color: primaryColor),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: vPadding * 0.8),
+                                  WelcomeHeader(type: "register_client"),
+                                ],
+                              ),
                             ),
-                            SizedBox(height: vPadding * 0.6),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 4),
-                                child: TextButton.icon(
-                                  onPressed: handleBack,
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    minimumSize: const Size(0, 0),
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: cardBorderGradient,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
                                   ),
-                                  icon: Icon(
-                                    Icons.arrow_back_ios_new,
-                                    color: primaryColor,
-                                    size: getResponsiveFont(context, 18),
+                                ),
+                                child: Container(
+                                  margin: const EdgeInsets.all(1),
+                                  decoration: BoxDecoration(
+                                    color: secondaryBlackColor,
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      topRight: Radius.circular(20),
+                                    ),
                                   ),
-                                  label: Text(
-                                    "Kembali",
-                                    style: bodyTextStyle(context)
-                                        .copyWith(color: primaryColor),
+                                  child: Card(
+                                    color: secondaryBlackColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      padding: const EdgeInsets.all(20),
+                                      child: Column(
+                                        children: [
+                                          _buildNameField(),
+                                          SizedBox(height: vPadding),
+                                          _buildEmailOtpRow(otpState),
+                                          SizedBox(height: vPadding),
+                                          _buildTeleponOtpRow(otpState),
+                                          SizedBox(height: vPadding),
+                                          _buildPasswordField(),
+                                          SizedBox(height: vPadding),
+                                          _PasswordRequirementRow(
+                                              controller:
+                                                  fieldPasswordController),
+                                          SizedBox(height: vPadding),
+                                          _buildKonfirmasiPasswordField(),
+                                          SizedBox(height: vPadding),
+                                          buildFieldComboMJnsclient(),
+                                          SizedBox(height: vPadding),
+                                          if (fieldComboJnsClient
+                                                  ?.mjnsclientId ==
+                                              '20') ...[
+                                            _buildCompanyNamaField(),
+                                            SizedBox(height: vPadding),
+                                          ],
+                                          _buildReferralField(),
+                                          SizedBox(height: vPadding),
+                                          AppButton.primary(
+                                            text: "Simpan",
+                                            isLoading: isSubmitting,
+                                            backgroundColor: isSubmitting
+                                                ? secondaryBlackColor
+                                                : primaryColor,
+                                            onPressed: isSubmitting
+                                                ? null
+                                                : () async {
+                                                    if (!validateForm1()) {
+                                                      return;
+                                                    }
+                                                    if (!_validateOtpBeforeSubmit(
+                                                      context
+                                                          .read<
+                                                              RegUserOtpBloc>()
+                                                          .state,
+                                                    )) {
+                                                      return;
+                                                    }
+
+                                                    setState(() {
+                                                      isSubmitting = true;
+                                                    });
+                                                    _startSubmitTimeout();
+
+                                                    onSubmit();
+                                                  },
+                                          ),
+                                          SizedBox(height: vPadding),
+                                          _buildLoginFooter(context),
+                                          const Spacer(),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                            SizedBox(height: vPadding * 0.8),
-                            WelcomeHeader(type: "register_client"),
                           ],
                         ),
                       ),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: cardBorderGradient,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                            ),
-                          ),
-                          child: Container(
-                            margin: const EdgeInsets.all(1),
-                            decoration: BoxDecoration(
-                              color: secondaryBlackColor,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
-                              ),
-                            ),
-                            child: Card(
-                              color: secondaryBlackColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Container(
-                                width: double.infinity,
-                                height: double.infinity,
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  children: [
-                                    _buildNameField(),
-                                    SizedBox(height: vPadding),
-                                    if (lastLoginBy == 'email') ...[
-                                      _buildTeleponField(),
-                                      SizedBox(height: vPadding),
-                                    ] else if (lastLoginBy == 'hp') ...[
-                                      _buildEmailField(),
-                                      SizedBox(height: vPadding),
-                                    ],
-                                    _buildPasswordField(),
-                                    SizedBox(height: vPadding),
-                                    _PasswordRequirementRow(
-                                        controller: fieldPasswordController),
-                                    SizedBox(height: vPadding),
-                                    _buildKonfirmasiPasswordField(),
-                                    SizedBox(height: vPadding),
-                                    buildFieldComboMJnsclient(),
-                                    SizedBox(height: vPadding),
-                                    _buildReferralField(),
-                                    SizedBox(height: vPadding),
-                                    AppButton.primary(
-                                      text: "Simpan",
-                                      isLoading: isSubmitting,
-                                      backgroundColor: isSubmitting
-                                          ? secondaryBlackColor
-                                          : primaryColor,
-                                      onPressed: isSubmitting
-                                          ? null
-                                          : () async {
-                                              if (!validateForm1()) return;
-
-                                              setState(() {
-                                                isSubmitting = true;
-                                              });
-                                              _startSubmitTimeout();
-
-                                              onSubmit();
-                                            },
-                                    ),
-                                    SizedBox(height: vPadding),
-                                    _buildLoginFooter(context),
-                                    const Spacer(),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -543,20 +694,9 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     final ok = validateForm1();
     if (!ok) return;
 
-    User user = AppData.user;
-
-    final bool fromEmail = lastLoginBy == 'email';
-
-    final String email =
-        fromEmail ? user.email ?? '' : fieldEmailController.text.trim();
-
-    String telepon =
-        fromEmail ? fieldTeleponController.text.trim() : user.email ?? '';
-
-    if (lastLoginBy == 'email') {
-      var phoneRes = IndoPhoneHelper.normalize(telepon);
-      telepon = phoneRes.phone62 ?? '';
-    }
+    final String email = fieldEmailController.text.trim();
+    final phoneRes = IndoPhoneHelper.normalize(fieldTeleponController.text);
+    final String telepon = phoneRes.phone62 ?? '';
 
     final record = RegUserModel(
       personalNama: fieldNameController.text.trim(),
@@ -565,8 +705,13 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       jnsClientId: fieldComboJnsClient!.mjnsclientId,
       email: email,
       userNama: fieldNameController.text.trim(),
-      sendOtpVia: fromEmail ? "hp" : "email",
+      sendOtpVia: '',
       referral: fieldComboMReferral?.kodeUnik,
+      companyNama: fieldComboJnsClient?.mjnsclientId == '20'
+          ? fieldCompanyNamaController.text.trim()
+          : null,
+      emailReqtokenId: context.read<RegUserOtpBloc>().state.emailRequestId,
+      hpReqtokenId: context.read<RegUserOtpBloc>().state.hpRequestId,
     );
 
     context.read<RegUserBloc>().add(ClearRequestFromEvent());
@@ -575,16 +720,114 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
           RegUserTambahEvent(
             record: record,
             requestFrom: widget.requestFrom,
-            pinSentTo: fromEmail ? telepon : email,
-            pinSentVia: fromEmail ? "hp" : "email",
           ),
         );
+  }
+
+  void _sendEmailOtp() {
+    final email = fieldEmailController.text.trim();
+
+    if (email.isEmpty) {
+      setErr('form1.email', kStringNullError);
+      return;
+    }
+
+    if (!EmailValidator.validate(email)) {
+      setErr('form1.email', 'Format tidak valid');
+      return;
+    }
+
+    clearErr('form1.email');
+    _pendingOpenOtpFor = 'email';
+    context.read<RegUserOtpBloc>().add(
+          RegUserOtpKirimEvent(
+            target: email,
+            requestFrom: 'email',
+          ),
+        );
+  }
+
+  void _sendHpOtp() {
+    final phoneRes = IndoPhoneHelper.normalize(fieldTeleponController.text);
+
+    if (!phoneRes.isValid) {
+      setErr('form1.telepon', phoneRes.error ?? 'Format tidak valid');
+      return;
+    }
+
+    clearErr('form1.telepon');
+    _pendingOpenOtpFor = 'hp';
+    context.read<RegUserOtpBloc>().add(
+          RegUserOtpKirimEvent(
+            target: phoneRes.phone62 ?? '',
+            requestFrom: 'hp',
+          ),
+        );
+  }
+
+  void _handleOtpStateChanged(BuildContext context, RegUserOtpState state) {
+    if (_pendingOpenOtpFor.isEmpty) return;
+    if (state.activeRequestFrom != _pendingOpenOtpFor) return;
+
+    final isEmail = _pendingOpenOtpFor == 'email';
+    final isSending = isEmail ? state.isEmailSending : state.isHpSending;
+    if (isSending) return;
+
+    if (state.hasFailure) {
+      final message = isEmail ? state.emailError : state.hpError;
+      setErr(
+        isEmail ? 'form1.email' : 'form1.telepon',
+        message.isNotEmpty ? message : 'Gagal mengirim OTP.',
+      );
+      _pendingOpenOtpFor = '';
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(message.isNotEmpty ? message : 'Gagal mengirim OTP.'),
+      );
+      return;
+    }
+
+    final requestId = isEmail ? state.emailRequestId : state.hpRequestId;
+    if (requestId.isEmpty) return;
+
+    final target = state.activeTarget;
+    final requestFrom = _pendingOpenOtpFor;
+    _pendingOpenOtpFor = '';
+
+    showRegisterOtpPopup(
+      context,
+      target: target,
+      requestFrom: requestFrom,
+    );
+  }
+
+  bool _validateOtpBeforeSubmit(RegUserOtpState otpState) {
+    var ok = true;
+
+    if (!otpState.isEmailVerified) {
+      setErr('form1.email', 'Email belum diverifikasi');
+      ok = false;
+    }
+
+    if (!otpState.isHpVerified) {
+      setErr('form1.telepon', 'No. HP belum diverifikasi');
+      ok = false;
+    }
+
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar('Verifikasi email dan nomor HP terlebih dahulu.'),
+      );
+    }
+
+    return ok;
   }
 
   void _startSubmitTimeout() {
     final attempt = ++_submitAttempt;
     Future.delayed(const Duration(seconds: 10), () {
       if (!mounted || attempt != _submitAttempt || !isSubmitting) return;
+
+      _hideGlobalLoading();
 
       setState(() {
         isSubmitting = false;

@@ -22,6 +22,10 @@ class appTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final AutovalidateMode? autovalidateMode;
   final String? errorText;
+  final String? helperText;
+  final TextStyle? helperStyle;
+  final Color? borderColor;
+  final Color? focusedBorderColor;
 
   const appTextField({
     super.key,
@@ -46,6 +50,10 @@ class appTextField extends StatelessWidget {
     this.textInputAction,
     this.autovalidateMode,
     this.errorText,
+    this.helperText,
+    this.helperStyle,
+    this.borderColor,
+    this.focusedBorderColor,
   });
 
   List<TextInputFormatter>? _getDefaultFormatters() {
@@ -99,6 +107,7 @@ class appTextField extends StatelessWidget {
       textInputAction: textInputAction,
       cursorColor: primaryLightColor,
       style: bodyTextStyle(context),
+      validator: validator,
       decoration: InputDecoration(
         alignLabelWithHint: true,
         labelText: label,
@@ -112,19 +121,19 @@ class appTextField extends StatelessWidget {
         contentPadding: const EdgeInsets.all(10),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-          borderSide: BorderSide(color: sGrey),
+          borderSide: BorderSide(color: borderColor ?? sGrey),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-          borderSide: BorderSide(color: sGrey),
+          borderSide: BorderSide(color: borderColor ?? sGrey),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-          borderSide: BorderSide(color: sGrey),
+          borderSide: BorderSide(color: borderColor ?? sGrey),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-          borderSide: BorderSide(color: primaryColor),
+          borderSide: BorderSide(color: focusedBorderColor ?? primaryColor),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
@@ -138,12 +147,13 @@ class appTextField extends StatelessWidget {
           color: Colors.red,
           fontSize: 12,
         ),
+        helperText: helperText,
+        helperStyle: helperStyle,
         prefix: prefix,
         suffix: suffix,
         suffixIcon: suffixIcon,
         errorText: errorText,
       ),
-      validator: validator,
     );
 
     if (height != null) {
@@ -242,7 +252,6 @@ class _AppDateFieldState extends State<AppDateField> {
     }
   }
 
-
   Future<void> _pickMonthYear(BuildContext context) async {
     final now = DateTime.now();
 
@@ -273,48 +282,49 @@ class _AppDateFieldState extends State<AppDateField> {
                   Row(
                     children: [
                       Expanded(
-                        child: DropdownButtonFormField<int>(
-                          dropdownColor: formGrey,
-                          value: selectedMonth,
-                          style: const TextStyle(
+                          child: DropdownButtonFormField<int>(
+                        dropdownColor: formGrey,
+                        value: selectedMonth,
+                        style: const TextStyle(
+                          color: primaryLightColor,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: "Bulan",
+                          labelStyle: const TextStyle(
                             color: primaryLightColor,
                           ),
-                          decoration: InputDecoration(
-                            labelText: "Bulan",
-                            labelStyle: const TextStyle(
-                              color: primaryLightColor,
-                            ),
-                            errorText: widget.errorText,
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(cardBorderRadius),
-                              borderSide: const BorderSide(color: sGrey),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(cardBorderRadius),
-                              borderSide: const BorderSide(color: primaryColor),
-                            ),
+                          errorText: widget.errorText,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(cardBorderRadius),
+                            borderSide: const BorderSide(color: sGrey),
                           ),
-                          iconEnabledColor: primaryLightColor,
-                          items: List.generate(12, (i) {
-                            final month = i + 1;
-                            return DropdownMenuItem(
-                              value: month,
-                              child: Text(
-                                month.toString().padLeft(2, '0'),
-                                style: const TextStyle(
-                                  color: primaryLightColor,
-                                ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(cardBorderRadius),
+                            borderSide: const BorderSide(color: primaryColor),
+                          ),
+                        ),
+                        iconEnabledColor: primaryLightColor,
+                        items: List.generate(12, (i) {
+                          final month = i + 1;
+                          return DropdownMenuItem(
+                            value: month,
+                            child: Text(
+                              month.toString().padLeft(2, '0'),
+                              style: const TextStyle(
+                                color: primaryLightColor,
                               ),
-                            );
-                          }),
-                          onChanged: (v) {
-                            if (v == null) return;
-                            setModalState(() {
-                              selectedMonth = v;
-                            });
-                          },
-                        )
-                      ),
+                            ),
+                          );
+                        }),
+                        onChanged: (v) {
+                          if (v == null) return;
+                          setModalState(() {
+                            selectedMonth = v;
+                          });
+                        },
+                      )),
                       const SizedBox(width: 12),
                       Expanded(
                         child: DropdownButtonFormField<int>(
@@ -329,11 +339,13 @@ class _AppDateFieldState extends State<AppDateField> {
                               color: primaryLightColor,
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(cardBorderRadius),
+                              borderRadius:
+                                  BorderRadius.circular(cardBorderRadius),
                               borderSide: const BorderSide(color: sGrey),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(cardBorderRadius),
+                              borderRadius:
+                                  BorderRadius.circular(cardBorderRadius),
                               borderSide: const BorderSide(color: primaryColor),
                             ),
                           ),
@@ -398,23 +410,21 @@ class _AppDateFieldState extends State<AppDateField> {
       controller: TextEditingController(
         text: selectedDate != null
             ? widget.mode == AppDateFieldMode.monthYear
-            ? DateFormat('MM / yyyy').format(selectedDate!)
-            : DateFormat('yyyy-MM-dd').format(selectedDate!)
+                ? DateFormat('MM / yyyy').format(selectedDate!)
+                : DateFormat('yyyy-MM-dd').format(selectedDate!)
             : '',
       ),
       cursorColor: primaryLightColor,
       style: bodyTextStyle(context),
       decoration: InputDecoration(
         labelText: widget.label,
-        labelStyle: isEnabled
-            ? inputTextStyle(context)
-            : bodyTextStyle(context),
+        labelStyle:
+            isEnabled ? inputTextStyle(context) : bodyTextStyle(context),
         hintText: 'Pilih ${widget.label}',
         hintStyle: inputTextStyle(context, color: sGrey),
         filled: true,
         fillColor: bgColor,
         contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(cardBorderRadius),
           borderSide: BorderSide(color: borderColor),
@@ -431,7 +441,6 @@ class _AppDateFieldState extends State<AppDateField> {
           borderRadius: BorderRadius.circular(cardBorderRadius),
           borderSide: const BorderSide(color: primaryColor),
         ),
-
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(cardBorderRadius),
           borderSide: const BorderSide(color: Colors.red),
@@ -444,7 +453,6 @@ class _AppDateFieldState extends State<AppDateField> {
           color: Colors.red,
           fontSize: 12,
         ),
-
         suffixIcon: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

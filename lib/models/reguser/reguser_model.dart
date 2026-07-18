@@ -9,6 +9,9 @@ class RegUserModel {
   String jnsClientId;
   String sendOtpVia;
   String? referral;
+  String? companyNama;
+  String? emailReqtokenId;
+  String? hpReqtokenId;
 
   RegUserModel({
     required this.email,
@@ -21,6 +24,9 @@ class RegUserModel {
     required this.jnsClientId,
     required this.sendOtpVia,
     this.referral,
+    this.companyNama,
+    this.emailReqtokenId,
+    this.hpReqtokenId,
   });
 
   factory RegUserModel.fromJson(Map<String, dynamic> data) {
@@ -35,6 +41,9 @@ class RegUserModel {
       jnsClientId: data['jnsClientId'] ?? '',
       sendOtpVia: data['sendOtpVia'] ?? '',
       referral: data['referral'],
+      companyNama: data['companyNama'],
+      emailReqtokenId: data['emailReqtokenId'],
+      hpReqtokenId: data['hpReqtokenId'],
     );
   }
 
@@ -49,6 +58,9 @@ class RegUserModel {
         'jnsClientId': jnsClientId,
         'sendOtpVia': sendOtpVia,
         'referral': referral,
+        'companyNama': companyNama,
+        'emailReqtokenId': emailReqtokenId,
+        'hpReqtokenId': hpReqtokenId,
       };
 
   RegUserModel copyWith({
@@ -62,6 +74,9 @@ class RegUserModel {
     String? jnsClientId,
     String? sendOtpVia,
     String? referral,
+    String? companyNama,
+    String? emailReqtokenId,
+    String? hpReqtokenId,
   }) {
     return RegUserModel(
       email: email ?? this.email,
@@ -74,6 +89,9 @@ class RegUserModel {
       jnsClientId: jnsClientId ?? this.jnsClientId,
       sendOtpVia: sendOtpVia ?? this.sendOtpVia,
       referral: referral ?? this.referral,
+      companyNama: companyNama ?? this.companyNama,
+      emailReqtokenId: emailReqtokenId ?? this.emailReqtokenId,
+      hpReqtokenId: hpReqtokenId ?? this.hpReqtokenId,
     );
   }
 }

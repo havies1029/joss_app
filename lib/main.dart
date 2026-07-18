@@ -119,6 +119,7 @@ import 'package:joss_app/blocs/networkconnection/network_bloc.dart';
 import 'package:joss_app/blocs/profile/profile_download_foto_bloc.dart';
 import 'package:joss_app/blocs/profile/profile_upload_foto_bloc.dart';
 import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
+import 'package:joss_app/blocs/reguser_otp/reguser_otp_bloc.dart';
 
 import 'package:joss_app/blocs/local_prefs/simulasi_par_local_cubit.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_mv_local_cubit.dart';
@@ -732,6 +733,9 @@ Future<void> main() async {
 
         // RegUser
         BlocProvider(
+          create: (context) => RegUserOtpBloc(),
+        ),
+        BlocProvider(
           create: (context) => RegUserBloc(
             repository: RegUserRepository(),
             authenticationBloc: context.read<AuthenticationBloc>(),
@@ -932,6 +936,12 @@ class _AppState extends State<_App> {
                 final mjenisClient =
                     context.read<RegUserBloc>().state.record?.jnsClientId;
                 if (nav == null) return;
+                if (state.authenticatedFrom == 'daftarclient_page') {
+                  while (nav.canPop()) {
+                    nav.pop();
+                  }
+                  return;
+                }
                 if (singlePopPages.contains(state.authenticatedFrom)) {
                   if (mjenisClient == '10') {
                     WidgetsBinding.instance.addPostFrameCallback((_) {

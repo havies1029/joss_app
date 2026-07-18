@@ -525,11 +525,23 @@ class _SettingsPageState extends State<SettingsPage> {
                       );
                     },
                   ),
-                  _buildMenuItem(
-                    svgAsset: 'assets/icons/bantuan.svg',
-                    title: 'Bantuan',
-                    onTap: () {
-                      Navigator.pushNamed(context, 'chat');
+                  BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                    builder: (context, authState) {
+                      final userType = authState is AuthenticationAuthenticated
+                          ? authState.user.userType.trim()
+                          : '';
+
+                      if (userType.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+
+                      return _buildMenuItem(
+                        svgAsset: 'assets/icons/bantuan.svg',
+                        title: 'Bantuan',
+                        onTap: () {
+                          Navigator.pushNamed(context, 'chat');
+                        },
+                      );
                     },
                   ),
                 ],
