@@ -41,7 +41,8 @@ class ListMenuWidget extends StatelessWidget {
       return tp.didExceedMaxLines;
     }
 
-    final needsExtraHeight = menuItems.any((m) => willWrapToSecondLine(m.title));
+    final needsExtraHeight =
+        menuItems.any((m) => willWrapToSecondLine(m.title));
     final double menuHeight = needsExtraHeight ? 140 : 120;
 
     return BlocListener<AuthenticationBloc, AuthenticationState>(
@@ -57,7 +58,6 @@ class ListMenuWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (userType != 'C') _buildDaftarKlienButton(context),
-
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
             decoration: const BoxDecoration(
@@ -71,7 +71,8 @@ class ListMenuWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                   child: Text(
                     'Claim is Simple.',
                     style: headingStyle(context).copyWith(
@@ -80,9 +81,7 @@ class ListMenuWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
                 SizedBox(
                   height: menuHeight,
                   child: Stack(
@@ -99,7 +98,6 @@ class ListMenuWidget extends StatelessWidget {
                           );
                         },
                       ),
-
                       Positioned(
                         left: 0,
                         top: 0,
@@ -114,7 +112,6 @@ class ListMenuWidget extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       Positioned(
                         right: 0,
                         top: 0,
@@ -234,19 +231,26 @@ class ListMenuWidget extends StatelessWidget {
                         height: 20,
                       ),
                       const SizedBox(width: 5),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Sudah Punya Akun?',
-                            style: bodyTextStyle(context, fontSize: 16),
-                          ),
-                          Text(
-                            'Silahkan masuk menggunakan akun yang sudah terdaftar',
-                            style: bodyTextStyle(context, fontSize: 14),
-                          ),
-                        ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Sudah Punya Akun?',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: bodyTextStyle(context, fontSize: 16),
+                            ),
+                            Text(
+                              'Silahkan masuk menggunakan akun yang sudah terdaftar',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
+                              style: bodyTextStyle(context, fontSize: 14),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -255,7 +259,8 @@ class ListMenuWidget extends StatelessWidget {
 
                 // CTA "Mulai"
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                   decoration: BoxDecoration(
                     color: primaryColor,
                     borderRadius: BorderRadius.circular(12),
@@ -275,8 +280,9 @@ class ListMenuWidget extends StatelessWidget {
 
   Widget _buildMenuItem(BuildContext context, MenuItem item, String userType) {
     final isClient = userType == 'C';
-    final isAlwaysActive =
-        item.title == "Cari Asuransi" || item.title == "Lapor Klaim" || item.title == "Bantuan";
+    final isAlwaysActive = item.title == "Cari Asuransi" ||
+        item.title == "Lapor Klaim" ||
+        item.title == "Bantuan";
     final isActive = isClient || isAlwaysActive;
 
     return GestureDetector(
@@ -301,10 +307,13 @@ class ListMenuWidget extends StatelessWidget {
             const gapAfterIcon = 8.0;
             final bottomGap = hPadding.toDouble();
 
-            final fixedHeights = iconSize + topMargin + gapAfterIcon + bottomGap;
-            final remaining = (c.maxHeight - fixedHeights).clamp(0.0, double.infinity);
+            final fixedHeights =
+                iconSize + topMargin + gapAfterIcon + bottomGap;
+            final remaining =
+                (c.maxHeight - fixedHeights).clamp(0.0, double.infinity);
             final titleHeight = desiredTitleHeight.clamp(0.0, remaining);
-            final bottomFill = (remaining - titleHeight).clamp(0.0, double.infinity);
+            final bottomFill =
+                (remaining - titleHeight).clamp(0.0, double.infinity);
 
             return Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -325,7 +334,8 @@ class ListMenuWidget extends StatelessWidget {
                           border: Border.all(color: sGrey),
                         ),
                         child: Center(
-                          child: SvgPicture.asset(item.iconPath, width: 38, height: 38),
+                          child: SvgPicture.asset(item.iconPath,
+                              width: 38, height: 38),
                         ),
                       ),
                       if (item.isPopular)
@@ -333,9 +343,11 @@ class ListMenuWidget extends StatelessWidget {
                           top: -10,
                           left: 20,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(cardBorderRadius),
+                              borderRadius:
+                                  BorderRadius.circular(cardBorderRadius),
                               gradient: primaryBadgeGradient,
                             ),
                             child: Text(
@@ -351,7 +363,6 @@ class ListMenuWidget extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-
                 SizedBox(
                   height: titleHeight,
                   child: Text(
@@ -363,9 +374,7 @@ class ListMenuWidget extends StatelessWidget {
                     style: titleStyle,
                   ),
                 ),
-
                 SizedBox(height: hPadding),
-
                 SizedBox(height: bottomFill),
               ],
             );
@@ -383,43 +392,67 @@ class ListMenuWidget extends StatelessWidget {
 
   List<MenuItem> _getMenuItems() {
     return [
-      MenuItem(title: 'Cari Asuransi', iconPath: 'assets/icons/menu_cari_asuransi.svg', isPopular: true,),
-      MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
+      MenuItem(
+        title: 'Cari Asuransi',
+        iconPath: 'assets/icons/menu_cari_asuransi.svg',
+        isPopular: true,
+      ),
+      MenuItem(
+        title: 'Lapor Klaim',
+        iconPath: 'assets/icons/menu_lapor_klaim.svg',
+      ),
       MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
       // MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
-      MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
+      MenuItem(
+        title: 'Tagihan Pembayaran',
+        iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',
+      ),
     ];
   }
 
   void handleMenuTap(BuildContext context, String title) async {
-
     final polisFormKey = GlobalKey<FormState>();
     switch (title) {
       case 'Cari Asuransi':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => CariAsuransiWidget2.page()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (_) => CariAsuransiWidget2.page()));
         break;
 
       case 'Lapor Klaim':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()));
         break;
 
       case 'Polis':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => ManagementPolisPage()));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => ManagementPolisPage()));
         break;
 
       case 'Test Page':
         // Navigator.push(context, MaterialPageRoute(builder: (_) => KlaimLacakPage(klaim1Id: '', statusDesc: '',)));
-        Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentMethodPage(curr: 'IDR', totalBayar: 100000,)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => PaymentMethodPage(
+                      curr: 'IDR',
+                      totalBayar: 100000,
+                    )));
 
         break;
 
       case 'Klaim':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => KlaimMainPage()));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => KlaimMainPage()));
         break;
 
       case 'Tagihan Pembayaran':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => TagihanPembayaranPage(initialTab: 0,)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => TagihanPembayaranPage(
+                      initialTab: 0,
+                    )));
         break;
 
       default:
@@ -428,7 +461,6 @@ class ListMenuWidget extends StatelessWidget {
         );
     }
   }
-
 }
 
 class MenuItem {
@@ -544,10 +576,7 @@ class _SuccessPageState extends State<SuccessPage> {
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
-                )
-                    .animate()
-                    .fadeIn(duration: 600.ms)
-                    .slideY(begin: 0.3, end: 0),
+                ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.3, end: 0),
 
                 const SizedBox(height: 10),
 
@@ -558,10 +587,7 @@ class _SuccessPageState extends State<SuccessPage> {
                     color: Colors.white70,
                     fontSize: 16,
                   ),
-                )
-                    .animate()
-                    .fadeIn(duration: 800.ms)
-                    .slideY(begin: 0.3, end: 0),
+                ).animate().fadeIn(duration: 800.ms).slideY(begin: 0.3, end: 0),
 
                 const SizedBox(height: 30),
 
@@ -583,10 +609,7 @@ class _SuccessPageState extends State<SuccessPage> {
                     "Lihat Detail",
                     style: TextStyle(color: Colors.white),
                   ),
-                )
-                    .animate()
-                    .fadeIn(duration: 900.ms)
-                    .slideY(begin: 0.2, end: 0),
+                ).animate().fadeIn(duration: 900.ms).slideY(begin: 0.2, end: 0),
               ],
             ),
           ),
