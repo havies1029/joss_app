@@ -26,7 +26,18 @@ class _HeroPageState extends State<HeroPage> {
   @override
   void initState() {
     super.initState();
-    context.read<SumdashBloc>().add(SumdashLihatEvent());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final authState = context.read<AuthenticationBloc>().state;
+      final userType = authState is AuthenticationAuthenticated
+          ? authState.user.userType.trim()
+          : '';
+
+      if (userType.isNotEmpty) {
+        context.read<SumdashBloc>().add(SumdashLihatEvent());
+      }
+    });
   }
 
   @override
@@ -49,19 +60,22 @@ class _HeroPageState extends State<HeroPage> {
                       BlocBuilder<AuthenticationBloc, AuthenticationState>(
                         builder: (context, authState) {
                           final userType =
-                          authState is AuthenticationAuthenticated
-                              ? (authState.user.userType).toUpperCase()
-                              : '';
+                              authState is AuthenticationAuthenticated
+                                  ? authState.user.userType.trim().toUpperCase()
+                                  : '';
 
                           if (userType == 'C') {
-                            return BlocBuilder<MRekan1CrudBloc, MRekan1CrudState>(
+                            return BlocBuilder<MRekan1CrudBloc,
+                                MRekan1CrudState>(
                               buildWhen: (prev, curr) =>
-                              prev.record?.rekanNama != curr.record?.rekanNama ||
+                                  prev.record?.rekanNama !=
+                                      curr.record?.rekanNama ||
                                   prev.record?.mjnsclientId !=
                                       curr.record?.mjnsclientId,
                               builder: (context, rekanState) {
                                 final mjenisClient =
-                                    rekanState.record?.mjnsclientId.trim() ?? '';
+                                    rekanState.record?.mjnsclientId.trim() ??
+                                        '';
                                 final userNama =
                                     AppData.user.nama?.trim() ?? '';
                                 final rekanNama =
@@ -92,21 +106,27 @@ class _HeroPageState extends State<HeroPage> {
                           } else if (userType == 'U') {
                             return BlocBuilder<RegUserBloc, RegUserState>(
                               buildWhen: (prev, curr) =>
-                              prev.record?.email != curr.record?.email ||
-                                  prev.record?.personalNama != curr.record?.personalNama ||
-                                  prev.record?.userNama != curr.record?.userNama,
+                                  prev.record?.email != curr.record?.email ||
+                                  prev.record?.personalNama !=
+                                      curr.record?.personalNama ||
+                                  prev.record?.userNama !=
+                                      curr.record?.userNama,
                               builder: (context, regState) {
-                                final email = (regState.record?.email ?? '').trim();
+                                final email =
+                                    (regState.record?.email ?? '').trim();
                                 final personalNama =
-                                (regState.record?.personalNama ?? '').trim();
+                                    (regState.record?.personalNama ?? '')
+                                        .trim();
                                 final userNama =
-                                (regState.record?.userNama ?? '').trim();
+                                    (regState.record?.userNama ?? '').trim();
 
                                 final displayName = email.isNotEmpty
                                     ? email
                                     : (personalNama.isNotEmpty
-                                    ? personalNama
-                                    : (userNama.isNotEmpty ? userNama : 'New User'));
+                                        ? personalNama
+                                        : (userNama.isNotEmpty
+                                            ? userNama
+                                            : 'New User'));
 
                                 return _buildHeroContent(
                                   context,
@@ -117,15 +137,15 @@ class _HeroPageState extends State<HeroPage> {
                               },
                             );
                           } else {
-                            final fallbackEmail =
-                            authState is AuthenticationAuthenticated
+                            final fallbackEmail = authState
+                                    is AuthenticationAuthenticated
                                 ? (authState.user.email?.trim() ?? 'Guest User')
                                 : 'Guest User';
 
                             return _buildHeroContent(
                               context,
                               displayName: fallbackEmail,
-                              userType: userType.isEmpty ? '(Unknown)' : userType,
+                              userType: userType,
                               screenHeight: screenHeight,
                             );
                           }
@@ -143,11 +163,11 @@ class _HeroPageState extends State<HeroPage> {
   }
 
   Widget _buildHeroContent(
-      BuildContext context, {
-        required String displayName,
-        required String userType,
-        required double screenHeight,
-      }) {
+    BuildContext context, {
+    required String displayName,
+    required String userType,
+    required double screenHeight,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -172,36 +192,36 @@ class _HeroPageState extends State<HeroPage> {
         const CarouselMenuWidget(),
         (userType == 'C')
             ? Column(
-          children: [
-            SizedBox(height: vPadding - 3),
-            const TransaksiListWidget(),
-          ],
-        )
+                children: [
+                  SizedBox(height: vPadding - 3),
+                  const TransaksiListWidget(),
+                ],
+              )
             : Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(height: vPadding - 3),
-            Container(
-              padding: const EdgeInsets.all(hPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Berizin dan Diawasi Oleh:',
-                    style: bodyTextStyle(context, fontSize: 14),
-                  ),
-                  const SizedBox(height: 8),
-                  Image.asset(
-                    'assets/images/ojk.png',
-                    height: 50,
-                    fit: BoxFit.cover,
+                  SizedBox(height: vPadding - 3),
+                  Container(
+                    padding: const EdgeInsets.all(hPadding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Berizin dan Diawasi Oleh:',
+                          style: bodyTextStyle(context, fontSize: 14),
+                        ),
+                        const SizedBox(height: 8),
+                        Image.asset(
+                          'assets/images/ojk.png',
+                          height: 50,
+                          fit: BoxFit.cover,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
       ],
     );
   }
