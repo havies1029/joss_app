@@ -15,6 +15,7 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
         super(const RegUserOtpState()) {
     on<RegUserOtpKirimEvent>(_onKirim);
     on<RegUserOtpValidasiEvent>(_onValidasi);
+    on<RegUserOtpTargetChangedEvent>(_onTargetChanged);
     on<RegUserOtpResetEmailEvent>(_onResetEmail);
     on<RegUserOtpResetHpEvent>(_onResetHp);
     on<RegUserOtpClearEvent>(_onClear);
@@ -28,6 +29,50 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
     return _isEmail(requestFrom)
         ? 'Email ini telah diverifikasi'
         : 'No. telepon ini telah diverifikasi';
+  }
+
+  String _targetKey(String requestFrom, String target) {
+    final cleanTarget = target.trim();
+    return _isEmail(requestFrom) ? cleanTarget.toLowerCase() : cleanTarget;
+  }
+
+  RegUserOtpVerifiedTarget? _findVerifiedTarget(
+    String requestFrom,
+    String target,
+  ) {
+    final normalizedRequestFrom = requestFrom.trim().toLowerCase();
+    final normalizedTarget = _targetKey(normalizedRequestFrom, target);
+
+    for (final item in state.verifiedTargets ?? const []) {
+      if (item.requestFrom == normalizedRequestFrom &&
+          item.target == normalizedTarget) {
+        return item;
+      }
+    }
+
+    return null;
+  }
+
+  List<RegUserOtpVerifiedTarget> _upsertVerifiedTarget({
+    required String requestFrom,
+    required String target,
+    required String requestId,
+  }) {
+    final normalizedRequestFrom = requestFrom.trim().toLowerCase();
+    final normalizedTarget = _targetKey(normalizedRequestFrom, target);
+
+    return [
+      ...(state.verifiedTargets ?? const []).where(
+        (item) =>
+            item.requestFrom != normalizedRequestFrom ||
+            item.target != normalizedTarget,
+      ),
+      RegUserOtpVerifiedTarget(
+        requestFrom: normalizedRequestFrom,
+        target: normalizedTarget,
+        requestId: requestId,
+      ),
+    ];
   }
 
   Future<void> _onKirim(
@@ -119,6 +164,12 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
     );
 
     if (result.success) {
+      final verifiedTargets = _upsertVerifiedTarget(
+        requestFrom: requestFrom,
+        target: event.target,
+        requestId: result.data,
+      );
+
       emit(
         state.copyWith(
           emailRequestId: isEmail ? result.data : state.emailRequestId,
@@ -133,6 +184,7 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
           activeRequestFrom: requestFrom,
           message: _successMessage(requestFrom),
           hasFailure: false,
+          verifiedTargets: verifiedTargets,
         ),
       );
       return;
@@ -150,6 +202,62 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
         activeRequestFrom: requestFrom,
         message: result.data,
         hasFailure: true,
+      ),
+    );
+  }
+
+  void _onTargetChanged(
+    RegUserOtpTargetChangedEvent event,
+    Emitter<RegUserOtpState> emit,
+  ) {
+    final requestFrom = event.requestFrom.trim().toLowerCase();
+    final isEmail = _isEmail(requestFrom);
+    final target = _targetKey(requestFrom, event.target);
+    final verifiedTarget =
+        target.isEmpty ? null : _findVerifiedTarget(requestFrom, target);
+
+    if (verifiedTarget != null) {
+      emit(
+        state.copyWith(
+          emailRequestId:
+              isEmail ? verifiedTarget.requestId : state.emailRequestId,
+          hpRequestId: isEmail ? state.hpRequestId : verifiedTarget.requestId,
+          isEmailSending: isEmail ? false : state.isEmailSending,
+          isHpSending: isEmail ? state.isHpSending : false,
+          isEmailValidating: isEmail ? false : state.isEmailValidating,
+          isHpValidating: isEmail ? state.isHpValidating : false,
+          isEmailVerified: isEmail ? true : state.isEmailVerified,
+          isHpVerified: isEmail ? state.isHpVerified : true,
+          emailError: isEmail ? _successMessage(requestFrom) : state.emailError,
+          hpError: isEmail ? state.hpError : _successMessage(requestFrom),
+          activeTarget: target,
+          activeRequestFrom: requestFrom,
+          message: '',
+          hasFailure: false,
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        emailRequestId: isEmail ? '' : state.emailRequestId,
+        hpRequestId: isEmail ? state.hpRequestId : '',
+        isEmailSending: isEmail ? false : state.isEmailSending,
+        isHpSending: isEmail ? state.isHpSending : false,
+        isEmailValidating: isEmail ? false : state.isEmailValidating,
+        isHpValidating: isEmail ? state.isHpValidating : false,
+        isEmailVerified: isEmail ? false : state.isEmailVerified,
+        isHpVerified: isEmail ? state.isHpVerified : false,
+        emailError: isEmail ? '' : state.emailError,
+        hpError: isEmail ? state.hpError : '',
+        activeTarget:
+            state.activeRequestFrom == requestFrom ? '' : state.activeTarget,
+        activeRequestFrom: state.activeRequestFrom == requestFrom
+            ? ''
+            : state.activeRequestFrom,
+        message: '',
+        hasFailure: false,
       ),
     );
   }

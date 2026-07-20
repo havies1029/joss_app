@@ -349,7 +349,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
                   : null,
         ),
       ),
-      items: (filter, infiniteScrollProps) => _loadItems(filter ?? ''),
+      items: (filter, infiniteScrollProps) => _loadItems(filter),
       suffixProps: DropdownSuffixProps(
         clearButtonProps: ClearButtonProps(
           isVisible: widget.showClearButton,
@@ -373,6 +373,9 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
         ),
         loadingBuilder: (context, searchEntry) {
           return const Center(child: LoadingIndicator());
+        },
+        emptyBuilder: (context, searchEntry) {
+          return const _DropdownEmptyView();
         },
         constraints: BoxConstraints(maxHeight: widget.maxHeight),
         showSelectedItems: true,
@@ -560,16 +563,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
 
   Widget _buildCustomDataLayer(List<T> items) {
     if (items.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(15),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            'Data tidak ditemukan',
-            style: bodyTextStyle(context).copyWith(color: hintGrey),
-          ),
-        ),
-      );
+      return const _DropdownEmptyView();
     }
 
     return Column(
@@ -682,6 +676,45 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _DropdownEmptyView extends StatelessWidget {
+  const _DropdownEmptyView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5, vertical: vPadding),
+      color: formGrey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SvgPicture.asset(
+            'assets/icons/belum_ada.svg',
+            height: 32,
+          ),
+          const SizedBox(height: 14),
+          Text(
+            'Data tidak ditemukan',
+            textAlign: TextAlign.center,
+            style: bodyTextStyle(context, fontSize: 18).copyWith(
+              color: primaryLightColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Tidak ada data yang sesuai dengan pencarian Anda.',
+            textAlign: TextAlign.center,
+            style: bodyTextStyle(context, fontSize: 14).copyWith(
+              color: hintGrey,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

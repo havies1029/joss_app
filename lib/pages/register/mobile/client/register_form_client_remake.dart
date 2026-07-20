@@ -10,6 +10,7 @@ import 'package:joss_app/pages/login/mobile/client/new_login_client/new_login_cl
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../blocs/reguser_otp/reguser_otp_bloc.dart';
 import '../../../../helper/indo_phone_result.dart';
+import '../../../../helper/phone_number_result.dart';
 import '../../../../models/combobox/combomjnsclient_model.dart';
 import '../../../../models/combobox/combomreferral_model.dart';
 import '../../../../models/reguser/reguser_model.dart';
@@ -45,6 +46,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   int _submitAttempt = 0;
   String _pendingOpenOtpFor = '';
   bool _isDialogLoadingShown = false;
+  final Map<String, String> _verifiedEmailRequestIds = {};
+  final Map<String, String> _verifiedHpRequestIds = {};
 
   late final RegUserModel? record;
 
@@ -150,10 +153,18 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       setErr('form1.telepon', kStringNullError);
       ok = false;
     } else {
-      final phoneRes = IndoPhoneHelper.normalize(telp);
-      if (!phoneRes.isValid) {
-        setErr('form1.telepon', phoneRes.error ?? "Format tidak valid");
-        ok = false;
+      if (isCompanyClient) {
+        final phoneRes = PhoneNumberHelper.normalize(telp);
+        if (!phoneRes.isValid) {
+          setErr('form1.telepon', phoneRes.error ?? "Format tidak valid");
+          ok = false;
+        }
+      } else {
+        final phoneRes = IndoPhoneHelper.normalize(telp);
+        if (!phoneRes.isValid) {
+          setErr('form1.telepon', phoneRes.error ?? "Format tidak valid");
+          ok = false;
+        }
       }
     }
 
@@ -250,18 +261,100 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         },
       );
 
+  String _emailOtpTarget(String value) {
+    final email = value.trim();
+    return EmailValidator.validate(email) ? email.toLowerCase() : '';
+  }
+
+  String _hpOtpTarget(String value) {
+    final isCompanyClient = fieldComboJnsClient?.mjnsclientId == '20';
+
+    if (isCompanyClient) {
+      final phoneRes = PhoneNumberHelper.normalize(value);
+      return phoneRes.phone ?? '';
+    }
+
+    final phoneRes = IndoPhoneHelper.normalize(value);
+    return phoneRes.phone62 ?? '';
+  }
+
+  bool _isEmailVerifiedForCurrent(RegUserOtpState otpState) {
+    final target = _emailOtpTarget(fieldEmailController.text);
+    if (target.isEmpty) return false;
+    if (_verifiedEmailRequestIds.containsKey(target)) return true;
+
+    return otpState.isEmailVerified &&
+        otpState.activeRequestFrom == 'email' &&
+        otpState.activeTarget == target;
+  }
+
+  bool _isHpVerifiedForCurrent(RegUserOtpState otpState) {
+    final target = _hpOtpTarget(fieldTeleponController.text);
+    if (target.isEmpty) return false;
+    if (_verifiedHpRequestIds.containsKey(target)) return true;
+
+    return otpState.isHpVerified &&
+        otpState.activeRequestFrom == 'hp' &&
+        otpState.activeTarget == target;
+  }
+
+  String _emailRequestIdForCurrent(RegUserOtpState otpState) {
+    final target = _emailOtpTarget(fieldEmailController.text);
+    if (target.isEmpty) return '';
+    return _verifiedEmailRequestIds[target] ??
+        (otpState.isEmailVerified &&
+                otpState.activeRequestFrom == 'email' &&
+                otpState.activeTarget == target
+            ? otpState.emailRequestId
+            : '');
+  }
+
+  String _hpRequestIdForCurrent(RegUserOtpState otpState) {
+    final target = _hpOtpTarget(fieldTeleponController.text);
+    if (target.isEmpty) return '';
+    return _verifiedHpRequestIds[target] ??
+        (otpState.isHpVerified &&
+                otpState.activeRequestFrom == 'hp' &&
+                otpState.activeTarget == target
+            ? otpState.hpRequestId
+            : '');
+  }
+
   Widget _buildTeleponField(RegUserOtpState otpState) {
-    final isVerified = otpState.isHpVerified;
+    final isVerified = _isHpVerifiedForCurrent(otpState);
+    final isCompanyClient = fieldComboJnsClient?.mjnsclientId == '20';
 
     return appTextField(
-      label: "No. HP",
-      hint: "Masukkan nomor telepon",
+      label: isCompanyClient ? "No. Telp Perusahaan" : "No. HP",
+      hint:  isCompanyClient ? "Masukkan No. Telp Perusahaan" : "Masukkan No. HP",
       controller: fieldTeleponController,
       keyboardType: TextInputType.phone,
-      prefix: Text(
-        "+62 | ",
-        style: inputTextStyle(context, color: primaryLightColor),
-      ),
+      inputFormatters: [
+        TextInputFormatter.withFunction((oldValue, newValue) {
+          final cleaned = PhoneNumberHelper.clean(newValue.text);
+          if (cleaned == newValue.text) return newValue;
+
+          final cursor = newValue.selection.baseOffset < 0
+              ? newValue.text.length
+              : newValue.selection.baseOffset.clamp(0, newValue.text.length);
+          final cleanedBeforeCursor = PhoneNumberHelper.clean(
+            newValue.text.substring(0, cursor),
+          );
+
+          return TextEditingValue(
+            text: cleaned,
+            selection: TextSelection.collapsed(
+              offset: cleanedBeforeCursor.length,
+            ),
+          );
+        }),
+      ],
+      prefix: isCompanyClient
+          ? null
+          : Text(
+              "+62 | ",
+              style: inputTextStyle(context, color: primaryLightColor),
+            ),
       errorText: isVerified ? null : err('form1.telepon'),
       helperText: isVerified ? 'No telepon ini telah diverifikasi' : null,
       helperStyle: bodyTextStyle(context, fontSize: 12).copyWith(
@@ -274,15 +367,19 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         if (v.trim().isNotEmpty) {
           clearErr('form1.telepon');
         }
-        if (isVerified) {
+        final target = _hpOtpTarget(v);
+        final isVerifiedAfterChange =
+            target.isNotEmpty && _verifiedHpRequestIds.containsKey(target);
+        if (!isVerifiedAfterChange) {
           context.read<RegUserOtpBloc>().add(const RegUserOtpResetHpEvent());
         }
+        setState(() {});
       },
     );
   }
 
   Widget _buildEmailField(RegUserOtpState otpState) {
-    final isVerified = otpState.isEmailVerified;
+    final isVerified = _isEmailVerifiedForCurrent(otpState);
 
     return appTextField(
       label: "Email",
@@ -304,15 +401,19 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         if (v.trim().isNotEmpty) {
           clearErr('form1.email');
         }
-        if (isVerified) {
+        final target = _emailOtpTarget(v);
+        final isVerifiedAfterChange =
+            target.isNotEmpty && _verifiedEmailRequestIds.containsKey(target);
+        if (!isVerifiedAfterChange) {
           context.read<RegUserOtpBloc>().add(const RegUserOtpResetEmailEvent());
         }
+        setState(() {});
       },
     );
   }
 
   Widget _buildEmailOtpRow(RegUserOtpState otpState) {
-    if (otpState.isEmailVerified) {
+    if (_isEmailVerifiedForCurrent(otpState)) {
       return _buildEmailField(otpState);
     }
 
@@ -340,7 +441,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   }
 
   Widget _buildTeleponOtpRow(RegUserOtpState otpState) {
-    if (otpState.isHpVerified) {
+    if (_isHpVerifiedForCurrent(otpState)) {
       return _buildTeleponField(otpState);
     }
 
@@ -378,6 +479,9 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         validatorCallback: (v) => v == null ? kStringNullError : null,
         errorText: err('form1.jenisClient'),
         onChangedCallback: (v) {
+          final wasCompanyClient = fieldComboJnsClient?.mjnsclientId == '20';
+          final isCompanyClient = v?.mjnsclientId == '20';
+
           setState(() {
             fieldComboJnsClient = v;
             if (v?.mjnsclientId != '20') {
@@ -388,6 +492,10 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
               clearErr('form1.jenisClient');
             }
           });
+
+          if (wasCompanyClient != isCompanyClient) {
+            context.read<RegUserOtpBloc>().add(const RegUserOtpResetHpEvent());
+          }
         },
         onSaveCallback: (value) => fieldComboJnsClient = value,
       );
@@ -613,6 +721,14 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
                                       padding: const EdgeInsets.all(20),
                                       child: Column(
                                         children: [
+                                          buildFieldComboMJnsclient(),
+                                          SizedBox(height: vPadding),
+                                          if (fieldComboJnsClient
+                                                  ?.mjnsclientId ==
+                                              '20') ...[
+                                            _buildCompanyNamaField(),
+                                            SizedBox(height: vPadding),
+                                          ],
                                           _buildNameField(),
                                           SizedBox(height: vPadding),
                                           _buildEmailOtpRow(otpState),
@@ -627,14 +743,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
                                           SizedBox(height: vPadding),
                                           _buildKonfirmasiPasswordField(),
                                           SizedBox(height: vPadding),
-                                          buildFieldComboMJnsclient(),
-                                          SizedBox(height: vPadding),
-                                          if (fieldComboJnsClient
-                                                  ?.mjnsclientId ==
-                                              '20') ...[
-                                            _buildCompanyNamaField(),
-                                            SizedBox(height: vPadding),
-                                          ],
                                           _buildReferralField(),
                                           SizedBox(height: vPadding),
                                           AppButton.primary(
@@ -695,8 +803,11 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     if (!ok) return;
 
     final String email = fieldEmailController.text.trim();
-    final phoneRes = IndoPhoneHelper.normalize(fieldTeleponController.text);
-    final String telepon = phoneRes.phone62 ?? '';
+    final isCompanyClient = fieldComboJnsClient?.mjnsclientId == '20';
+    final String telepon = isCompanyClient
+        ? (PhoneNumberHelper.normalize(fieldTeleponController.text).phone ?? '')
+        : (IndoPhoneHelper.normalize(fieldTeleponController.text).phone62 ??
+            '');
 
     final record = RegUserModel(
       personalNama: fieldNameController.text.trim(),
@@ -710,8 +821,12 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       companyNama: fieldComboJnsClient?.mjnsclientId == '20'
           ? fieldCompanyNamaController.text.trim()
           : null,
-      emailReqtokenId: context.read<RegUserOtpBloc>().state.emailRequestId,
-      hpReqtokenId: context.read<RegUserOtpBloc>().state.hpRequestId,
+      emailReqtokenId: _emailRequestIdForCurrent(
+        context.read<RegUserOtpBloc>().state,
+      ),
+      hpReqtokenId: _hpRequestIdForCurrent(
+        context.read<RegUserOtpBloc>().state,
+      ),
     );
 
     context.read<RegUserBloc>().add(ClearRequestFromEvent());
@@ -748,24 +863,55 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   }
 
   void _sendHpOtp() {
-    final phoneRes = IndoPhoneHelper.normalize(fieldTeleponController.text);
+    final isCompanyClient = fieldComboJnsClient?.mjnsclientId == '20';
+    final String target;
 
-    if (!phoneRes.isValid) {
-      setErr('form1.telepon', phoneRes.error ?? 'Format tidak valid');
-      return;
+    if (isCompanyClient) {
+      final phoneRes = PhoneNumberHelper.normalize(fieldTeleponController.text);
+
+      if (!phoneRes.isValid) {
+        setErr('form1.telepon', phoneRes.error ?? 'Format tidak valid');
+        return;
+      }
+
+      target = phoneRes.phone ?? '';
+    } else {
+      final phoneRes = IndoPhoneHelper.normalize(fieldTeleponController.text);
+
+      if (!phoneRes.isValid) {
+        setErr('form1.telepon', phoneRes.error ?? 'Format tidak valid');
+        return;
+      }
+
+      target = phoneRes.phone62 ?? '';
     }
 
     clearErr('form1.telepon');
     _pendingOpenOtpFor = 'hp';
     context.read<RegUserOtpBloc>().add(
           RegUserOtpKirimEvent(
-            target: phoneRes.phone62 ?? '',
+            target: target,
             requestFrom: 'hp',
           ),
         );
   }
 
   void _handleOtpStateChanged(BuildContext context, RegUserOtpState state) {
+    if (state.isEmailVerified &&
+        state.activeRequestFrom == 'email' &&
+        state.activeTarget.isNotEmpty &&
+        state.emailRequestId.isNotEmpty) {
+      _verifiedEmailRequestIds[state.activeTarget.toLowerCase()] =
+          state.emailRequestId;
+    }
+
+    if (state.isHpVerified &&
+        state.activeRequestFrom == 'hp' &&
+        state.activeTarget.isNotEmpty &&
+        state.hpRequestId.isNotEmpty) {
+      _verifiedHpRequestIds[state.activeTarget] = state.hpRequestId;
+    }
+
     if (_pendingOpenOtpFor.isEmpty) return;
     if (state.activeRequestFrom != _pendingOpenOtpFor) return;
 
@@ -803,12 +949,12 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   bool _validateOtpBeforeSubmit(RegUserOtpState otpState) {
     var ok = true;
 
-    if (!otpState.isEmailVerified) {
+    if (!_isEmailVerifiedForCurrent(otpState)) {
       setErr('form1.email', 'Email belum diverifikasi');
       ok = false;
     }
 
-    if (!otpState.isHpVerified) {
+    if (!_isHpVerifiedForCurrent(otpState)) {
       setErr('form1.telepon', 'No. HP belum diverifikasi');
       ok = false;
     }

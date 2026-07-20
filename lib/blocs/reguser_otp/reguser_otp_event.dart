@@ -37,6 +37,19 @@ class RegUserOtpValidasiEvent extends RegUserOtpEvent {
   List<Object?> get props => [requestId, target, requestFrom, pin];
 }
 
+class RegUserOtpTargetChangedEvent extends RegUserOtpEvent {
+  final String target;
+  final String requestFrom;
+
+  const RegUserOtpTargetChangedEvent({
+    required this.target,
+    required this.requestFrom,
+  });
+
+  @override
+  List<Object?> get props => [target, requestFrom];
+}
+
 class RegUserOtpResetEmailEvent extends RegUserOtpEvent {
   const RegUserOtpResetEmailEvent();
 }

@@ -42,6 +42,7 @@ import '../../../repositories/combobox/combormatauang_repository.dart';
 import '../../../repositories/combobox/comborokupasi_repository.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
+import '../../../widgets/apptheme/hitung_premi_empty_view.dart';
 import '../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
@@ -793,14 +794,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                               // buildFieldPremiOther(),
                             ],
                           )
-                        : const SizedBox(
-                            height: 40,
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                  "Klik Hitung Premi untuk melihat hasil."),
-                            ),
-                          ),
+                        : const HitungPremiEmptyView(),
                   ),
                   const SizedBox(height: hPadding),
                   if (calpar4Id?.isNotEmpty == true) ...[
@@ -820,17 +814,20 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                               ),
                               const SizedBox(height: hPadding),
                               AppButton.primary(
-                                text: state.isProcessing ? "Memproses..." : "Lanjutkan",
+                                text: state.isProcessing
+                                    ? "Memproses..."
+                                    : "Lanjutkan",
                                 isLoading: state.isProcessing,
                                 onPressed: state.isProcessing
                                     ? null
                                     : () {
-                                  if (calpar1Id == null || calpar1Id!.isEmpty) {
-                                    return;
-                                  }
-                                  _showGlobalLoading();
-                                  onLanjutkanPressed();
-                                },
+                                        if (calpar1Id == null ||
+                                            calpar1Id!.isEmpty) {
+                                          return;
+                                        }
+                                        _showGlobalLoading();
+                                        onLanjutkanPressed();
+                                      },
                               ),
                             ],
                           );
@@ -1034,63 +1031,63 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
     User user = authState.user;
     if (user.userType == "C") {
-        if (mjenisClient == "10") {
-          final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
+      if (mjenisClient == "10") {
+        final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
 
-          if (!idvState.isDataComplete) {
-            debugPrint("MRekanGeneralIdvPopUpPage : calpar_page");
-            _hideGlobalLoading();
-            showDialog(
-              context: context,
-              barrierDismissible: true,
-              barrierColor: Colors.black.withOpacity(0.6),
-              builder: (context) => RegisterClientPopUp(
-                header: 'Isi Data Pribadi Anda',
-                description:
-                    'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
-                buttonText: 'Lengkapi Data Pribadi',
-                onPressed: () {
-                  _pendingAutoConfirm = true;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => MRekanGeneralIdvPopUpPage(),
-                    ),
-                  );
-                },
-              ),
-            );
-            return;
-          }
-        } else if (mjenisClient == "20") {
-          final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
-
-          if (!cmpState.isDataComplete) {
-            _hideGlobalLoading();
-            showDialog(
-              context: context,
-              barrierDismissible: true,
-              barrierColor: Colors.black.withOpacity(0.6),
-              builder: (context) => RegisterClientPopUp(
-                header: 'Isi Data Pribadi Anda',
-                description:
-                    'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
-                buttonText: 'Lengkapi Data Pribadi',
-                onPressed: () {
-                  _pendingAutoConfirm = true;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => MRekanGeneralCmpPopUpPage(),
-                    ),
-                  );
-                },
-              ),
-            );
-            return;
-          }
+        if (!idvState.isDataComplete) {
+          debugPrint("MRekanGeneralIdvPopUpPage : calpar_page");
+          _hideGlobalLoading();
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            barrierColor: Colors.black.withOpacity(0.6),
+            builder: (context) => RegisterClientPopUp(
+              header: 'Isi Data Pribadi Anda',
+              description:
+                  'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+              buttonText: 'Lengkapi Data Pribadi',
+              onPressed: () {
+                _pendingAutoConfirm = true;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MRekanGeneralIdvPopUpPage(),
+                  ),
+                );
+              },
+            ),
+          );
+          return;
         }
-        _continueToRegPar();
+      } else if (mjenisClient == "20") {
+        final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
+
+        if (!cmpState.isDataComplete) {
+          _hideGlobalLoading();
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            barrierColor: Colors.black.withOpacity(0.6),
+            builder: (context) => RegisterClientPopUp(
+              header: 'Isi Data Pribadi Anda',
+              description:
+                  'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+              buttonText: 'Lengkapi Data Pribadi',
+              onPressed: () {
+                _pendingAutoConfirm = true;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MRekanGeneralCmpPopUpPage(),
+                  ),
+                );
+              },
+            ),
+          );
+          return;
+        }
+      }
+      _continueToRegPar();
     }
   }
 

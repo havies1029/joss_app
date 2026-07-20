@@ -467,84 +467,78 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: vPadding),
-              _buildSectionTitle(context, 'Lainnya'),
-              _buildCardContainer(
-                children: [
-                  BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                    builder: (context, authState) {
-                      final userType = authState is AuthenticationAuthenticated
-                          ? authState.user.userType.trim()
-                          : '';
+              BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                builder: (context, authState) {
+                  final userType = authState is AuthenticationAuthenticated
+                      ? authState.user.userType.trim()
+                      : '';
 
-                      if (userType.isEmpty) {
-                        return const SizedBox.shrink();
-                      }
+                  if (userType.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
 
-                      return BlocConsumer<NotifEmailSettingBloc,
-                          NotifEmailSettingState>(
-                        listenWhen: (prev, curr) =>
-                            prev.isSaved != curr.isSaved ||
-                            prev.hasFailure != curr.hasFailure,
-                        listener: (context, state) {
-                          if (state.isSaved && state.message.isNotEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              successSnackBar(state.message),
-                            );
-                          }
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: vPadding),
+                      _buildSectionTitle(context, 'Lainnya'),
+                      _buildCardContainer(
+                        children: [
+                          BlocConsumer<NotifEmailSettingBloc,
+                              NotifEmailSettingState>(
+                            listenWhen: (prev, curr) =>
+                                prev.isSaved != curr.isSaved ||
+                                prev.hasFailure != curr.hasFailure,
+                            listener: (context, state) {
+                              if (state.isSaved && state.message.isNotEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  successSnackBar(state.message),
+                                );
+                              }
 
-                          if (state.hasFailure && state.message.isNotEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              errorSnackBar(state.message),
-                            );
-                          }
-                        },
-                        builder: (context, state) {
-                          return Column(
-                            children: [
-                              _buildSwitchItem(
-                                svgAsset: 'assets/icons/notification.svg',
-                                title: 'Email Notifikasi',
-                                value: state.isNotifEmail,
-                                onChanged: state.isSaving
-                                    ? (_) {}
-                                    : (value) {
-                                        context
-                                            .read<NotifEmailSettingBloc>()
-                                            .add(
-                                              NotifEmailSettingUbahEvent(
-                                                value,
-                                              ),
-                                            );
-                                      },
-                              ),
-                              sDivider,
-                            ],
-                          );
-                        },
-                      );
-                    },
-                  ),
-                  BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                    builder: (context, authState) {
-                      final userType = authState is AuthenticationAuthenticated
-                          ? authState.user.userType.trim()
-                          : '';
-
-                      if (userType.isEmpty) {
-                        return const SizedBox.shrink();
-                      }
-
-                      return _buildMenuItem(
-                        svgAsset: 'assets/icons/bantuan.svg',
-                        title: 'Bantuan',
-                        onTap: () {
-                          Navigator.pushNamed(context, 'chat');
-                        },
-                      );
-                    },
-                  ),
-                ],
+                              if (state.hasFailure &&
+                                  state.message.isNotEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  errorSnackBar(state.message),
+                                );
+                              }
+                            },
+                            builder: (context, state) {
+                              return Column(
+                                children: [
+                                  _buildSwitchItem(
+                                    svgAsset: 'assets/icons/notification.svg',
+                                    title: 'Email Notifikasi',
+                                    value: state.isNotifEmail,
+                                    onChanged: state.isSaving
+                                        ? (_) {}
+                                        : (value) {
+                                            context
+                                                .read<NotifEmailSettingBloc>()
+                                                .add(
+                                                  NotifEmailSettingUbahEvent(
+                                                    value,
+                                                  ),
+                                                );
+                                          },
+                                  ),
+                                  sDivider,
+                                ],
+                              );
+                            },
+                          ),
+                          _buildMenuItem(
+                            svgAsset: 'assets/icons/bantuan.svg',
+                            title: 'Bantuan',
+                            onTap: () {
+                              Navigator.pushNamed(context, 'chat');
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: vPadding),
               _buildSectionTitle(context, 'Keluar'),

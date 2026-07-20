@@ -40,26 +40,25 @@ class AttachmentPickerPanel extends StatelessWidget {
           items.isEmpty
               ? _emptyState(context)
               : SizedBox(
-            height: 148,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.zero,
-              itemCount: items.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, i) {
-                final item = items[i];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 22),
-                  child: _ThumbCard(
-                    item: item,
-                    onRemove: () => onRemove(item.localId),
-                    onTap: () => onTapItem(item),
+                  height: 148,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.zero,
+                    itemCount: items.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (context, i) {
+                      final item = items[i];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 11),
+                        child: _ThumbCard(
+                          item: item,
+                          onRemove: () => onRemove(item.localId),
+                          onTap: () => onTapItem(item),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
-
+                ),
           Padding(
             padding: const EdgeInsets.only(bottom: 14),
             child: Row(
@@ -184,7 +183,6 @@ class _ThumbCardState extends State<_ThumbCard> {
                 Positioned.fill(
                   child: _content(),
                 ),
-
                 Positioned.fill(
                   child: DecoratedBox(
                     decoration: BoxDecoration(
@@ -200,7 +198,6 @@ class _ThumbCardState extends State<_ThumbCard> {
                     ),
                   ),
                 ),
-
                 Positioned(
                   top: 6,
                   right: 6,
@@ -314,7 +311,7 @@ class _PdfThumbImage extends StatelessWidget {
     final page = await doc.getPage(1);
 
     final img = await page.render(
-      width: (width * 2).toDouble(),   // biar tajam
+      width: (width * 2).toDouble(), // biar tajam
       height: (height * 2).toDouble(),
       format: PdfPageImageFormat.png,
     );

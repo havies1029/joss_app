@@ -50,12 +50,6 @@ class PhoneNumberHelper {
       );
     }
 
-    if (RegExp(r'^([0-9])\1+$').hasMatch(digits)) {
-      return PhoneNumberResult.fail(
-        'Nomor telepon tidak boleh menggunakan angka yang sama semua',
-      );
-    }
-
     return PhoneNumberResult.success(digits);
   }
 

@@ -1,5 +1,20 @@
 part of 'reguser_otp_bloc.dart';
 
+class RegUserOtpVerifiedTarget extends Equatable {
+  final String requestFrom;
+  final String target;
+  final String requestId;
+
+  const RegUserOtpVerifiedTarget({
+    required this.requestFrom,
+    required this.target,
+    required this.requestId,
+  });
+
+  @override
+  List<Object?> get props => [requestFrom, target, requestId];
+}
+
 class RegUserOtpState extends Equatable {
   final String emailRequestId;
   final String hpRequestId;
@@ -15,6 +30,7 @@ class RegUserOtpState extends Equatable {
   final String activeRequestFrom;
   final String message;
   final bool hasFailure;
+  final List<RegUserOtpVerifiedTarget>? verifiedTargets;
 
   const RegUserOtpState({
     this.emailRequestId = '',
@@ -31,6 +47,7 @@ class RegUserOtpState extends Equatable {
     this.activeRequestFrom = '',
     this.message = '',
     this.hasFailure = false,
+    this.verifiedTargets = const [],
   });
 
   RegUserOtpState copyWith({
@@ -48,6 +65,7 @@ class RegUserOtpState extends Equatable {
     String? activeRequestFrom,
     String? message,
     bool? hasFailure,
+    List<RegUserOtpVerifiedTarget>? verifiedTargets,
   }) {
     return RegUserOtpState(
       emailRequestId: emailRequestId ?? this.emailRequestId,
@@ -64,6 +82,7 @@ class RegUserOtpState extends Equatable {
       activeRequestFrom: activeRequestFrom ?? this.activeRequestFrom,
       message: message ?? this.message,
       hasFailure: hasFailure ?? this.hasFailure,
+      verifiedTargets: verifiedTargets ?? this.verifiedTargets ?? const [],
     );
   }
 
@@ -83,5 +102,6 @@ class RegUserOtpState extends Equatable {
         activeRequestFrom,
         message,
         hasFailure,
+        verifiedTargets ?? const [],
       ];
 }

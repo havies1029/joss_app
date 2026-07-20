@@ -55,6 +55,7 @@ import '../../../repositories/combobox/comborokupasi_repository.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/dropdown2.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
+import '../../../widgets/apptheme/hitung_premi_empty_view.dart';
 import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
 import 'konfirmasi_regpar_page.dart';
@@ -1214,14 +1215,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                               //                         // buildFieldPremiNet(),
                             ],
                           )
-                        : const SizedBox(
-                            height: 40,
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                  "Klik Hitung Premi untuk melihat hasil."),
-                            ),
-                          ),
+                        : const HitungPremiEmptyView(),
                   ),
                   const SizedBox(height: hPadding),
                   if (canShowLanjutkan) ...[
