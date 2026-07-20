@@ -531,6 +531,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         //displayText: (item) => item.namaMarketing,
         displayText: (item) => item.kodeUnik,
         compareItems: (a, b) => a.mreferralId == b.mreferralId,
+        showClearButton: true,
         errorText: err('form1.referral'),
         onChangedCallback: (value) {
           setState(() {

@@ -261,6 +261,13 @@ class HomeTabWidgetState extends State<HomeTabWidget> {
                 ),
                 DraggableChatButton(
                   onTap: () {
+                    final authState = context.read<AuthenticationBloc>().state;
+                    final userType = authState is AuthenticationAuthenticated
+                        ? authState.user.userType.trim()
+                        : '';
+
+                    if (userType.isEmpty) return;
+
                     if (ChatInitService.I.isInitialized) {
                       Navigator.pushNamed(context, 'chat');
                     } else {
