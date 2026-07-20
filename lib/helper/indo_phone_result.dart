@@ -22,7 +22,7 @@ class IndoPhoneHelper {
     final digits = _clean(rawInput);
 
     if (digits.isEmpty) {
-      return IndoPhoneResult.fail('Nomor tidak boleh kosong');
+      return IndoPhoneResult.fail('Email/No. Handphone belum valid');
     }
 
     String normalized;

@@ -41,6 +41,7 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
   bool _isInitialEmailApplied = false;
   int _submitAttempt = 0;
   bool _isDialogLoadingShown = false;
+  final Map<String, String?> fieldErrors = {};
 
   @override
   void initState() {
@@ -131,6 +132,57 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
+  String? err(String key) => fieldErrors[key];
+
+  void setErr(String key, String? msg) {
+    setState(() => fieldErrors[key] = msg);
+  }
+
+  void clearErr(String key) {
+    if (!fieldErrors.containsKey(key)) return;
+    setState(() => fieldErrors.remove(key));
+  }
+
+  void clearErrsByPrefix(String prefix) {
+    setState(() {
+      fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
+    });
+  }
+
+  bool validateLoginForm() {
+    clearErrsByPrefix('form.');
+    var ok = true;
+
+    final input = _usernameController.text.trim();
+    if (input.isEmpty) {
+      setErr('form.username', "Mohon isi email atau nomor handphone");
+      ok = false;
+    } else if (!EmailValidator.validate(input)) {
+      final phoneRes = IndoPhoneHelper.normalize(input);
+
+      if (!phoneRes.isValid) {
+        setErr(
+          'form.username',
+          phoneRes.error ?? "Masukkan format nomor HP yang valid",
+        );
+        ok = false;
+      } else {
+        _usernameController.text = phoneRes.phone62!;
+      }
+    }
+
+    final password = _passwordController.text;
+    if (password.isEmpty) {
+      setErr('form.password', kPassNullError);
+      ok = false;
+    } else if (password.length < 8) {
+      setErr('form.password', kShortPassError);
+      ok = false;
+    }
+
+    return ok;
+  }
+
   Widget _buildEmailField() {
     return appTextField(
       label: "Email atau No. Handphone",
@@ -141,25 +193,21 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
       inputFormatters: [
         FilteringTextInputFormatter.deny(RegExp(r'\s')),
       ],
-      validator: (value) {
-        final input = (value ?? '').trim();
-        if (input.isEmpty) {
-          return "Mohon isi email atau nomor handphone";
+      errorText: err('form.username'),
+      validator: (_) => err('form.username'),
+      onChanged: (value) {
+        final input = value.trim();
+        if (input.isEmpty) return;
+
+        if (EmailValidator.validate(input)) {
+          clearErr('form.username');
+          return;
         }
 
-        final isEmail = EmailValidator.validate(input);
-
-        if (!isEmail) {
-          final phoneRes = IndoPhoneHelper.normalize(input);
-
-          if (!phoneRes.isValid) {
-            return phoneRes.error ?? "Masukkan format nomor HP yang valid";
-          }
-
-          _usernameController.text = phoneRes.phone62!;
+        final phoneRes = IndoPhoneHelper.normalize(input);
+        if (phoneRes.isValid) {
+          clearErr('form.username');
         }
-
-        return null;
       },
       onTap: () {
         _animationController.forward(from: 0);
@@ -177,6 +225,7 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
       inputFormatters: [
         FilteringTextInputFormatter.deny(RegExp(r'\s')),
       ],
+      errorText: err('form.password'),
       suffixIcon: IconButton(
         icon: Icon(
           _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
@@ -187,13 +236,12 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
             setState(() => _isPasswordVisible = !_isPasswordVisible),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) {
-          return kPassNullError;
+        return err('form.password');
+      },
+      onChanged: (value) {
+        if (value.length >= 8) {
+          clearErr('form.password');
         }
-        if (value.length < 8) {
-          return kShortPassError;
-        }
-        return null;
       },
       onTap: () {
         _animationController.forward(from: 0);
@@ -209,7 +257,7 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
       onPressed: isSubmitting
           ? null
           : () async {
-              if (!_formKey.currentState!.validate()) return;
+              if (!validateLoginForm()) return;
 
               if (mounted) {
                 setState(() {
@@ -243,6 +291,16 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
         ),
       );
     });
+  }
+
+  String _loginFailureMessage() {
+    final input = _usernameController.text.trim();
+
+    if (EmailValidator.validate(input)) {
+      return "Email atau Kata Sandi Anda salah!";
+    }
+
+    return "No Handphone atau Kata Sandi Anda salah!";
   }
 
   void onLoginButtonPressed() {
@@ -283,7 +341,7 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
                   }
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    errorSnackBar("Username atau Password Anda salah!"),
+                    errorSnackBar(_loginFailureMessage()),
                   );
                   return;
                 }
@@ -486,12 +544,11 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
                                             Navigator.of(context)
                                                 .pushReplacement(
                                               MaterialPageRoute(
-                                                builder: (_) =>
-                                                    RegisterClient(
+                                                builder: (_) => RegisterClient(
                                                   requestFrom:
                                                       widget.requestFrom.isEmpty
-                                                      ? 'daftarclient_page'
-                                                      : widget.requestFrom,
+                                                          ? 'daftarclient_page'
+                                                          : widget.requestFrom,
                                                 ),
                                               ),
                                             );

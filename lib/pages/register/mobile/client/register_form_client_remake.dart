@@ -326,7 +326,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
 
     return appTextField(
       label: isCompanyClient ? "No. Telp Perusahaan" : "No. HP",
-      hint:  isCompanyClient ? "Masukkan No. Telp Perusahaan" : "Masukkan No. HP",
+      hint:
+          isCompanyClient ? "Masukkan No. Telp Perusahaan" : "Masukkan No. HP",
       controller: fieldTeleponController,
       keyboardType: TextInputType.phone,
       inputFormatters: [
@@ -398,7 +399,13 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       focusedBorderColor: isVerified ? successGreen : null,
       validator: (_) => err('form1.email'),
       onChanged: (v) {
-        if (v.trim().isNotEmpty) {
+        final email = v.trim();
+
+        if (email.isEmpty) {
+          setErr('form1.email', kStringNullError);
+        } else if (!EmailValidator.validate(email)) {
+          setErr('form1.email', 'Format tidak valid');
+        } else {
           clearErr('form1.email');
         }
         final target = _emailOtpTarget(v);
