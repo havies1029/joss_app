@@ -18,11 +18,14 @@ class IndoPhoneHelper {
     return input.replaceAll(RegExp(r'[^0-9]'), '');
   }
 
-  static IndoPhoneResult normalize(String rawInput) {
+  static IndoPhoneResult normalize(
+    String rawInput, {
+    String emptyMessage = 'Email/No. Handphone belum valid',
+  }) {
     final digits = _clean(rawInput);
 
     if (digits.isEmpty) {
-      return IndoPhoneResult.fail('Email/No. Handphone belum valid');
+      return IndoPhoneResult.fail(emptyMessage);
     }
 
     String normalized;
@@ -33,18 +36,15 @@ class IndoPhoneHelper {
         return IndoPhoneResult.fail('Nomor HP harus diawali 628');
       }
       normalized = digits;
-    }
-    else if (digits.startsWith('0')) {
+    } else if (digits.startsWith('0')) {
       // HARUS 08
       if (!digits.startsWith('08')) {
         return IndoPhoneResult.fail('Nomor HP harus diawali 08');
       }
       normalized = '62${digits.substring(1)}';
-    }
-    else if (digits.startsWith('8')) {
+    } else if (digits.startsWith('8')) {
       normalized = '62$digits';
-    }
-    else {
+    } else {
       return IndoPhoneResult.fail(
         'Awalan nomor tidak valid (harus 62, 0, atau 8)',
       );

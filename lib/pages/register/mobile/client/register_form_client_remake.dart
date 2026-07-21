@@ -30,6 +30,8 @@ class RegisterFormClientRemake extends StatefulWidget {
       _RegisterFormClientRemakeState();
 }
 
+const _indoPhoneOnlyEmptyError = 'No. Handphone belum valid';
+
 class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   final fieldNameController = TextEditingController();
   final fieldPasswordController = TextEditingController();
@@ -62,6 +64,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
 
   @override
   void dispose() {
+    _submitAttempt++;
     fieldNameController.dispose();
     fieldPasswordController.dispose();
     fieldTeleponController.dispose();
@@ -160,7 +163,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
           ok = false;
         }
       } else {
-        final phoneRes = IndoPhoneHelper.normalize(telp);
+        final phoneRes = IndoPhoneHelper.normalize(telp,
+            emptyMessage: _indoPhoneOnlyEmptyError);
         if (!phoneRes.isValid) {
           setErr('form1.telepon', phoneRes.error ?? "Format tidak valid");
           ok = false;
@@ -274,7 +278,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       return phoneRes.phone ?? '';
     }
 
-    final phoneRes = IndoPhoneHelper.normalize(value);
+    final phoneRes = IndoPhoneHelper.normalize(value,
+        emptyMessage: _indoPhoneOnlyEmptyError);
     return phoneRes.phone62 ?? '';
   }
 
@@ -425,7 +430,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     }
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           flex: 8,
@@ -453,7 +458,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     }
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           flex: 8,
@@ -614,6 +619,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
             },
             listener: (context, state) {
               if (state.hasFailure && state.errors.isNotEmpty) {
+                _submitAttempt++;
                 _hideGlobalLoading();
 
                 if (mounted) {
@@ -630,6 +636,12 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
               if (!state.hasFailure &&
                   state.isSaved &&
                   state.isRegisterSuccess) {
+                _submitAttempt++;
+                if (mounted) {
+                  setState(() {
+                    isSubmitting = false;
+                  });
+                }
                 _showGlobalLoading();
                 context
                     .read<RegUserOtpBloc>()
@@ -814,7 +826,9 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     final isCompanyClient = fieldComboJnsClient?.mjnsclientId == '20';
     final String telepon = isCompanyClient
         ? (PhoneNumberHelper.normalize(fieldTeleponController.text).phone ?? '')
-        : (IndoPhoneHelper.normalize(fieldTeleponController.text).phone62 ??
+        : (IndoPhoneHelper.normalize(fieldTeleponController.text,
+                    emptyMessage: _indoPhoneOnlyEmptyError)
+                .phone62 ??
             '');
 
     final record = RegUserModel(
@@ -884,7 +898,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
 
       target = phoneRes.phone ?? '';
     } else {
-      final phoneRes = IndoPhoneHelper.normalize(fieldTeleponController.text);
+      final phoneRes = IndoPhoneHelper.normalize(fieldTeleponController.text,
+          emptyMessage: _indoPhoneOnlyEmptyError);
 
       if (!phoneRes.isValid) {
         setErr('form1.telepon', phoneRes.error ?? 'Format tidak valid');
