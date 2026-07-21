@@ -141,7 +141,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       _setBool(fieldIsRsmdccController, true);
 
       fieldComboMKabZonaGempa = null;
-      comboMKabZonaGempaKey.currentState?.clear();
       clearErr('form3.kab2zonagempaId');
     }
   }
@@ -1979,6 +1978,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         comboKey: comboRKonstruksiojkKey,
         maxHeight: 200,
         initItem: fieldComboRKonstruksiojk,
+        isEnabled: fieldComboROkupasi != null,
+        dependencyKey: fieldComboROkupasi?.rokupasiId,
         params: {
           "rokupasiId": fieldComboROkupasi?.rokupasiId ?? "",
         },
@@ -2059,7 +2060,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
             });
           } else {
             setState(() {
-              comboRKonstruksiojkKey.currentState?.clear();
               fieldComboRKonstruksiojk = oldKonstruksi;
             });
           }
@@ -2083,7 +2083,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
             fieldComboRKonstruksiojk = null;
             previousKonstruksi = null;
-            comboRKonstruksiojkKey.currentState?.clear();
             clearErr('form2.kelasKonstruksi');
           });
           if (v != null) {
@@ -2128,9 +2127,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
             fieldComboMPropinsi = v;
             if (v != null) {
               clearErr('form2.provinsi');
-              comboMKotaKey.currentState?.clear();
-              comboMKecamatanKey.currentState?.clear();
-              comboMKelurahanKey.currentState?.clear();
               fieldComboMKota = null;
               fieldComboMKecamatan = null;
               fieldComboMKelurahan = null;
@@ -2152,6 +2148,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         hintText: "Kota",
         comboKey: comboMKotaKey,
         initItem: fieldComboMKota,
+        isEnabled: fieldComboMPropinsi != null,
+        dependencyKey: fieldComboMPropinsi?.mpropinsiId,
         params: {
           "mpropinsiId": fieldComboMPropinsi?.mpropinsiId ?? "",
         },
@@ -2168,8 +2166,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
             fieldComboMKota = v;
             if (v != null) {
               clearErr('form2.kota');
-              comboMKecamatanKey.currentState?.clear();
-              comboMKelurahanKey.currentState?.clear();
               fieldComboMKecamatan = null;
               fieldComboMKelurahan = null;
               clearErr('form2.kecamatan');
@@ -2190,6 +2186,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         hintText: "Kecamatan",
         comboKey: comboMKecamatanKey,
         initItem: fieldComboMKecamatan,
+        isEnabled: fieldComboMKota != null,
+        dependencyKey: fieldComboMKota?.mkotaId,
         params: {
           "mkotaId": fieldComboMKota?.mkotaId ?? "",
         },
@@ -2206,7 +2204,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
             fieldComboMKecamatan = v;
             if (v != null) {
               clearErr('form2.kecamatan');
-              comboMKelurahanKey.currentState?.clear();
               fieldComboMKelurahan = null;
               clearErr('form2.kelurahan');
             }
@@ -2225,6 +2222,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         hintText: "Kelurahan",
         comboKey: comboMKelurahanKey,
         initItem: fieldComboMKelurahan,
+        isEnabled: fieldComboMKecamatan != null,
+        dependencyKey: fieldComboMKecamatan?.mkecamatanId,
         params: {
           "mkecamatanId": fieldComboMKecamatan?.mkecamatanId ?? "",
         },
@@ -2332,7 +2331,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
             if (v != null) {
               clearErr('form3.wilayah');
               fieldComboMKabZonaGempa = null;
-              comboMKabZonaGempaKey.currentState?.clear();
               clearErr('form3.kab2zonagempaId');
             }
           });
@@ -2350,6 +2348,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         hintText: "Zona Gempa Bumi",
         initItem: fieldComboMKabZonaGempa,
         comboKey: comboMKabZonaGempaKey,
+        isEnabled: _showZonaGempa && fieldComboMWilayah != null,
+        dependencyKey: fieldComboMWilayah?.mwilayahId,
         params: {
           "mwilayahId": fieldComboMWilayah?.mwilayahId ?? "",
         },

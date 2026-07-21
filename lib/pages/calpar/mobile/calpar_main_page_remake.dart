@@ -124,7 +124,6 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       _setBool(fieldIsRsmdccController, true);
 
       fieldComboMKabZonaGempa = null;
-      comboMKabZonaGempaKey.currentState?.clear();
       clearErr('form3.kab2zonagempaId');
     }
   }
@@ -1441,8 +1440,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         maxHeight: 200,
         initItem: fieldComboRKonstruksiojk,
         enableSearch: false,
+        isEnabled: fieldComboROkupasi != null,
+        dependencyKey: fieldComboROkupasi?.rokupasiId,
         params: {
-          "rokupasiId": fieldComboROkupasi?.rokupasiId,
+          "rokupasiId": fieldComboROkupasi?.rokupasiId ?? "",
         },
         loader: (q) {
           return ComboRKonstruksiojkRepository()
@@ -1521,7 +1522,6 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
             });
           } else {
             setState(() {
-              konstruksiKey.currentState?.clear();
               fieldComboRKonstruksiojk = null;
               previousKonstruksi = null;
             });
@@ -1544,7 +1544,6 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
             clearErr('form1.rokupasiId');
             fieldComboRKonstruksiojk = null;
             previousKonstruksi = null;
-            konstruksiKey.currentState?.clear();
             clearErr('form1.rkonstruksiojkId');
           });
         },
@@ -1757,8 +1756,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
             fieldComboMWilayah = v;
             clearErr('form3.mwilayahId');
             fieldComboMKabZonaGempa = null;
-            comboMKabZonaGempaKey.currentState?.clear();
-            clearErr('form3.zonaGempa');
+            clearErr('form3.kab2zonagempaId');
           });
           if (v != null) {
             calpar3formBloc?.add(
@@ -1774,6 +1772,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         hintText: "Zona Gempa Bumi",
         initItem: fieldComboMKabZonaGempa,
         comboKey: comboMKabZonaGempaKey,
+        isEnabled: _showZonaGempa && fieldComboMWilayah != null,
+        dependencyKey: fieldComboMWilayah?.mwilayahId,
         params: {
           "mwilayahId": fieldComboMWilayah?.mwilayahId ?? "",
         },
@@ -2057,7 +2057,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   bool isForm3Complete() =>
       fieldComboMJnscoverPar != null &&
       fieldComboMWilayah != null &&
-      fieldComboMKabZonaGempa != null;
+      (!_showZonaGempa || fieldComboMKabZonaGempa != null);
 
   bool isForm4Complete() => (calpar4Id?.isNotEmpty == true);
 }

@@ -179,7 +179,8 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
       _isSearchingNotifier.value = false;
       _itemsVersionNotifier.value++;
 
-      widget.comboKey?.currentState?.clear();
+      // Parent state owns selectedItem/initItem; clearing DropdownSearch here
+      // can detach active ink/popup during a dependency rebuild.
     }
   }
 
@@ -310,7 +311,9 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
           labelText: widget.hintText,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          labelStyle: inputTextStyle(context),
+          labelStyle: widget.isEnabled
+              ? inputTextStyle(context)
+              : bodyTextStyle(context),
           hintText: 'Pilih ${widget.hintText}',
           hintMaxLines: 1,
           hintStyle: bodyTextStyle(context).copyWith(color: hintGrey),
@@ -318,12 +321,16 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
               ? Icon(widget.prefixIcon, color: primaryColor)
               : null,
           filled: true,
-          fillColor: formGrey,
+          fillColor: widget.isEnabled ? formGrey : sGrey,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(color: sGrey),
           ),
           enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: sGrey),
+          ),
+          disabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(color: sGrey),
           ),
@@ -687,7 +694,8 @@ class _DropdownEmptyView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5, vertical: vPadding),
+      padding: const EdgeInsets.symmetric(
+          horizontal: hPadding * 1.5, vertical: vPadding),
       color: formGrey,
       child: Column(
         mainAxisSize: MainAxisSize.min,

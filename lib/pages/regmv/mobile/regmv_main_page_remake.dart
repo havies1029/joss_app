@@ -2548,8 +2548,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               clearErr('form3.merek');
               regmv3formbloc?.add(ComboMMvmerkChangedEvent(comboMMvmerk: v));
             }
-            comboMMvtipeKey.currentState?.clear();
-            comboMMvmodelKey.currentState?.clear();
           });
         },
         onSaveCallback: (value) => fieldComboMMvmerk = value,
@@ -2559,6 +2557,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         hintText: "Model",
         comboKey: comboMMvtipeKey,
         initItem: fieldComboMMvtipe,
+        isEnabled: fieldComboMMvmerk != null,
+        dependencyKey: fieldComboMMvmerk?.mmvmerkId,
         params: {
           "mmvmerkId": fieldComboMMvmerk?.mmvmerkId ?? "",
         },
@@ -2581,7 +2581,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               clearErr('form3.model');
               regmv3formbloc?.add(ComboMMvtipeChangedEvent(comboMMvtipe: v));
             }
-            comboMMvmodelKey.currentState?.clear();
           });
         },
         onSaveCallback: (value) => fieldComboMMvtipe = value,
@@ -2591,6 +2590,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         hintText: "Sub Model",
         comboKey: comboMMvmodelKey,
         initItem: fieldComboMMvmodel,
+        isEnabled: fieldComboMMvtipe != null,
+        dependencyKey: fieldComboMMvtipe?.mmvtipeId,
         params: {
           "mmvtipeId": fieldComboMMvtipe?.mmvtipeId ?? "",
         },

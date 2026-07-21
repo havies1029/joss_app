@@ -41,7 +41,8 @@ class MRekanContactCrudFormPageFormState
   ComboMKotaModel? fieldComboMKota;
   final comboMKotaKey = GlobalKey<DropdownSearchState<ComboMKotaModel>>();
   ComboMPropinsiModel? fieldComboMPropinsi;
-  final comboMPropinsiKey = GlobalKey<DropdownSearchState<ComboMPropinsiModel>>();
+  final comboMPropinsiKey =
+      GlobalKey<DropdownSearchState<ComboMPropinsiModel>>();
   ComboRKodeposModel? fieldComboRKodepos;
   final comboRKodeposKey = GlobalKey<DropdownSearchState<ComboRKodeposModel>>();
 
@@ -86,12 +87,15 @@ class MRekanContactCrudFormPageFormState
                     horizontal: 15,
                     vertical: 20,
                   ),
-                  child: BlocListener<MRekanContactCrudBloc, MRekanContactCrudState>(
+                  child: BlocListener<MRekanContactCrudBloc,
+                      MRekanContactCrudState>(
                     listenWhen: (prev, curr) =>
-                    prev.isLoaded != curr.isLoaded ||
+                        prev.isLoaded != curr.isLoaded ||
                         prev.isSaved != curr.isSaved,
                     listener: (context, state) {
-                      if (state.isLoaded && state.record != null && _isFirstLoad) {
+                      if (state.isLoaded &&
+                          state.record != null &&
+                          _isFirstLoad) {
                         final contact = state.record!;
 
                         if (fieldAlamat1Controller.text.trim().isEmpty) {
@@ -104,7 +108,8 @@ class MRekanContactCrudFormPageFormState
                         final contactEmail = contact.email.trim();
                         final contactTelp = contact.telp.trim();
 
-                        final rekan = context.read<MRekan1CrudBloc>().state.record;
+                        final rekan =
+                            context.read<MRekan1CrudBloc>().state.record;
                         final rekanEmail = (rekan?.email ?? '').trim();
                         final rekanTelp = (rekan?.telepon ?? '').trim();
 
@@ -124,11 +129,14 @@ class MRekanContactCrudFormPageFormState
                           final userTelp = (AppData.user.hp ?? '').trim();
 
                           if (contactTelp.isNotEmpty) {
-                            fieldTelpController.text = PhoneNumberHelper.clean(contactTelp);
+                            fieldTelpController.text =
+                                PhoneNumberHelper.clean(contactTelp);
                           } else if (rekanTelp.isNotEmpty) {
-                            fieldTelpController.text = PhoneNumberHelper.clean(rekanTelp);
+                            fieldTelpController.text =
+                                PhoneNumberHelper.clean(rekanTelp);
                           } else if (userTelp.isNotEmpty) {
-                            fieldTelpController.text = PhoneNumberHelper.clean(userTelp);
+                            fieldTelpController.text =
+                                PhoneNumberHelper.clean(userTelp);
                           }
                         }
 
@@ -222,8 +230,8 @@ class MRekanContactCrudFormPageFormState
             onPressed: isSaving
                 ? null
                 : () async {
-              await onSaveForm();
-            },
+                    await onSaveForm();
+                  },
           )
         ],
       ),
@@ -243,30 +251,27 @@ class MRekanContactCrudFormPageFormState
   }
 
   Widget buildFieldEmail() => appTextField(
-    label: "Email",
-    controller: fieldEmailController,
-    keyboardType: TextInputType.emailAddress,
-    inputFormatters: [
-      FilteringTextInputFormatter.deny(RegExp(r'\s')),
-    ],
-    validator: (v) {
-      final email = v?.trim() ?? "";
-      if (email.isEmpty) {
-        return kEmailNullError;
-      }
-      if (!emailValidatorRegExp.hasMatch(email)) {
-        return "Format email tidak valid";
-      }
-      return null;
-    },
-  );
+        label: "Email",
+        controller: fieldEmailController,
+        keyboardType: TextInputType.emailAddress,
+        inputFormatters: [
+          FilteringTextInputFormatter.deny(RegExp(r'\s')),
+        ],
+        validator: (v) {
+          final email = v?.trim() ?? "";
+          if (email.isEmpty) {
+            return kEmailNullError;
+          }
+          if (!emailValidatorRegExp.hasMatch(email)) {
+            return "Format email tidak valid";
+          }
+          return null;
+        },
+      );
 
   Widget buildFieldTelp() {
-    final mjenisClient = context
-        .read<MRekan1CrudBloc>()
-        .state
-        .record
-        ?.mjnsclientId;
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
 
     final jenisClientLabel = switch (mjenisClient) {
       '10' => 'Individu',
@@ -297,83 +302,67 @@ class MRekanContactCrudFormPageFormState
   }
 
   Widget buildFieldAlamat1() => appTextField(
-    label: "Alamat Rumah",
-    controller: fieldAlamat1Controller,
-    keyboardType: TextInputType.streetAddress,
-    validator: (v) {
-      if (v == null || v.isEmpty) return kAddressNullError;
-      return null;
-    },
-  );
+        label: "Alamat Rumah",
+        controller: fieldAlamat1Controller,
+        keyboardType: TextInputType.streetAddress,
+        validator: (v) {
+          if (v == null || v.isEmpty) return kAddressNullError;
+          return null;
+        },
+      );
 
-  Widget buildFieldMpropinsiId() =>
-      ReusableComboBoxV2<ComboMPropinsiModel>(
+  Widget buildFieldMpropinsiId() => ReusableComboBoxV2<ComboMPropinsiModel>(
         hintText: "Provinsi",
         comboKey: comboMPropinsiKey,
         initItem: fieldComboMPropinsi,
-
-        loader: (q) => ComboMPropinsiRepository().getComboMPropinsi(q.searchText),
-
+        loader: (q) =>
+            ComboMPropinsiRepository().getComboMPropinsi(q.searchText),
         displayText: (item) => item.propinsiNama,
         compareItems: (a, b) => a.mpropinsiId == b.mpropinsiId,
-
         validatorCallback: (v) => v == null ? kStringProvinsiError : null,
-
         onChangedCallback: (v) {
           setState(() {
             fieldComboMPropinsi = v;
             fieldComboMKota = null;
             fieldComboRKodepos = null;
-
-            comboMKotaKey.currentState?.clear();
-            comboRKodeposKey.currentState?.clear();
           });
         },
-
         onSaveCallback: (value) => fieldComboMPropinsi = value,
       );
 
-  Widget buildFieldMkotaId() =>
-      ReusableComboBoxV2<ComboMKotaModel>(
+  Widget buildFieldMkotaId() => ReusableComboBoxV2<ComboMKotaModel>(
         hintText: "Kota",
         comboKey: comboMKotaKey,
         initItem: fieldComboMKota,
-
+        isEnabled: fieldComboMPropinsi != null,
+        dependencyKey: fieldComboMPropinsi?.mpropinsiId,
         params: {
           "mpropinsiId": fieldComboMPropinsi?.mpropinsiId ?? "",
         },
-
         loader: (q) {
           final mpropinsiId = q.get<String>("mpropinsiId") ?? "";
 
           return ComboMKotaRepository().getComboMKota(mpropinsiId);
         },
-
         displayText: (item) => item.kotaDesc,
         compareItems: (a, b) => a.mkotaId == b.mkotaId,
-
         validatorCallback: (v) => v == null ? kStringKotaError : null,
-
         onChangedCallback: (v) {
           setState(() {
-            if (v != null) {
-              comboRKodeposKey.currentState?.clear();
-              fieldComboRKodepos = null;
-            }
-
             fieldComboMKota = v;
+            fieldComboRKodepos = null;
           });
         },
-
         onSaveCallback: (value) => fieldComboMKota = value,
       );
 
-  Widget buildFieldRkodeposId() =>
-      ReusableComboBoxV2<ComboRKodeposModel>(
+  Widget buildFieldRkodeposId() => ReusableComboBoxV2<ComboRKodeposModel>(
         hintText: "Kodepos (Opsional)",
         comboKey: comboRKodeposKey,
         initItem: fieldComboRKodepos,
         showClearButton: true,
+        isEnabled: fieldComboMKota != null,
+        dependencyKey: fieldComboMKota?.mkotaId,
 
         params: {
           "mkotaId": fieldComboMKota?.mkotaId ?? "",

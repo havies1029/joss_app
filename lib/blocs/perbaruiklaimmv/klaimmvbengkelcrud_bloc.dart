@@ -9,7 +9,9 @@ import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvbengkelcrud_reposit
 
 part 'klaimmvbengkelcrud_event.dart';
 part 'klaimmvbengkelcrud_state.dart';
-class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, KlaimmvbengkelcrudState> {
+
+class KlaimmvbengkelcrudBloc
+    extends Bloc<KlaimmvbengkelcrudEvents, KlaimmvbengkelcrudState> {
   final KlaimmvbengkelcrudRepository repository;
 
   KlaimmvbengkelcrudBloc({required this.repository})
@@ -26,9 +28,9 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
   }
 
   Future<void> onTambahKlaimmvbengkelcrud(
-      KlaimmvbengkelcrudTambahEvent event,
-      Emitter<KlaimmvbengkelcrudState> emit,
-      ) async {
+    KlaimmvbengkelcrudTambahEvent event,
+    Emitter<KlaimmvbengkelcrudState> emit,
+  ) async {
     ReturnDataAPI returnData;
     bool hasFailure = true;
 
@@ -45,9 +47,9 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
   }
 
   Future<void> onUbahKlaimmvbengkelcrud(
-      KlaimmvbengkelcrudUbahEvent event,
-      Emitter<KlaimmvbengkelcrudState> emit,
-      ) async {
+    KlaimmvbengkelcrudUbahEvent event,
+    Emitter<KlaimmvbengkelcrudState> emit,
+  ) async {
     emit(state.copyWith(isSaving: true, isSaved: false));
 
     bool hasFailure = !await repository.klaimmvbengkelcrudUbah(event.record);
@@ -60,9 +62,9 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
   }
 
   Future<void> onHapusKlaimmvbengkelcrud(
-      KlaimmvbengkelcrudHapusEvent event,
-      Emitter<KlaimmvbengkelcrudState> emit,
-      ) async {
+    KlaimmvbengkelcrudHapusEvent event,
+    Emitter<KlaimmvbengkelcrudState> emit,
+  ) async {
     emit(state.copyWith(isSaving: true, isSaved: false));
 
     bool hasFailure = !await repository.klaimmvbengkelcrudHapus(event.recordId);
@@ -75,13 +77,13 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
   }
 
   Future<void> onLihatKlaimmvbengkelcrud(
-      KlaimmvbengkelcrudLihatEvent event,
-      Emitter<KlaimmvbengkelcrudState> emit,
-      ) async {
+    KlaimmvbengkelcrudLihatEvent event,
+    Emitter<KlaimmvbengkelcrudState> emit,
+  ) async {
     emit(state.copyWith(isLoading: true, isLoaded: false));
 
     KlaimmvbengkelcrudModel? record =
-    await repository.klaimmvbengkelcrudLihat(event.recordId);
+        await repository.klaimmvbengkelcrudLihat(event.recordId);
 
     final valid = _validate(record);
 
@@ -99,21 +101,24 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
   }
 
   Future<void> onComboMJnsbengkelChanged(
-      ComboMJnsbengkelChangedEvent event,
-      Emitter<KlaimmvbengkelcrudState> emit,
-      ) async {
+    ComboMJnsbengkelChangedEvent event,
+    Emitter<KlaimmvbengkelcrudState> emit,
+  ) async {
     emit(state.copyWith(isLoading: true, isLoaded: false));
 
     final comboMJnsbengkel = event.comboMJnsbengkel;
-    final jenisId = comboMJnsbengkel.mjnsbengkelId;
+    final jenisId = comboMJnsbengkel?.mjnsbengkelId;
 
     KlaimmvbengkelcrudModel updatedRecord =
         state.record ?? KlaimmvbengkelcrudModel.empty();
 
     updatedRecord = updatedRecord.copyWith(
       mjnsbengkelId: jenisId,
-      mwilayahbengkelId: '',
-      mbengkelId: '',
+      comboMJnsbengkel: comboMJnsbengkel,
+      mwilayahbengkelId: null,
+      comboMWilayahBengkel: null,
+      mbengkelId: null,
+      comboMBengkel: null,
       namaBengkelLain: '',
     );
 
@@ -134,18 +139,20 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
   }
 
   Future<void> onComboMWilayahBengkelChanged(
-      ComboMWilayahBengkelChangedEvent event,
-      Emitter<KlaimmvbengkelcrudState> emit,
-      ) async {
-    ComboMWilayahBengkelModel comboMWilayahBengkel =
-        event.comboMWilayahBengkel;
+    ComboMWilayahBengkelChangedEvent event,
+    Emitter<KlaimmvbengkelcrudState> emit,
+  ) async {
+    final comboMWilayahBengkel = event.comboMWilayahBengkel;
+    final wilayahId = comboMWilayahBengkel?.mwilayahbengkelId;
 
     KlaimmvbengkelcrudModel updatedRecord =
         state.record ?? KlaimmvbengkelcrudModel.empty();
 
     updatedRecord = updatedRecord.copyWith(
-      mwilayahbengkelId: comboMWilayahBengkel.mwilayahbengkelId,
-      mbengkelId: '',
+      mwilayahbengkelId: wilayahId,
+      comboMWilayahBengkel: comboMWilayahBengkel,
+      mbengkelId: null,
+      comboMBengkel: null,
       namaBengkelLain: '',
     );
 
@@ -163,9 +170,9 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
   }
 
   Future<void> onComboMBengkelChanged(
-      ComboMBengkelChangedEvent event,
-      Emitter<KlaimmvbengkelcrudState> emit,
-      ) async {
+    ComboMBengkelChangedEvent event,
+    Emitter<KlaimmvbengkelcrudState> emit,
+  ) async {
     emit(state.copyWith(isLoading: true, isLoaded: false));
 
     ComboMBengkelModel comboMBengkel = event.comboMBengkel;
@@ -175,6 +182,7 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
 
     updatedRecord = updatedRecord.copyWith(
       mbengkelId: comboMBengkel.mbengkelId,
+      comboMBengkel: comboMBengkel,
       namaBengkelLain: '',
     );
 
@@ -193,9 +201,9 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
   }
 
   Future<void> onKlaimmvbengkelAutoSave(
-      KlaimmvbengkelAutoSaveEvent event,
-      Emitter<KlaimmvbengkelcrudState> emit,
-      ) async {
+    KlaimmvbengkelAutoSaveEvent event,
+    Emitter<KlaimmvbengkelcrudState> emit,
+  ) async {
     if (!state.isDirty && event.saveFrom != "button") return;
 
     final record = state.record;
@@ -228,16 +236,18 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
   }
 
   Future<void> onFieldNamaBengkelLainChanged(
-      FieldNamaBengkelLainChangedEvent event,
-      Emitter<KlaimmvbengkelcrudState> emit,
-      ) async {
+    FieldNamaBengkelLainChangedEvent event,
+    Emitter<KlaimmvbengkelcrudState> emit,
+  ) async {
     KlaimmvbengkelcrudModel updatedRecord =
         state.record ?? KlaimmvbengkelcrudModel.empty();
 
     updatedRecord = updatedRecord.copyWith(
       namaBengkelLain: event.namaBengkelLain,
-      mwilayahbengkelId: '',
-      mbengkelId: '',
+      mwilayahbengkelId: null,
+      comboMWilayahBengkel: null,
+      mbengkelId: null,
+      comboMBengkel: null,
     );
 
     final valid = _validate(updatedRecord);
