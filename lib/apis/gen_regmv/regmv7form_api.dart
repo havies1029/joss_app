@@ -1,93 +1,106 @@
 import 'dart:convert';
 import 'package:joss_app/common/app_data.dart';
+import 'package:joss_app/helper/api_side_effects.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/gen_regmv/regmv7form_model.dart';
 
 class Regmv7FormAPI {
+  Future<ReturnDataAPI> regmv7FormTambahAPI(Regmv7FormModel record) async {
+    String tambahEndpoint =
+        "${AppData.prefixEndPoint}/api/regmv/regmv7form/create";
+    Map<String, String> queryParams = {"modul_id": "regmv7FormTambahAPI"};
+    var uri =
+        AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
-	Future<ReturnDataAPI> regmv7FormTambahAPI(Regmv7FormModel record) async {
-		String tambahEndpoint =
-			"${AppData.prefixEndPoint}/api/regmv/regmv7form/create";
-		Map<String, String> queryParams = {"modul_id": "regmv7FormTambahAPI"};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
+    ReturnDataAPI returnData;
+    final http.Response response = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; odata=verbos',
+          'Accept': 'application/json; odata=verbos',
+          'Authorization': 'Bearer ${AppData.userToken}'
+        },
+        body: jsonEncode(record.toJson()));
 
-		ReturnDataAPI returnData;
-		final http.Response response = await http.post(uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: jsonEncode(record.toJson()));
+    if (response.statusCode == 200) {
+      ApiSideEffects.refreshHakakses();
+      returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+    } else {
+      returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+    }
+    return returnData;
+  }
 
-		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
-		}
-		return returnData;
-	}
-	Future<bool> regmv7FormUbahAPI(Regmv7FormModel record) async {
-		String ubahEndpoint =
-			"${AppData.prefixEndPoint}/api/regmv/regmv7form/update";
-		Map<String, String> queryParams = {"modul_id": "regmv7FormUbahAPI"};
+  Future<bool> regmv7FormUbahAPI(Regmv7FormModel record) async {
+    String ubahEndpoint =
+        "${AppData.prefixEndPoint}/api/regmv/regmv7form/update";
+    Map<String, String> queryParams = {"modul_id": "regmv7FormUbahAPI"};
 
-		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
+    var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
 
-		final http.Response response = await http.post(uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: jsonEncode(record.toJson()));
+    final http.Response response = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; odata=verbos',
+          'Accept': 'application/json; odata=verbos',
+          'Authorization': 'Bearer ${AppData.userToken}'
+        },
+        body: jsonEncode(record.toJson()));
 
-		ReturnDataAPI returnData;
-		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
-		}
-		return returnData.success;
-	}
-	Future<bool> regmv7FormHapusAPI(String regmv7Id) async {
-		String hapusEndpoint = "${AppData.prefixEndPoint}/api/regmv/regmv7form/delete";
-		Map<String, String> queryParams = {
-			'regmv7Id': regmv7Id,
-			'modul_id': 'regmv7FormHapusAPI'};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, hapusEndpoint, queryParams);
-		final http.Response response =
-			await http.get(uri, headers: <String, String>{
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		});
+    ReturnDataAPI returnData;
+    if (response.statusCode == 200) {
+      ApiSideEffects.refreshHakakses();
+      returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+    } else {
+      returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+    }
+    return returnData.success;
+  }
 
-		ReturnDataAPI returnData;
-		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
-		}
-		return returnData.success;
-	}
-	Future<Regmv7FormModel> regmv7FormLihatAPI(String regmv7Id) async {
-		String lihatEndpoint = "${AppData.prefixEndPoint}/api/regmv/regmv7form/read";
-		Map<String, String> queryParams = {'regmv7Id': regmv7Id};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
-		final http.Response response =
-			await http.get(uri, headers: <String, String>{
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		});
+  Future<bool> regmv7FormHapusAPI(String regmv7Id) async {
+    String hapusEndpoint =
+        "${AppData.prefixEndPoint}/api/regmv/regmv7form/delete";
+    Map<String, String> queryParams = {
+      'regmv7Id': regmv7Id,
+      'modul_id': 'regmv7FormHapusAPI'
+    };
+    var uri =
+        AppData.uriHtpp(AppData.httpAuthority, hapusEndpoint, queryParams);
+    final http.Response response =
+        await http.get(uri, headers: <String, String>{
+      'Content-Type': 'application/json; odata=verbos',
+      'Accept': 'application/json; odata=verbos',
+      'Authorization': 'Bearer ${AppData.userToken}'
+    });
 
-		if (response.statusCode == 200) {
-			var returnData = Regmv7FormModel.fromJson(jsonDecode(response.body));
-			return returnData;
-		} else {
-			return throw Exception("Failed to load data");
-		}
-	}
+    ReturnDataAPI returnData;
+    if (response.statusCode == 200) {
+      ApiSideEffects.refreshHakakses();
+      returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+    } else {
+      returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+    }
+    return returnData.success;
+  }
+
+  Future<Regmv7FormModel> regmv7FormLihatAPI(String regmv7Id) async {
+    String lihatEndpoint =
+        "${AppData.prefixEndPoint}/api/regmv/regmv7form/read";
+    Map<String, String> queryParams = {'regmv7Id': regmv7Id};
+    var uri =
+        AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+    final http.Response response =
+        await http.get(uri, headers: <String, String>{
+      'Content-Type': 'application/json; odata=verbos',
+      'Accept': 'application/json; odata=verbos',
+      'Authorization': 'Bearer ${AppData.userToken}'
+    });
+
+    if (response.statusCode == 200) {
+      ApiSideEffects.refreshHakakses();
+      var returnData = Regmv7FormModel.fromJson(jsonDecode(response.body));
+      return returnData;
+    } else {
+      return throw Exception("Failed to load data");
+    }
+  }
 }

@@ -1,4 +1,4 @@
-class IndoPhoneResult {
+﻿class IndoPhoneResult {
   final String? phone62; // hasil normalisasi: 628xxxx
   final String? error;
 
@@ -37,10 +37,6 @@ class IndoPhoneHelper {
       }
       normalized = digits;
     } else if (digits.startsWith('0')) {
-      // HARUS 08
-      if (!digits.startsWith('08')) {
-        return IndoPhoneResult.fail('Nomor HP harus diawali 08');
-      }
       normalized = '62${digits.substring(1)}';
     } else if (digits.startsWith('8')) {
       normalized = '62$digits';

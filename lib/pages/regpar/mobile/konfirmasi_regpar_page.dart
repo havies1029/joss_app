@@ -29,6 +29,7 @@ import '../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../heropage/mobile/widget/transaksi_page.dart';
 import '../../tagihan_pembayaran/mobile/riwayat/riwayat_page_remake.dart';
+import '../../../helper/cob_access_guard.dart';
 
 //micky 2026-02-27
 
@@ -47,6 +48,7 @@ class KonfirmasiRegParPage extends StatefulWidget {
 }
 
 class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
+  bool _accessDeniedDialogShown = false;
   Regpar1CrudModel? regpar1Record;
   Regpar2FormModel? regpar2Record;
   Regpar3FormModel? regpar3Record;
@@ -69,7 +71,8 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
     super.initState();
     regpar1listBloc = context.read<Regpar1ListBloc>();
     if (widget.viewMode == "ubah" && widget.recordId != null) {
-      context.read<Regpar1CrudBloc>()
+      context
+          .read<Regpar1CrudBloc>()
           .add(Regpar1CrudLihatEvent(recordId: widget.recordId!));
     }
   }
@@ -186,7 +189,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
+                                    BorderRadius.circular(cardBorderRadius),
                               ),
                               elevation: 0,
                             ),
@@ -211,7 +214,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
+                                    BorderRadius.circular(cardBorderRadius),
                               ),
                               elevation: 0,
                             ),
@@ -254,8 +257,8 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
 
     if (shouldLeave == true) {
       context.read<Regpar1CrudBloc>().add(
-        Regpar1CrudHapusEvent(recordId:  widget.recordId ?? ""),
-      );
+            Regpar1CrudHapusEvent(recordId: widget.recordId ?? ""),
+          );
 
       final homeState = homeTabKey.currentState;
 
@@ -265,6 +268,20 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
 
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
+  }
+
+  void _handleAccessDeniedExit(BuildContext context) {
+    context.read<Regpar1CrudBloc>().add(
+          Regpar1CrudHapusEvent(recordId: widget.recordId ?? ""),
+        );
+
+    final homeState = homeTabKey.currentState;
+
+    if (homeState != null) {
+      homeState.goToHeroPage();
+    }
+
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   bool _isGlobalLoadingShown = false;
@@ -305,6 +322,14 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
         await _handleExit(context);
       },
       blocListeners: [
+        CobAccessGuard.buildHakaksesListener(
+          cobId: CobAccessGuard.cobProperti,
+          isDialogShown: () => _accessDeniedDialogShown,
+          markDialogShown: () {
+            _accessDeniedDialogShown = true;
+          },
+          onAccessDeniedReturn: () => _handleAccessDeniedExit(context),
+        ),
         BlocListener<DnRekap2invBloc, DnRekap2invState>(
           listenWhen: (previous, current) {
             return previous.isProcessed != current.isProcessed ||
@@ -341,7 +366,8 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 ),
               );
 
-              final curr = (state.curr.isEmpty) ? globalMataUang ?? "" : state.curr;
+              final curr =
+                  (state.curr.isEmpty) ? globalMataUang ?? "" : state.curr;
               onViewPaymentMethods(curr, state.totalBayar);
               return;
             }
@@ -387,7 +413,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                     display: "Pembayaran berhasil!",
                     displayButton: "Kembali",
                     description:
-                    "Selamat! Perlindungan kendaraan Anda resmi dimulai.",
+                        "Selamat! Perlindungan kendaraan Anda resmi dimulai.",
                   ),
                 ),
               );
@@ -462,7 +488,6 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
             );
           },
         ),
-
         BlocListener<InvoiceStatusCardBloc, InvoiceStatusCardState>(
           listenWhen: (previous, current) {
             return previous.isLoaded != current.isLoaded ||
@@ -478,7 +503,8 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 setState(() => isSubmitting = false);
               }
 
-              String message = 'Proses pembayaran kartu gagal. Silakan coba lagi.';
+              String message =
+                  'Proses pembayaran kartu gagal. Silakan coba lagi.';
 
               final errorMessage = state.message.trim();
 
@@ -486,12 +512,12 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 '"card_number" must be a credit card',
               )) {
                 message =
-                'Maaf, nomor kartu yang dimasukkan tidak dikenali sebagai kartu kredit.';
+                    'Maaf, nomor kartu yang dimasukkan tidak dikenali sebagai kartu kredit.';
               } else if (errorMessage.contains(
                 'card_details.card_number must match pattern',
               )) {
                 message =
-                'Maaf, nomor kartu harus terdiri dari 14 sampai 19 digit angka.';
+                    'Maaf, nomor kartu harus terdiri dari 14 sampai 19 digit angka.';
               }
 
               ScaffoldMessenger.of(context).showSnackBar(
@@ -535,7 +561,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                         MaterialPageRoute(
                           builder: (_) => const TransaksiPage(),
                         ),
-                            (route) => route.isFirst,
+                        (route) => route.isFirst,
                       );
                     },
                   ),
@@ -578,11 +604,11 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
             }
 
             context.read<InvbayarvaFormBloc>().add(
-              CreditCardPaymentCheckingStarted(
-                invoiceId: record.invoiceId,
-                interval: const Duration(seconds: 4),
-              ),
-            );
+                  CreditCardPaymentCheckingStarted(
+                    invoiceId: record.invoiceId,
+                    interval: const Duration(seconds: 4),
+                  ),
+                );
 
             _isCardWebViewOpen = true;
 
@@ -600,7 +626,6 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
             _isCardWebViewOpen = false;
           },
         ),
-
         BlocListener<QuotationPdfBloc, QuotationPdfState>(
           listener: (context, state) async {
             if (state is QuotationPdfLoading) {
@@ -635,39 +660,39 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
             }
           },
         ),
-
-        _buildGenericListener<Regpar1CrudBloc, Regpar1CrudState, Regpar1CrudModel>(
+        _buildGenericListener<Regpar1CrudBloc, Regpar1CrudState,
+            Regpar1CrudModel>(
           onPayload: (record) {
             setState(() => regpar1Record = record);
 
             context.read<Regpar2FormBloc>().add(
-              Regpar2FormLihatEvent(recordId: record.regpar1Id),
-            );
+                  Regpar2FormLihatEvent(recordId: record.regpar1Id),
+                );
           },
         ),
-
-        _buildGenericListener<Regpar2FormBloc, Regpar2FormState, Regpar2FormModel>(
+        _buildGenericListener<Regpar2FormBloc, Regpar2FormState,
+            Regpar2FormModel>(
           onPayload: (record) {
             setState(() => regpar2Record = record);
 
             context.read<Regpar3FormBloc>().add(
-              Regpar3FormLihatEvent(recordId: record.regpar1Id),
-            );
+                  Regpar3FormLihatEvent(recordId: record.regpar1Id),
+                );
           },
         ),
-
-        _buildGenericListener<Regpar3FormBloc, Regpar3FormState, Regpar3FormModel>(
+        _buildGenericListener<Regpar3FormBloc, Regpar3FormState,
+            Regpar3FormModel>(
           onPayload: (record) {
             setState(() => regpar3Record = record);
 
-            // Form3 → Form4 (PAKAI record)
+            // Form3 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Form4 (PAKAI record)
             context.read<Regpar4FormBloc>().add(
-              Regpar4FormLihatEvent(recordId: record.regpar1Id),
-            );
+                  Regpar4FormLihatEvent(recordId: record.regpar1Id),
+                );
           },
         ),
-
-        _buildGenericListener<Regpar4FormBloc, Regpar4FormState, Regpar4FormModel>(
+        _buildGenericListener<Regpar4FormBloc, Regpar4FormState,
+            Regpar4FormModel>(
           onPayload: (record) {
             setState(() => regpar4Record = record);
           },
@@ -682,7 +707,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
   }) {
     return BlocListener<B, S>(
       listenWhen: (prev, curr) =>
-      (prev as dynamic).isLoaded != (curr as dynamic).isLoaded &&
+          (prev as dynamic).isLoaded != (curr as dynamic).isLoaded &&
           (curr as dynamic).isLoaded == true,
       listener: (context, state) {
         final record = (state as dynamic).record;
@@ -713,9 +738,9 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                   // if (regpar3Record != null) _buildRegpar3Card(regpar3Record!),
                   // if (regpar4Record != null) _buildRegpar4Card(regpar4Record!),
 
-
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -731,32 +756,39 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                     ),
                   ),
 
-                  _buildRegpar1Card(regpar1Record ?? Regpar1CrudModel(
-                    regpar1Id: "-",
-                    ttgNama: "-",
-                    ttgAlamat: "-",
-                  )),
+                  _buildRegpar1Card(regpar1Record ??
+                      Regpar1CrudModel(
+                        regpar1Id: "-",
+                        ttgNama: "-",
+                        ttgAlamat: "-",
+                      )),
 
-                  _buildRegpar2Card(regpar2Record ?? Regpar2FormModel(
-                    regpar2Id: "-",
-                    polisMulai: DateTime.now(),
-                    polisAkhir: DateTime.now(), regpar1Id: widget.recordId!, objectAlamat: '',
-                  )),
+                  _buildRegpar2Card(regpar2Record ??
+                      Regpar2FormModel(
+                        regpar2Id: "-",
+                        polisMulai: DateTime.now(),
+                        polisAkhir: DateTime.now(),
+                        regpar1Id: widget.recordId!,
+                        objectAlamat: '',
+                      )),
 
-                  _buildRegpar4Card(regpar4Record ?? Regpar4FormModel(
-                    siBuilding: 0,
-                    siContent: 0,
-                    siMachinery: 0,
-                    siOther: 0,
-                    siStock: 0, regpar1Id: widget.recordId!,
-                  )),
+                  _buildRegpar4Card(regpar4Record ??
+                      Regpar4FormModel(
+                        siBuilding: 0,
+                        siContent: 0,
+                        siMachinery: 0,
+                        siOther: 0,
+                        siStock: 0,
+                        regpar1Id: widget.recordId!,
+                      )),
 
-                  _buildRegpar3Card(regpar3Record ?? Regpar3FormModel(
-                    regpar3Id: "-",
-                    isEq: false, regpar1Id: widget.recordId!,
-                  )),
+                  _buildRegpar3Card(regpar3Record ??
+                      Regpar3FormModel(
+                        regpar3Id: "-",
+                        isEq: false,
+                        regpar1Id: widget.recordId!,
+                      )),
                   const SizedBox(height: hPadding),
-
 
                   // Padding(
                   //     padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
@@ -807,70 +839,77 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                     padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: regpar3Record == null
                         ? const Center(
-                      child: LoadingIndicator(),
-                    )
+                            child: LoadingIndicator(),
+                          )
                         : (regpar3Record?.isEq == true)
-                        ? Row(
-                      children: [
-                        Expanded(
-                          child: AppButton.iconLeft(
-                            text: "Lihat Penawaran PAR",
-                            backgroundColor: pdfRed,
-                            onPressed: isSubmitting
-                                ? null
-                                : () {
-                              context.read<QuotationPdfBloc>().add(
-                                DownloadQuotationPdfEvent(
-                                  quotationType: "par",
-                                  quotationNo: widget.recordId ?? "",
-                                ),
-                              );
-                            },
-                            icon: _pdfIcon(),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: AppButton.iconLeft(
-                            text: "Lihat Penawaran EQ",
-                            backgroundColor: pdfRed,
-                            onPressed: isSubmitting
-                                ? null
-                                : () {
-                              context.read<QuotationPdfBloc>().add(
-                                DownloadQuotationPdfEvent(
-                                  quotationType: "pareq",
-                                  quotationNo: widget.recordId ?? "",
-                                ),
-                              );
-                            },
-                            icon: _pdfIcon(),
-                          ),
-                        ),
-                      ],
-                    )
-                        : AppButton.iconLeft(
-                      text: "Lihat Penawaran PAR",
-                      backgroundColor: pdfRed,
-                      onPressed: isSubmitting
-                          ? null
-                          : () {
-                        context.read<QuotationPdfBloc>().add(
-                          DownloadQuotationPdfEvent(
-                            quotationType: "par",
-                            quotationNo: widget.recordId ?? "",
-                          ),
-                        );
-                      },
-                      icon: _pdfIcon(),
-                    ),
+                            ? Row(
+                                children: [
+                                  Expanded(
+                                    child: AppButton.iconLeft(
+                                      text: "Lihat Penawaran PAR",
+                                      backgroundColor: pdfRed,
+                                      onPressed: isSubmitting
+                                          ? null
+                                          : () {
+                                              context
+                                                  .read<QuotationPdfBloc>()
+                                                  .add(
+                                                    DownloadQuotationPdfEvent(
+                                                      quotationType: "par",
+                                                      quotationNo:
+                                                          widget.recordId ?? "",
+                                                    ),
+                                                  );
+                                            },
+                                      icon: _pdfIcon(),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: AppButton.iconLeft(
+                                      text: "Lihat Penawaran EQ",
+                                      backgroundColor: pdfRed,
+                                      onPressed: isSubmitting
+                                          ? null
+                                          : () {
+                                              context
+                                                  .read<QuotationPdfBloc>()
+                                                  .add(
+                                                    DownloadQuotationPdfEvent(
+                                                      quotationType: "pareq",
+                                                      quotationNo:
+                                                          widget.recordId ?? "",
+                                                    ),
+                                                  );
+                                            },
+                                      icon: _pdfIcon(),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : AppButton.iconLeft(
+                                text: "Lihat Penawaran PAR",
+                                backgroundColor: pdfRed,
+                                onPressed: isSubmitting
+                                    ? null
+                                    : () {
+                                        context.read<QuotationPdfBloc>().add(
+                                              DownloadQuotationPdfEvent(
+                                                quotationType: "par",
+                                                quotationNo:
+                                                    widget.recordId ?? "",
+                                              ),
+                                            );
+                                      },
+                                icon: _pdfIcon(),
+                              ),
                   ),
 
                   const SizedBox(height: hPadding),
 
-
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: Row(
                       children: [
                         Expanded(
@@ -887,7 +926,8 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(checkboxBorderRadius),
                       onTap: () {
@@ -917,9 +957,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                               });
                             },
                           ),
-
                           const SizedBox(width: 6),
-
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 12),
@@ -973,24 +1011,23 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                         text: "Pembayaran",
                         isLoading: isSubmitting,
                         backgroundColor:
-                        isAgreementChecked ? primaryColor : sGrey,
-                          onPressed: isSubmitting || !isAgreementChecked
-                              ? null
-                              : () async {
-                            if (mounted) {
-                              setState(() => isSubmitting = true);
-                            }
+                            isAgreementChecked ? primaryColor : sGrey,
+                        onPressed: isSubmitting || !isAgreementChecked
+                            ? null
+                            : () async {
+                                if (mounted) {
+                                  setState(() => isSubmitting = true);
+                                }
 
-                            _showGlobalLoading();
+                                _showGlobalLoading();
 
-                            context.read<DnRekap2invBloc>().add(
-                              RegPar2InvoiceEvent(
-                                regpar1Id: widget.recordId ?? "",
-                              ),
-                            );
-                          },
-                      )
-                  ),
+                                context.read<DnRekap2invBloc>().add(
+                                      RegPar2InvoiceEvent(
+                                        regpar1Id: widget.recordId ?? "",
+                                      ),
+                                    );
+                              },
+                      )),
                 ],
               ),
             ),
@@ -1202,14 +1239,15 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
     );
   }
 
-
   Widget _buildDetailRowIcon(String label, dynamic value) {
     Widget iconWidget;
 
     if (value == 1 || value == true) {
-      iconWidget = SvgPicture.asset('assets/icons/dipilih.svg', width: 24, height: 24);
+      iconWidget =
+          SvgPicture.asset('assets/icons/dipilih.svg', width: 24, height: 24);
     } else if (value == 0 || value == false) {
-      iconWidget = SvgPicture.asset('assets/icons/tidak_dipilih.svg', width: 24, height: 24);
+      iconWidget = SvgPicture.asset('assets/icons/tidak_dipilih.svg',
+          width: 24, height: 24);
     } else {
       iconWidget = const Text("-");
     }
@@ -1226,16 +1264,15 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
     );
   }
 
-
   Widget _buildSectionHeader(String title) {
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: hPadding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: bodyTextStyle(context).copyWith(color: primaryLightColor)),
-       ],
+          Text(title,
+              style: bodyTextStyle(context).copyWith(color: primaryLightColor)),
+        ],
       ),
     );
   }
@@ -1259,5 +1296,4 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
       return const Text("-");
     }
   }
-
 }

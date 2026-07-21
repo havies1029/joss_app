@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../blocs/authentication/authentication_bloc.dart';
-import '../../blocs/hakakses/hakaksescrud_bloc.dart';
 import '../../common/constants.dart';
 import '../../helper/navigation_keys.dart';
 
@@ -37,21 +35,6 @@ class BaseBackgroundSidePage extends StatefulWidget {
 }
 
 class _BaseBackgroundSidePageState extends State<BaseBackgroundSidePage> {
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-
-      final authState = context.read<AuthenticationBloc>().state;
-      if (authState is AuthenticationAuthenticated &&
-          authState.user.userType == 'C') {
-        context.read<HakaksesCrudBloc>().add(const HakaksesCrudLihatEvent());
-      }
-    });
-  }
-
   Widget get child => widget.child;
   double get fadeHeight => widget.fadeHeight;
   String get backgroundAsset => widget.backgroundAsset;

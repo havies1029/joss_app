@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:joss_app/common/app_data.dart';
+import 'package:joss_app/helper/api_side_effects.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 
 class RegmvUploadFotoAccApi {
@@ -11,11 +12,11 @@ class RegmvUploadFotoAccApi {
   final Dio _dio = Dio();
 
   Future<ReturnDataAPI> uploadFotoAcc(
-      String regmv1Id,
-      String caption,
-      Uint8List imageBytes,
-      String filename,
-      ) async {
+    String regmv1Id,
+    String caption,
+    Uint8List imageBytes,
+    String filename,
+  ) async {
     const endpoint = "api/regmv/regmv7form/uploadbinaryfotoacc";
     final url = _base + endpoint;
 
@@ -36,6 +37,7 @@ class RegmvUploadFotoAccApi {
       );
 
       if (resp.statusCode == 200) {
+        ApiSideEffects.refreshHakakses();
         final data = _asMap(resp.data);
         return ReturnDataAPI.fromDatabaseJson(data);
       } else {
@@ -48,11 +50,11 @@ class RegmvUploadFotoAccApi {
   }
 
   Future<ReturnDataAPI> uploadFotoAccByPath(
-      String regmv1Id,
-      String caption,
-      String filePath,
-      String filename,
-      ) async {
+    String regmv1Id,
+    String caption,
+    String filePath,
+    String filename,
+  ) async {
     const endpoint = "api/regmv/regmv7form/uploadbinaryfotoacc";
     final url = _base + endpoint;
 
@@ -72,13 +74,13 @@ class RegmvUploadFotoAccApi {
       final resp = await _dio.post(url, data: form);
 
       if (resp.statusCode == 200) {
+        ApiSideEffects.refreshHakakses();
         final data = _asMap(resp.data);
         return ReturnDataAPI.fromDatabaseJson(data);
       } else {
         return ReturnDataAPI(success: false, data: "", rowcount: 0);
       }
     } on DioException {
-
       rethrow;
     } catch (e) {
       debugPrint("Error uploading photo ACC: $e");

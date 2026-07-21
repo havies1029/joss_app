@@ -59,6 +59,7 @@ import '../../../widgets/apptheme/hitung_premi_empty_view.dart';
 import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
 import 'konfirmasi_regpar_page.dart';
+import '../../../helper/cob_access_guard.dart';
 
 enum RegparSection { form1, form2, form3, form4, form6, form5 }
 // urutan sesuai UI kamu sekarang: 1,2,3,4,6,5 (premi terakhir)
@@ -78,6 +79,7 @@ class RegparFormMainRemake extends StatefulWidget {
 }
 
 class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
+  bool _accessDeniedDialogShown = false;
   late List<bool> expanded;
 
   String? regpar1Id;
@@ -391,7 +393,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
       if (sameDay(mulai, akhir)) {
         debugPrint(
-            '⚠️ Polis invalid dari backend (mulai==akhir). Abaikan polisAkhir backend.');
+            'ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Polis invalid dari backend (mulai==akhir). Abaikan polisAkhir backend.');
       }
 
       context.read<PolisTanggalBloc>().add(PolisMulaiChanged(
@@ -455,7 +457,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       final jnsCoverPar = record.comboMJnscoverPar;
       if (fieldComboMJnscoverPar == null && jnsCoverPar != null) {
         fieldComboMJnscoverPar = jnsCoverPar;
-        _applyCoverParRule(jnsCoverPar.mjnscoverparId); // ✅ sync dari data
+        _applyCoverParRule(
+            jnsCoverPar.mjnscoverparId); // ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ sync dari data
       }
 
       if (fieldComboMWilayah == null && record.comboMWilayah != null) {
@@ -679,6 +682,20 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     }
   }
 
+  void _handleAccessDeniedExit(BuildContext context) {
+    context.read<Regpar1CrudBloc>().add(
+          Regpar1CrudHapusEvent(recordId: regpar1Id ?? ""),
+        );
+
+    final homeState = homeTabKey.currentState;
+
+    if (homeState != null) {
+      homeState.goToHeroPage();
+    }
+
+    Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+
   bool _isLanjutkanLoading = false;
 
   bool _isDialogLoadingShown = false;
@@ -734,6 +751,14 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
           },
           title: "Polis Properti",
           blocListeners: [
+            CobAccessGuard.buildHakaksesListener(
+              cobId: CobAccessGuard.cobProperti,
+              isDialogShown: () => _accessDeniedDialogShown,
+              markDialogShown: () {
+                _accessDeniedDialogShown = true;
+              },
+              onAccessDeniedReturn: () => _handleAccessDeniedExit(context),
+            ),
             BlocListener<Regpar1CrudBloc, Regpar1CrudState>(
               listener: (context, state) {
                 if (state.isSaved &&

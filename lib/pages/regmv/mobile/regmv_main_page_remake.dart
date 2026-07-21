@@ -62,6 +62,7 @@ import '../../../widgets/apptheme/hitung_premi_empty_view.dart';
 import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
 import 'konfirmasi_regmv_page.dart';
+import '../../../helper/cob_access_guard.dart';
 
 enum RegmvFormSection {
   form1,
@@ -88,6 +89,7 @@ class RegmvFormMainRemake extends StatefulWidget {
 }
 
 class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
+  bool _accessDeniedDialogShown = false;
   List<bool> expanded = List.filled(RegmvFormSection.values.length, false);
 
   int getOpenedIndex() => expanded.indexWhere((e) => e);
@@ -211,7 +213,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
-      resetUploadStates(); // ✅ ini yang bikin foto lama hilang
+      resetUploadStates(); // ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ini yang bikin foto lama hilang
 
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
@@ -302,7 +304,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   void refreshForm4({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) {
-      debugPrint("❌ recordId null atau empty, RETURN");
+      debugPrint("ÃƒÂ¢Ã‚ÂÃ…â€™ recordId null atau empty, RETURN");
       return;
     }
 
@@ -400,7 +402,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
       if (sameDay(mulai, akhir)) {
         debugPrint(
-            '⚠️ Polis invalid dari backend (mulai==akhir). Abaikan polisAkhir backend.');
+            'ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Polis invalid dari backend (mulai==akhir). Abaikan polisAkhir backend.');
       }
 
       context.read<PolisTanggalBloc>().add(PolisMulaiChanged(
@@ -665,6 +667,20 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     }
   }
 
+  void _handleAccessDeniedExit(BuildContext context) {
+    context.read<Regmv1CrudBloc>().add(
+          Regmv1CrudHapusEvent(recordId: regmv1Id ?? ""),
+        );
+
+    final homeState = homeTabKey.currentState;
+
+    if (homeState != null) {
+      homeState.goToHeroPage();
+    }
+
+    Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+
   bool _isLanjutkanLoading = false;
 
   bool _isDialogLoadingShown = false;
@@ -720,6 +736,14 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           },
           title: "Polis Kendaraan",
           blocListeners: [
+            CobAccessGuard.buildHakaksesListener(
+              cobId: CobAccessGuard.cobKendaraan,
+              isDialogShown: () => _accessDeniedDialogShown,
+              markDialogShown: () {
+                _accessDeniedDialogShown = true;
+              },
+              onAccessDeniedReturn: () => _handleAccessDeniedExit(context),
+            ),
             BlocListener<Regmv1CrudBloc, Regmv1CrudState>(
               listener: (context, state) {
                 if (state.isSaved &&
@@ -2865,10 +2889,10 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   bool validateOpenedForm() {
     final opened = getOpenedIndex();
 
-    // ✅ Tidak ada section yang sedang terbuka (awal halaman)
+    // ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Tidak ada section yang sedang terbuka (awal halaman)
     if (opened < 0) return true;
 
-    // ✅ Guard tambahan kalau suatu saat index out of range
+    // ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Guard tambahan kalau suatu saat index out of range
     if (opened >= RegmvFormSection.values.length) return true;
 
     final section = RegmvFormSection.values[opened];

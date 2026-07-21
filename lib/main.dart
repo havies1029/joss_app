@@ -1,4 +1,4 @@
-import 'package:firebase_core/firebase_core.dart';
+﻿import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/services.dart';
@@ -884,7 +884,7 @@ class _App extends StatefulWidget {
 
 class _AppState extends State<_App> {
   late bool _showOnboarding;
-  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> _navigatorKey = rootNavigatorKey;
 
   @override
   void initState() {
@@ -1019,7 +1019,7 @@ class _AppState extends State<_App> {
 
               if (ChatInitService.I.isInitialized) {
                 debugPrint(
-                    "⚠️ [ChatInitService] Sudah diinisialisasi, skip ulang init.");
+                    "âš ï¸ [ChatInitService] Sudah diinisialisasi, skip ulang init.");
                 return homeWidget;
               }
 
@@ -1052,7 +1052,7 @@ class _AppState extends State<_App> {
                         displayName: displayName,
                       );
                     } catch (e, s) {
-                      debugPrint("🔥 [ChatInit Error C] $e\n$s");
+                      debugPrint("ðŸ”¥ [ChatInit Error C] $e\n$s");
                     }
                   },
                   child: homeWidget,
@@ -1071,10 +1071,10 @@ class _AppState extends State<_App> {
                     );
 
                     debugPrint(result.success
-                        ? "✅ [ChatInitService] Initialized untuk $email"
-                        : "⚠️ [ChatInitService] Gagal init: ${result.error}");
+                        ? "âœ… [ChatInitService] Initialized untuk $email"
+                        : "âš ï¸ [ChatInitService] Gagal init: ${result.error}");
                   } catch (e, s) {
-                    debugPrint("🔥 [ChatInit Error] $e\n$s");
+                    debugPrint("ðŸ”¥ [ChatInit Error] $e\n$s");
                   }
                 });
               }

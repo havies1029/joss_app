@@ -105,6 +105,19 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     }
   }
 
+  IndoPhoneResult _normalizeTeleponInput() {
+    final phoneRes = IndoPhoneHelper.normalize(
+      fieldTeleponController.text,
+      emptyMessage: _indoPhoneOnlyEmptyError,
+    );
+
+    if (phoneRes.isValid) {
+      fieldTeleponController.text = phoneRes.phone62!;
+    }
+
+    return phoneRes;
+  }
+
   String? _validatePasswordRules(String pass) {
     final p = pass.trim();
 
@@ -156,19 +169,10 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       setErr('form1.telepon', kStringNullError);
       ok = false;
     } else {
-      if (isCompanyClient) {
-        final phoneRes = PhoneNumberHelper.normalize(telp);
-        if (!phoneRes.isValid) {
-          setErr('form1.telepon', phoneRes.error ?? "Format tidak valid");
-          ok = false;
-        }
-      } else {
-        final phoneRes = IndoPhoneHelper.normalize(telp,
-            emptyMessage: _indoPhoneOnlyEmptyError);
-        if (!phoneRes.isValid) {
-          setErr('form1.telepon', phoneRes.error ?? "Format tidak valid");
-          ok = false;
-        }
+      final phoneRes = _normalizeTeleponInput();
+      if (!phoneRes.isValid) {
+        setErr('form1.telepon', phoneRes.error ?? "Format tidak valid");
+        ok = false;
       }
     }
 
@@ -271,13 +275,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   }
 
   String _hpOtpTarget(String value) {
-    final isCompanyClient = fieldComboJnsClient?.mjnsclientId == '20';
-
-    if (isCompanyClient) {
-      final phoneRes = PhoneNumberHelper.normalize(value);
-      return phoneRes.phone ?? '';
-    }
-
     final phoneRes = IndoPhoneHelper.normalize(value,
         emptyMessage: _indoPhoneOnlyEmptyError);
     return phoneRes.phone62 ?? '';
@@ -355,12 +352,10 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
           );
         }),
       ],
-      prefix: isCompanyClient
-          ? null
-          : Text(
-              "+62 | ",
-              style: inputTextStyle(context, color: primaryLightColor),
-            ),
+      prefix: Text(
+        "+62 | ",
+        style: inputTextStyle(context, color: primaryLightColor),
+      ),
       errorText: isVerified ? null : err('form1.telepon'),
       helperText: isVerified ? 'No telepon ini telah diverifikasi' : null,
       helperStyle: bodyTextStyle(context, fontSize: 12).copyWith(
@@ -823,14 +818,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     if (!ok) return;
 
     final String email = fieldEmailController.text.trim();
-    final isCompanyClient = fieldComboJnsClient?.mjnsclientId == '20';
-    final String telepon = isCompanyClient
-        ? (PhoneNumberHelper.normalize(fieldTeleponController.text).phone ?? '')
-        : (IndoPhoneHelper.normalize(fieldTeleponController.text,
-                    emptyMessage: _indoPhoneOnlyEmptyError)
-                .phone62 ??
-            '');
-
+    final String telepon = _normalizeTeleponInput().phone62 ?? '';
     final record = RegUserModel(
       personalNama: fieldNameController.text.trim(),
       telepon: telepon,
@@ -885,29 +873,14 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   }
 
   void _sendHpOtp() {
-    final isCompanyClient = fieldComboJnsClient?.mjnsclientId == '20';
-    final String target;
+    final phoneRes = _normalizeTeleponInput();
 
-    if (isCompanyClient) {
-      final phoneRes = PhoneNumberHelper.normalize(fieldTeleponController.text);
-
-      if (!phoneRes.isValid) {
-        setErr('form1.telepon', phoneRes.error ?? 'Format tidak valid');
-        return;
-      }
-
-      target = phoneRes.phone ?? '';
-    } else {
-      final phoneRes = IndoPhoneHelper.normalize(fieldTeleponController.text,
-          emptyMessage: _indoPhoneOnlyEmptyError);
-
-      if (!phoneRes.isValid) {
-        setErr('form1.telepon', phoneRes.error ?? 'Format tidak valid');
-        return;
-      }
-
-      target = phoneRes.phone62 ?? '';
+    if (!phoneRes.isValid) {
+      setErr('form1.telepon', phoneRes.error ?? 'Format tidak valid');
+      return;
     }
+
+    final target = phoneRes.phone62 ?? '';
 
     clearErr('form1.telepon');
     _pendingOpenOtpFor = 'hp';

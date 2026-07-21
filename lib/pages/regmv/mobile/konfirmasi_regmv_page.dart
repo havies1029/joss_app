@@ -27,6 +27,7 @@ import '../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../heropage/mobile/widget/transaksi_page.dart';
 import '../../tagihan_pembayaran/mobile/riwayat/riwayat_page_remake.dart';
+import '../../../helper/cob_access_guard.dart';
 
 class KonfirmasiRegMvPage extends StatefulWidget {
   final String viewMode;
@@ -43,6 +44,7 @@ class KonfirmasiRegMvPage extends StatefulWidget {
 }
 
 class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
+  bool _accessDeniedDialogShown = false;
   Regmv1CrudModel? regmv1Record;
   Regmv2FormModel? regmv2Record;
   Regmv3FormModel? regmv3Record;
@@ -96,7 +98,8 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (widget.viewMode == "ubah" && widget.recordId?.isNotEmpty == true) {
-        context.read<Regmv1CrudBloc>()
+        context
+            .read<Regmv1CrudBloc>()
             .add(Regmv1CrudLihatEvent(recordId: widget.recordId!));
       }
     });
@@ -194,7 +197,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
+                                    BorderRadius.circular(cardBorderRadius),
                               ),
                               elevation: 0,
                             ),
@@ -219,7 +222,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
+                                    BorderRadius.circular(cardBorderRadius),
                               ),
                               elevation: 0,
                             ),
@@ -262,8 +265,8 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
 
     if (shouldLeave == true) {
       context.read<Regmv1CrudBloc>().add(
-        Regmv1CrudHapusEvent(recordId: widget.recordId ?? ""),
-      );
+            Regmv1CrudHapusEvent(recordId: widget.recordId ?? ""),
+          );
 
       final homeState = homeTabKey.currentState;
 
@@ -273,6 +276,20 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
 
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
+  }
+
+  void _handleAccessDeniedExit(BuildContext context) {
+    context.read<Regmv1CrudBloc>().add(
+          Regmv1CrudHapusEvent(recordId: widget.recordId ?? ""),
+        );
+
+    final homeState = homeTabKey.currentState;
+
+    if (homeState != null) {
+      homeState.goToHeroPage();
+    }
+
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   void _showPdfLoadingDialog(BuildContext context) {
@@ -308,134 +325,140 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
         await _handleExit(context);
       },
       blocListeners: [
+        CobAccessGuard.buildHakaksesListener(
+          cobId: CobAccessGuard.cobKendaraan,
+          isDialogShown: () => _accessDeniedDialogShown,
+          markDialogShown: () {
+            _accessDeniedDialogShown = true;
+          },
+          onAccessDeniedReturn: () => _handleAccessDeniedExit(context),
+        ),
         BlocListener<DnRekap2invBloc, DnRekap2invState>(
-        listenWhen: (previous, current) {
-          return previous.isProcessed != current.isProcessed ||
-              previous.hasFailure != current.hasFailure;
-        },
-        listener: (context, state) {
-          if (state.isProcessed || state.hasFailure) {
-            _hideGlobalLoading();
+          listenWhen: (previous, current) {
+            return previous.isProcessed != current.isProcessed ||
+                previous.hasFailure != current.hasFailure;
+          },
+          listener: (context, state) {
+            if (state.isProcessed || state.hasFailure) {
+              _hideGlobalLoading();
 
-            if (mounted) {
-              setState(() => isSubmitting = false);
+              if (mounted) {
+                setState(() => isSubmitting = false);
+              }
             }
-          }
 
-          if (state.hasFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              errorSnackBar(
-                'Gagal memproses pembayaran. Silakan coba lagi.',
-              ),
-            );
-            return;
-          }
-
-          if (!state.isProcessed) return;
-
-          if (state.paymentStatus == "20") {
-            ScaffoldMessenger.of(context).showSnackBar(
-              successSnackBar(
-                'Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.',
-              ),
-            );
-
-            final curr = (state.curr.isEmpty)
-                ? globalMataUang ?? ""
-                : state.curr;
-
-            onViewPaymentMethods(curr, state.totalBayar);
-          } else if (state.paymentStatus == "30") {
-            ScaffoldMessenger.of(context).showSnackBar(
-              successSnackBar('Silakan lakukan pembayaran.'),
-            );
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PaymentProcess(
-                  viewMode: "ubah",
-                  recordId: state.invoiceId,
+            if (state.hasFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(
+                  'Gagal memproses pembayaran. Silakan coba lagi.',
                 ),
-              ),
-            );
-          } else if (state.paymentStatus == "92") {
-            if (_isCardWebViewOpen &&
-                Navigator.of(context, rootNavigator: true).canPop()) {
-              _isCardWebViewOpen = false;
-              Navigator.of(context, rootNavigator: true).pop();
+              );
+              return;
             }
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              errorSnackBar(
-                'Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.',
-              ),
-            );
-          } else if (state.paymentStatus == "40") {
-            if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
-              _isCardWebViewOpen = false;
-              Navigator.of(context).pop();
-            }
+            if (!state.isProcessed) return;
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              successSnackBar('Proses pembayaran Berhasil.'),
-            );
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PaymentSuccess(
-                  display: "Pembayaran berhasil!",
-                  description:
-                  "Selamat! Perlindungan kendaraan Anda resmi dimulai.",
-                  displayButton: "Kembali",
+            if (state.paymentStatus == "20") {
+              ScaffoldMessenger.of(context).showSnackBar(
+                successSnackBar(
+                  'Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.',
                 ),
-              ),
-            );
-          } else if (state.paymentStatus == "93") {
-            if (_isCardWebViewOpen &&
-                Navigator.of(context, rootNavigator: true).canPop()) {
-              _isCardWebViewOpen = false;
-              Navigator.of(context, rootNavigator: true).pop();
+              );
+
+              final curr =
+                  (state.curr.isEmpty) ? globalMataUang ?? "" : state.curr;
+
+              onViewPaymentMethods(curr, state.totalBayar);
+            } else if (state.paymentStatus == "30") {
+              ScaffoldMessenger.of(context).showSnackBar(
+                successSnackBar('Silakan lakukan pembayaran.'),
+              );
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentProcess(
+                    viewMode: "ubah",
+                    recordId: state.invoiceId,
+                  ),
+                ),
+              );
+            } else if (state.paymentStatus == "92") {
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(
+                  'Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.',
+                ),
+              );
+            } else if (state.paymentStatus == "40") {
+              if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context).pop();
+              }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                successSnackBar('Proses pembayaran Berhasil.'),
+              );
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentSuccess(
+                    display: "Pembayaran berhasil!",
+                    description:
+                        "Selamat! Perlindungan kendaraan Anda resmi dimulai.",
+                    displayButton: "Kembali",
+                  ),
+                ),
+              );
+            } else if (state.paymentStatus == "93") {
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                infoSnackBar(
+                  'Proses pembayaran kartu kredit dibatalkan.',
+                ),
+              );
             }
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              infoSnackBar(
-                'Proses pembayaran kartu kredit dibatalkan.',
-              ),
-            );
-          }
+            // else if (state.paymentStatus == "91") {
+            //   Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => PaymentSuccess(
+            //         display: "Pengajuan Tidak Dilanjutkan",
+            //         description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
+            //         displayButton: "Kembali",
+            //         onButtonPressed: () {
+            //           Navigator.of(context).pushAndRemoveUntil(
+            //             MaterialPageRoute(
+            //               builder: (_) => const TransaksiPage(),
+            //             ),
+            //                 (route) => route.isFirst,
+            //           );
+            //         },
+            //       ),
+            //     ),
+            //   );
+            // }
 
-          // else if (state.paymentStatus == "91") {
-          //   Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder: (context) => PaymentSuccess(
-          //         display: "Pengajuan Tidak Dilanjutkan",
-          //         description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
-          //         displayButton: "Kembali",
-          //         onButtonPressed: () {
-          //           Navigator.of(context).pushAndRemoveUntil(
-          //             MaterialPageRoute(
-          //               builder: (_) => const TransaksiPage(),
-          //             ),
-          //                 (route) => route.isFirst,
-          //           );
-          //         },
-          //       ),
-          //     ),
-          //   );
-          // }
-
-          // optional: kalau kamu punya flag hasFailure dan mau tampilkan error umumnya
-          // if (state.hasFailure) {
-          //   ScaffoldMessenger.of(context).showSnackBar(
-          //     SnackBar(content: Text(state.failureMessage ?? 'Terjadi kesalahan')),
-          //   );
-          // }
-        },
-      ),
-
+            // optional: kalau kamu punya flag hasFailure dan mau tampilkan error umumnya
+            // if (state.hasFailure) {
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //     SnackBar(content: Text(state.failureMessage ?? 'Terjadi kesalahan')),
+            //   );
+            // }
+          },
+        ),
         BlocListener<InvoiceStatusCardBloc, InvoiceStatusCardState>(
           listenWhen: (previous, current) {
             return previous.isLoaded != current.isLoaded ||
@@ -449,7 +472,8 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                 setState(() => isSubmitting = false);
               }
 
-              String message = 'Proses pembayaran kartu gagal. Silakan coba lagi.';
+              String message =
+                  'Proses pembayaran kartu gagal. Silakan coba lagi.';
 
               final errorMessage = state.message.trim();
 
@@ -457,12 +481,12 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                 '"card_number" must be a credit card',
               )) {
                 message =
-                'Maaf, nomor kartu yang dimasukkan tidak dikenali sebagai kartu kredit.';
+                    'Maaf, nomor kartu yang dimasukkan tidak dikenali sebagai kartu kredit.';
               } else if (errorMessage.contains(
                 'card_details.card_number must match pattern',
               )) {
                 message =
-                'Maaf, nomor kartu harus terdiri dari 14 sampai 19 digit angka.';
+                    'Maaf, nomor kartu harus terdiri dari 14 sampai 19 digit angka.';
               }
 
               ScaffoldMessenger.of(context).showSnackBar(
@@ -503,7 +527,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                         MaterialPageRoute(
                           builder: (_) => const TransaksiPage(),
                         ),
-                            (route) => route.isFirst,
+                        (route) => route.isFirst,
                       );
                     },
                   ),
@@ -542,11 +566,11 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
             }
 
             context.read<InvbayarvaFormBloc>().add(
-              CreditCardPaymentCheckingStarted(
-                invoiceId: record.invoiceId,
-                interval: const Duration(seconds: 4),
-              ),
-            );
+                  CreditCardPaymentCheckingStarted(
+                    invoiceId: record.invoiceId,
+                    interval: const Duration(seconds: 4),
+                  ),
+                );
 
             _isCardWebViewOpen = true;
 
@@ -564,7 +588,6 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
             _isCardWebViewOpen = false;
           },
         ),
-
         BlocListener<QuotationPdfBloc, QuotationPdfState>(
           listener: (context, state) async {
             if (state is QuotationPdfLoading) {
@@ -603,27 +626,24 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
             }
           },
         ),
-
         _buildGenericListener<Regmv1CrudBloc, Regmv1CrudState, Regmv1CrudModel>(
           onPayload: (record) {
             setState(() => regmv1Record = record);
             context.read<Regmv2FormBloc>().add(
-              Regmv2FormLihatEvent(recordId: record.regmv1Id),
-            );
+                  Regmv2FormLihatEvent(recordId: record.regmv1Id),
+                );
           },
         ),
-
         _buildGenericListener<Regmv2FormBloc, Regmv2FormState, Regmv2FormModel>(
           onPayload: (record) {
             setState(() => regmv2Record = record);
 
-            // Form2 → Form3 (PAKAI record.regmv1Id)
+            // Form2 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Form3 (PAKAI record.regmv1Id)
             context.read<Regmv3FormBloc>().add(
-              Regmv3FormLihatEvent(recordId: record.regmv1Id),
-            );
+                  Regmv3FormLihatEvent(recordId: record.regmv1Id),
+                );
           },
         ),
-
         _buildGenericListener<Regmv3FormBloc, Regmv3FormState, Regmv3FormModel>(
           onPayload: (record) {
             setState(() => regmv3Record = record);
@@ -640,13 +660,13 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
     );
   }
 
-  // 🔹 Generic listener tetap jalan seperti semula
+  // ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¹ Generic listener tetap jalan seperti semula
   BlocListener<B, S> _buildGenericListener<B extends StateStreamable<S>, S, M>({
     required void Function(M record) onPayload,
   }) {
     return BlocListener<B, S>(
       listenWhen: (prev, curr) =>
-      (prev as dynamic).isLoaded != (curr as dynamic).isLoaded &&
+          (prev as dynamic).isLoaded != (curr as dynamic).isLoaded &&
           (curr as dynamic).isLoaded == true,
       listener: (context, state) {
         final record = (state as dynamic).record;
@@ -677,9 +697,9 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                   // if (regmv3Record != null) _buildRegmv3Card(regmv3Record!),
                   // if (regmv4Record != null) _buildRegmv4Card(regmv4Record!),
 
-
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: Row(
                       children: [
                         Expanded(
@@ -695,61 +715,64 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                   ),
 
                   _buildRegmv1Card(
-                    regmv1Record ?? Regmv1CrudModel(
-                      calmv1Id: "-",
-                      regmv1Id: "-",
-                      ttgNama: "-",
-                      ttgAlamat: "-",
-                    ),
+                    regmv1Record ??
+                        Regmv1CrudModel(
+                          calmv1Id: "-",
+                          regmv1Id: "-",
+                          ttgNama: "-",
+                          ttgAlamat: "-",
+                        ),
                   ),
 
                   _buildRegmv2Card(
-                    regmv2Record ?? Regmv2FormModel(
-                      regmv2Id: "-",
-                      regmv1Id: "-",
-                      polisMulai: DateTime.now(),
-                      polisAkhir: DateTime.now(),
-                      pad: 0,
-                      pap: 0,
-                      tpl: 0,
-                      pll: 0,
-                      passangerCount: 0,
-                      isEq: false,
-                      isFlood: false,
-                      isSrcc: false,
-                      isTbod: false,
-                      isTerrorism: false,
-                      isAw: false,
-                      currId: null,
-                      comboRMatauang: null,
-                      mmvjnscoverId: null,
-                      comboMMvjnscover: null,
-                    ),
+                    regmv2Record ??
+                        Regmv2FormModel(
+                          regmv2Id: "-",
+                          regmv1Id: "-",
+                          polisMulai: DateTime.now(),
+                          polisAkhir: DateTime.now(),
+                          pad: 0,
+                          pap: 0,
+                          tpl: 0,
+                          pll: 0,
+                          passangerCount: 0,
+                          isEq: false,
+                          isFlood: false,
+                          isSrcc: false,
+                          isTbod: false,
+                          isTerrorism: false,
+                          isAw: false,
+                          currId: null,
+                          comboRMatauang: null,
+                          mmvjnscoverId: null,
+                          comboMMvjnscover: null,
+                        ),
                   ),
 
                   _buildRegmv3Card(
-                    regmv3Record ?? Regmv3FormModel(
-                      regmv3Id: "-",
-                      regmv1Id: "-",
-                      platNo: "-",
-                      mesinNo: "-",
-                      rangkaNo: "-",
-                      thnBuat: 0,
-                      harga: 0,
-                      aksesoris: "-",
-                      mmvmerkId: null,
-                      comboMMvmerk: null,
-                      mmvmodelId: null,
-                      comboMMvmodel: null,
-                      mmvpakaiId: null,
-                      comboMMvpakai: null,
-                      mmvtipeId: null,
-                      comboMMvtipe: null,
-                      mwarnaId: null,
-                      comboMWarna: null,
-                      mwilayahId: null,
-                      comboMWilayah: null,
-                    ),
+                    regmv3Record ??
+                        Regmv3FormModel(
+                          regmv3Id: "-",
+                          regmv1Id: "-",
+                          platNo: "-",
+                          mesinNo: "-",
+                          rangkaNo: "-",
+                          thnBuat: 0,
+                          harga: 0,
+                          aksesoris: "-",
+                          mmvmerkId: null,
+                          comboMMvmerk: null,
+                          mmvmodelId: null,
+                          comboMMvmodel: null,
+                          mmvpakaiId: null,
+                          comboMMvpakai: null,
+                          mmvtipeId: null,
+                          comboMMvtipe: null,
+                          mwarnaId: null,
+                          comboMWarna: null,
+                          mwilayahId: null,
+                          comboMWilayah: null,
+                        ),
                   ),
 
                   const SizedBox(height: hPadding),
@@ -782,13 +805,13 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                       onPressed: isSubmitting
                           ? null
                           : () {
-                        context.read<QuotationPdfBloc>().add(
-                          DownloadQuotationPdfEvent(
-                            quotationType: "mv",
-                            quotationNo: widget.recordId ?? "",
-                          ),
-                        );
-                      },
+                              context.read<QuotationPdfBloc>().add(
+                                    DownloadQuotationPdfEvent(
+                                      quotationType: "mv",
+                                      quotationNo: widget.recordId ?? "",
+                                    ),
+                                  );
+                            },
                       icon: SvgPicture.asset(
                         'assets/icons/icon_pdf.svg',
                         width: 18,
@@ -803,9 +826,9 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
 
                   const SizedBox(height: hPadding),
 
-
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: Row(
                       children: [
                         Expanded(
@@ -822,7 +845,8 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(checkboxBorderRadius),
                       onTap: () {
@@ -852,9 +876,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                               });
                             },
                           ),
-
                           const SizedBox(width: 6),
-
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 12),
@@ -907,24 +929,23 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                         text: "Pembayaran",
                         isLoading: isSubmitting,
                         backgroundColor:
-                        isAgreementChecked ? primaryColor : sGrey,
+                            isAgreementChecked ? primaryColor : sGrey,
                         onPressed: isSubmitting || !isAgreementChecked
                             ? null
                             : () async {
-                          if (mounted) {
-                            setState(() => isSubmitting = true);
-                          }
+                                if (mounted) {
+                                  setState(() => isSubmitting = true);
+                                }
 
-                          _showGlobalLoading();
+                                _showGlobalLoading();
 
-                          context.read<DnRekap2invBloc>().add(
-                            RegMv2InvoiceEvent(
-                              regmv1Id: widget.recordId ?? "",
-                            ),
-                          );
-                        },
-                      )
-                  ),
+                                context.read<DnRekap2invBloc>().add(
+                                      RegMv2InvoiceEvent(
+                                        regmv1Id: widget.recordId ?? "",
+                                      ),
+                                    );
+                              },
+                      )),
                 ],
               ),
             ),
@@ -955,7 +976,6 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
       ),
     );
   }
-
 
   Widget _buildRegmv2Card(Regmv2FormModel data) {
     final mataUang = data.comboRMatauang?.rmatauangSimbol ?? "-";
@@ -1132,9 +1152,11 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
     Widget iconWidget;
 
     if (value == 1 || value == true) {
-      iconWidget = SvgPicture.asset('assets/icons/dipilih.svg', width: 24, height: 24);
+      iconWidget =
+          SvgPicture.asset('assets/icons/dipilih.svg', width: 24, height: 24);
     } else if (value == 0 || value == false) {
-      iconWidget = SvgPicture.asset('assets/icons/tidak_dipilih.svg', width: 24, height: 24);
+      iconWidget = SvgPicture.asset('assets/icons/tidak_dipilih.svg',
+          width: 24, height: 24);
     } else {
       iconWidget = const Text("-");
     }
@@ -1151,15 +1173,14 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
     );
   }
 
-
   Widget _buildSectionHeader(String title) {
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: hPadding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: bodyTextStyle(context).copyWith(color: primaryLightColor)),
+          Text(title,
+              style: bodyTextStyle(context).copyWith(color: primaryLightColor)),
         ],
       ),
     );
@@ -1184,5 +1205,4 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
       return const Text("-");
     }
   }
-
 }

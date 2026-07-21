@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:joss_app/common/app_data.dart';
+import 'package:joss_app/helper/api_side_effects.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 
 class RegparUploadFotoObjectApi {
@@ -11,11 +12,11 @@ class RegparUploadFotoObjectApi {
   final Dio _dio = Dio();
 
   Future<ReturnDataAPI> uploadFotoObject(
-      String regpar1Id,
-      String caption,
-      Uint8List imageBytes,
-      String filename,
-      ) async {
+    String regpar1Id,
+    String caption,
+    Uint8List imageBytes,
+    String filename,
+  ) async {
     const endpoint = "api/regpar/regpar6form/uploadbinaryfotoobject";
     final url = _base + endpoint;
 
@@ -36,6 +37,7 @@ class RegparUploadFotoObjectApi {
       );
 
       if (resp.statusCode == 200) {
+        ApiSideEffects.refreshHakakses();
         final data = _asMap(resp.data);
         return ReturnDataAPI.fromDatabaseJson(data);
       } else {
@@ -49,11 +51,11 @@ class RegparUploadFotoObjectApi {
   }
 
   Future<ReturnDataAPI> uploadFotoObjectByPath(
-      String regpar1Id,
-      String caption,
-      String filePath,
-      String filename,
-      ) async {
+    String regpar1Id,
+    String caption,
+    String filePath,
+    String filename,
+  ) async {
     const endpoint = "api/regpar/regpar6form/uploadbinaryfotoobject";
     final url = _base + endpoint;
 
@@ -70,11 +72,10 @@ class RegparUploadFotoObjectApi {
         'file': await MultipartFile.fromFile(filePath, filename: filename),
       });
 
-      final start = DateTime.now();
       final resp = await _dio.post(url, data: form);
-      final ms = DateTime.now().difference(start).inMilliseconds;
 
       if (resp.statusCode == 200) {
+        ApiSideEffects.refreshHakakses();
         final data = _asMap(resp.data);
         debugPrint("parsed map: $data");
         return ReturnDataAPI.fromDatabaseJson(data);

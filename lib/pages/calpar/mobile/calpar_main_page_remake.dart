@@ -50,6 +50,7 @@ import '../../profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
 import '../../profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
 import '../../register/mobile/client/register_client_page.dart';
 import '../../regpar/mobile/regpar_main_page_remake.dart';
+import '../../../helper/cob_access_guard.dart';
 
 enum CalparFormSection { form1, form2, form3, form4 }
 
@@ -63,6 +64,7 @@ class CalparMainPageRemake extends StatefulWidget {
 }
 
 class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
+  bool _accessDeniedDialogShown = false;
   List<bool> expanded = List.filled(CalparFormSection.values.length, false);
 
   int getOpenedIndex() => expanded.indexWhere((e) => e);
@@ -473,6 +475,13 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           Navigator.pop(context);
         },
         blocListeners: [
+          CobAccessGuard.buildHakaksesListener(
+            cobId: CobAccessGuard.cobProperti,
+            isDialogShown: () => _accessDeniedDialogShown,
+            markDialogShown: () {
+              _accessDeniedDialogShown = true;
+            },
+          ),
           BlocListener<Calpar1ListBloc, Calpar1ListState>(
             listenWhen: (prev, curr) {
               return prev.processMessage != curr.processMessage &&
