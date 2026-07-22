@@ -818,14 +818,33 @@ Future<void> main() async {
           BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
             listenWhen: (prev, curr) =>
                 curr.isLoaded &&
-                prev.record?.mrekan1Id != curr.record?.mrekan1Id,
+                (prev.record?.mrekan1Id != curr.record?.mrekan1Id ||
+                    prev.record?.mjnsclientId != curr.record?.mjnsclientId),
             listener: (context, state) {
-              final mrekan1Id = state.record?.mrekan1Id;
+              final record = state.record;
+              final mrekan1Id = record?.mrekan1Id;
               if (mrekan1Id != null && mrekan1Id.isNotEmpty) {
                 context
                     .read<MRekanContactCrudBloc>()
                     .add(MRekanContactCrudLihatEvent());
               }
+
+              final mjenisClient = record?.mjnsclientId.trim();
+              if (mjenisClient == '10') {
+                context
+                    .read<MRekanGeneralIdvCrudBloc>()
+                    .add(MRekanGeneralIdvCrudLihatEvent());
+              } else if (mjenisClient == '20') {
+                context
+                    .read<MRekanGeneralCmpCrudBloc>()
+                    .add(MRekanGeneralCmpCrudLihatEvent());
+              }
+            },
+          ),
+          BlocListener<AuthenticationBloc, AuthenticationState>(
+            listenWhen: (_, curr) => curr is AuthenticationUnauthenticated,
+            listener: (context, state) {
+              context.read<MRekan1CrudBloc>().add(MRekan1CrudResetEvent());
             },
           ),
           BlocListener<AuthenticationBloc, AuthenticationState>(

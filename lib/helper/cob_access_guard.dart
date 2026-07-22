@@ -118,7 +118,7 @@ class CobAccessGuard {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Akses Ditolak',
+                    'Akses Anda Telah Diperbarui',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: primaryLightColor,
@@ -128,7 +128,7 @@ class CobAccessGuard {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Anda tidak memiliki akses untuk memilih kategori ini.',
+                    'Silakan kembali untuk melanjutkan dengan akses terbaru.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: primaryLightColor.withOpacity(0.7),

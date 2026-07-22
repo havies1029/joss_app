@@ -9,7 +9,6 @@ import '../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../blocs/notifevent/notif_email_setting_bloc.dart';
 import '../../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../../common/app_data.dart';
 import '../../profile/mobile/profile/form_section/rekan_bank.dart';
 import '../../profile/mobile/profile/form_section/rekan_contact.dart';
 import '../../profile/mobile/profile/form_section/rekan_general_cmp.dart';
@@ -39,7 +38,7 @@ class _SettingsPageState extends State<SettingsPage> {
   late MRekanGeneralCmpCrudBloc cmpBloc;
   late MRekanGeneralIdvCrudBloc idvBloc;
 
-  String? profileNama;
+  int? _activeUserId;
   String? profileEmail;
   String? profileTelepon;
 
@@ -74,6 +73,16 @@ class _SettingsPageState extends State<SettingsPage> {
             .add(MRekanGeneralCmpCrudLihatEvent());
       }
     });
+  }
+
+  void _syncActiveUser(AuthenticationState authState) {
+    final userId =
+        authState is AuthenticationAuthenticated ? authState.user.id : null;
+    if (_activeUserId == userId) return;
+
+    _activeUserId = userId;
+    profileEmail = null;
+    profileTelepon = null;
   }
 
   Future<bool?> showLogoutConfirmDialog(BuildContext context) {
@@ -249,35 +258,9 @@ class _SettingsPageState extends State<SettingsPage> {
           final rec = state.record;
           if (rec != null) {
             setState(() {
-              profileEmail =
-                  rec.email.trim().isNotEmpty ? rec.email : AppData.user.email;
+              profileEmail = rec.email.trim().isNotEmpty ? rec.email : null;
 
-              profileTelepon =
-                  rec.telp.trim().isNotEmpty ? rec.telp : AppData.user.hp;
-            });
-          }
-        },
-      ),
-      BlocListener<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
-        listener: (context, state) {
-          final rec = state.record;
-          if (rec != null) {
-            setState(() {
-              profileNama = rec.rekanNama.trim().isNotEmpty
-                  ? rec.rekanNama
-                  : AppData.user.nama;
-            });
-          }
-        },
-      ),
-      BlocListener<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
-        listener: (context, state) {
-          final rec = state.record;
-          if (rec != null) {
-            setState(() {
-              profileNama = (rec.rekanNama?.trim().isNotEmpty ?? false)
-                  ? rec.rekanNama
-                  : AppData.user.nama;
+              profileTelepon = rec.telp.trim().isNotEmpty ? rec.telp : null;
             });
           }
         },
@@ -309,16 +292,48 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               BlocBuilder<AuthenticationBloc, AuthenticationState>(
                 builder: (context, authState) {
-                  final userType = authState is AuthenticationAuthenticated
-                      ? authState.user.userType.toUpperCase()
-                      : '';
+                  _syncActiveUser(authState);
 
-                  if (userType == 'C') {
-                    return SettingsProfileCardWidget(
-                      nama: profileNama ?? AppData.user.nama ?? "",
-                      email: profileEmail ?? AppData.user.email,
-                      telepon: profileTelepon ?? AppData.user.hp,
-                      subtitle: "Klien Proteksi Plus",
+                  final authUser = authState is AuthenticationAuthenticated
+                      ? authState.user
+                      : null;
+                  final userType = authUser?.userType.toUpperCase() ?? '';
+
+                  if (userType == 'C' && authUser != null) {
+                    return BlocBuilder<MRekan1CrudBloc, MRekan1CrudState>(
+                      buildWhen: (prev, curr) =>
+                          prev.isLoading != curr.isLoading ||
+                          prev.isLoaded != curr.isLoaded ||
+                          prev.record?.rekanNama != curr.record?.rekanNama ||
+                          prev.record?.mjnsclientId !=
+                              curr.record?.mjnsclientId,
+                      builder: (context, rekanState) {
+                        final recordReady =
+                            rekanState.isLoaded && rekanState.record != null;
+                        final currentMjenisClient = recordReady
+                            ? rekanState.record!.mjnsclientId.trim()
+                            : mjenisClient;
+                        final userNama = authUser.nama?.trim() ?? '';
+                        final rekanNama = recordReady
+                            ? rekanState.record!.rekanNama.trim()
+                            : '';
+                        final displayName = !recordReady
+                            ? ''
+                            : currentMjenisClient == '20'
+                                ? (rekanNama.isNotEmpty
+                                    ? rekanNama
+                                    : 'Klien Baru')
+                                : (userNama.isNotEmpty
+                                    ? userNama
+                                    : 'Klien Baru');
+
+                        return SettingsProfileCardWidget(
+                          nama: displayName,
+                          email: profileEmail ?? authUser.email,
+                          telepon: profileTelepon ?? authUser.hp,
+                          subtitle: userNama,
+                        );
+                      },
                     );
                   } else {
                     return const SettingsProfileCardWidget(

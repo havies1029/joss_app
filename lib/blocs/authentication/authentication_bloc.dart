@@ -35,10 +35,14 @@ class AuthenticationBloc
     });
     on<UserAuthenticated>(_onUserAuthenticated);
     on<RequireRegisterClient>((event, emit) {
-      emit(AuthenticationRequireRegisterClient(requiredFrom: event.requiredFrom));
+      emit(AuthenticationRequireRegisterClient(
+          requiredFrom: event.requiredFrom));
     });
     on<RequirePinHPVerification>((event, emit) {
-      emit(AuthenticationRequirePinHPVerification(sentTo: event.sentTo, sentVia: event.sentVia, requestedAt: DateTime.now()));
+      emit(AuthenticationRequirePinHPVerification(
+          sentTo: event.sentTo,
+          sentVia: event.sentVia,
+          requestedAt: DateTime.now()));
     });
     on<PhonePinVerified>((event, emit) {
       emit(AuthenticationPhonePinVerified());
@@ -53,7 +57,6 @@ class AuthenticationBloc
           user: event.user, authenticatedFrom: event.authenticatedFrom));
     });
   }
-
 
   Future<void> _onAppStarted(
       AppStarted event, Emitter<AuthenticationState> emit) async {
@@ -99,6 +102,8 @@ class AuthenticationBloc
       LoggedOut event, Emitter<AuthenticationState> emit) async {
     emit(AuthenticationLoading());
     await userRepository.deleteToken(id: 0);
+    AppData.user = User();
+    AppData.userToken = '';
     emit(AuthenticationUnauthenticated());
   }
 

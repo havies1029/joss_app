@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/authentication/reset_password_model.dart';
+import 'package:joss_app/pages/login/mobile/client/new_login_client/new_login_client_page.dart';
 
 class KataSandiBaruPage extends StatefulWidget {
   final String email;
@@ -182,8 +183,12 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
               .read<ForgotPasswordBloc>()
               .add(const ForgotPswdClearMessageEvent());
 
-          Navigator.of(context, rootNavigator: true)
-              .popUntil((route) => route.isFirst);
+          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (_) => const NewLoginClient(),
+            ),
+            (route) => false,
+          );
           return;
         }
 
@@ -306,8 +311,7 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
                   ),
                   const SizedBox(height: 20),
                   BlocBuilder<ForgotPasswordBloc, ForgotPasswordState>(
-                    buildWhen: (prev, curr) =>
-                        prev.isLoading != curr.isLoading,
+                    buildWhen: (prev, curr) => prev.isLoading != curr.isLoading,
                     builder: (context, state) {
                       return AppButton.primary(
                         text: state.isLoading ? "Memproses..." : "Kirim",

@@ -6,7 +6,6 @@ import 'package:joss_app/pages/heropage/mobile/widget/detail_premi.dart';
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/reguser/reguser_bloc.dart';
-import '../../../common/app_data.dart';
 import '../../../common/constants.dart';
 import '../../base/base_background_firstpage.dart';
 
@@ -59,41 +58,43 @@ class _HeroPageState extends State<HeroPage> {
                     children: [
                       BlocBuilder<AuthenticationBloc, AuthenticationState>(
                         builder: (context, authState) {
-                          final userType =
+                          final authUser =
                               authState is AuthenticationAuthenticated
-                                  ? authState.user.userType.trim().toUpperCase()
-                                  : '';
+                                  ? authState.user
+                                  : null;
+                          final userType =
+                              authUser?.userType.trim().toUpperCase() ?? '';
 
                           if (userType == 'C') {
                             return BlocBuilder<MRekan1CrudBloc,
                                 MRekan1CrudState>(
                               buildWhen: (prev, curr) =>
+                                  prev.isLoading != curr.isLoading ||
+                                  prev.isLoaded != curr.isLoaded ||
                                   prev.record?.rekanNama !=
                                       curr.record?.rekanNama ||
                                   prev.record?.mjnsclientId !=
                                       curr.record?.mjnsclientId,
                               builder: (context, rekanState) {
-                                final mjenisClient =
-                                    rekanState.record?.mjnsclientId.trim() ??
-                                        '';
-                                final userNama =
-                                    AppData.user.nama?.trim() ?? '';
-                                final rekanNama =
-                                    rekanState.record?.rekanNama.trim() ?? '';
+                                final recordReady = rekanState.isLoaded &&
+                                    rekanState.record != null;
+                                final mjenisClient = recordReady
+                                    ? rekanState.record!.mjnsclientId.trim()
+                                    : '';
+                                final userNama = authUser?.nama?.trim() ?? '';
+                                final rekanNama = recordReady
+                                    ? rekanState.record!.rekanNama.trim()
+                                    : '';
 
-                                final displayName = mjenisClient == '10'
-                                    ? (userNama.isNotEmpty
-                                        ? userNama
-                                        : "Klien Baru")
+                                final displayName = !recordReady
+                                    ? ''
                                     : mjenisClient == '20'
                                         ? (rekanNama.isNotEmpty
                                             ? rekanNama
                                             : "Klien Baru")
-                                        : (rekanNama.isNotEmpty
-                                            ? rekanNama
-                                            : (userNama.isNotEmpty
-                                                ? userNama
-                                                : "Klien Baru"));
+                                        : (userNama.isNotEmpty
+                                            ? userNama
+                                            : "Klien Baru");
 
                                 return _buildHeroContent(
                                   context,
