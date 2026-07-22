@@ -32,6 +32,7 @@ class MRekanGeneralCmpCrudFormPageFormState
   late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
+  final Map<String, String?> fieldErrors = {};
   bool isSaving = false;
 
   ComboMBentukCstModel? fieldComboMBentukCst;
@@ -386,12 +387,14 @@ class MRekanGeneralCmpCrudFormPageFormState
       clientSideSearch: true,
       displayText: (item) => item.bentukNama,
       compareItems: (a, b) => a.mbentukcstId == b.mbentukcstId,
+      errorText: err('bentukBadan'),
       onChangedCallback: (value) {
         if (value != null) {
           setState(() {
             removeError(error: kStringNullError);
             fieldComboMBentukCst = value;
           });
+          clearErr('bentukBadan');
           mRekanGeneralCmpCrudBloc.add(
             ComboMBentukCstChangedEvent(comboMBentukCst: value),
           );
@@ -420,12 +423,14 @@ class MRekanGeneralCmpCrudFormPageFormState
       clientSideSearch: true,
       displayText: (item) => item.bidangNama,
       compareItems: (a, b) => a.mbidangId == b.mbidangId,
+      errorText: err('bidangUsaha'),
       onChangedCallback: (value) {
         if (value != null) {
           setState(() {
             removeError(error: kStringNullError);
             fieldComboMBidang = value;
           });
+          clearErr('bidangUsaha');
           mRekanGeneralCmpCrudBloc.add(
             ComboMBidangChangedEvent(comboMBidang: value),
           );
@@ -450,13 +455,11 @@ class MRekanGeneralCmpCrudFormPageFormState
       label: "Nama Perusahaan",
       controller: fieldRekanNamaController,
       keyboardType: TextInputType.text,
-      validator: (value) {
-        if (value == null || value.trim().isEmpty) {
-          return kStringNullError;
-        } else if (value.trim().length < 3) {
-          return "Nama Perusahaan terlalu pendek, Minimal 3 karakter";
-        }
-        return null;
+      errorText: err('namaPerusahaan'),
+      validator: (_) => err('namaPerusahaan'),
+      onChanged: (value) {
+        final nama = value.trim();
+        if (nama.length >= 3) clearErr('namaPerusahaan');
       },
     );
   }
@@ -478,6 +481,7 @@ class MRekanGeneralCmpCrudFormPageFormState
   }
 
   Future<void> onSaveForm() async {
+    if (!validateGeneralCmpForm()) return;
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 
@@ -506,5 +510,48 @@ class MRekanGeneralCmpCrudFormPageFormState
         errors.remove(error);
       });
     }
+  }
+
+  bool validateGeneralCmpForm() {
+    clearErrs();
+
+    bool ok = true;
+
+    if (fieldComboMBentukCst == null) {
+      setErr('bentukBadan', kStringNullError);
+      ok = false;
+    }
+
+    if (fieldComboMBidang == null) {
+      setErr('bidangUsaha', kStringNullError);
+      ok = false;
+    }
+
+    final nama = fieldRekanNamaController.text.trim();
+    if (nama.isEmpty) {
+      setErr('namaPerusahaan', kStringNullError);
+      ok = false;
+    } else if (nama.length < 3) {
+      setErr('namaPerusahaan',
+          "Nama Perusahaan terlalu pendek, Minimal 3 karakter");
+      ok = false;
+    }
+
+    return ok;
+  }
+
+  String? err(String key) => fieldErrors[key];
+
+  void setErr(String key, String? msg) {
+    setState(() => fieldErrors[key] = msg);
+  }
+
+  void clearErr(String key) {
+    if (!fieldErrors.containsKey(key)) return;
+    setState(() => fieldErrors.remove(key));
+  }
+
+  void clearErrs() {
+    setState(() => fieldErrors.clear());
   }
 }

@@ -32,6 +32,7 @@ class MRekanContactCrudFormPageFormState
   late final MRekanContactCrudBloc mRekanContactCrudBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
+  final Map<String, String?> fieldErrors = {};
   bool isSaving = false;
 
   final fieldAlamat1Controller = TextEditingController();
@@ -250,6 +251,51 @@ class MRekanContactCrudFormPageFormState
     mRekanContactCrudBloc.add(MRekanContactCrudLihatEvent());
   }
 
+  bool validateContactForm() {
+    clearErrs();
+
+    bool ok = true;
+
+    final email = fieldEmailController.text.trim();
+    if (email.isEmpty) {
+      setErr('email', kEmailNullError);
+      ok = false;
+    } else if (!emailValidatorRegExp.hasMatch(email)) {
+      setErr('email', "Format email tidak valid");
+      ok = false;
+    }
+
+    final alamat = fieldAlamat1Controller.text.trim();
+    if (alamat.isEmpty) {
+      setErr('alamat1', kAddressNullError);
+      ok = false;
+    }
+
+    final telp = fieldTelpController.text.trim();
+    if (telp.isEmpty) {
+      setErr('telp', kPhoneNumberNullError);
+      ok = false;
+    } else {
+      final res = PhoneNumberHelper.normalize(telp);
+      if (!res.isValid) {
+        setErr('telp', res.error ?? 'Nomor telepon tidak valid');
+        ok = false;
+      }
+    }
+
+    if (fieldComboMPropinsi == null) {
+      setErr('provinsi', kStringProvinsiError);
+      ok = false;
+    }
+
+    if (fieldComboMKota == null) {
+      setErr('kota', kStringKotaError);
+      ok = false;
+    }
+
+    return ok;
+  }
+
   Widget buildFieldEmail() => appTextField(
         label: "Email",
         controller: fieldEmailController,
@@ -257,15 +303,13 @@ class MRekanContactCrudFormPageFormState
         inputFormatters: [
           FilteringTextInputFormatter.deny(RegExp(r'\s')),
         ],
-        validator: (v) {
-          final email = v?.trim() ?? "";
-          if (email.isEmpty) {
-            return kEmailNullError;
+        errorText: err('email'),
+        validator: (_) => err('email'),
+        onChanged: (v) {
+          final email = v.trim();
+          if (email.isNotEmpty && emailValidatorRegExp.hasMatch(email)) {
+            clearErr('email');
           }
-          if (!emailValidatorRegExp.hasMatch(email)) {
-            return "Format email tidak valid";
-          }
-          return null;
         },
       );
 
@@ -283,20 +327,13 @@ class MRekanContactCrudFormPageFormState
       label: 'No. Telp $jenisClientLabel',
       controller: fieldTelpController,
       keyboardType: TextInputType.phone,
-      validator: (v) {
-        final telp = v?.trim() ?? '';
-
-        if (telp.isEmpty) {
-          return kPhoneNumberNullError;
+      errorText: err('telp'),
+      validator: (_) => err('telp'),
+      onChanged: (v) {
+        final telp = v.trim();
+        if (telp.isNotEmpty && PhoneNumberHelper.normalize(telp).isValid) {
+          clearErr('telp');
         }
-
-        final res = PhoneNumberHelper.normalize(telp);
-
-        if (!res.isValid) {
-          return res.error ?? 'Nomor telepon tidak valid';
-        }
-
-        return null;
       },
     );
   }
@@ -305,9 +342,10 @@ class MRekanContactCrudFormPageFormState
         label: "Alamat Rumah",
         controller: fieldAlamat1Controller,
         keyboardType: TextInputType.streetAddress,
-        validator: (v) {
-          if (v == null || v.isEmpty) return kAddressNullError;
-          return null;
+        errorText: err('alamat1'),
+        validator: (_) => err('alamat1'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('alamat1');
         },
       );
 
@@ -320,12 +358,14 @@ class MRekanContactCrudFormPageFormState
         displayText: (item) => item.propinsiNama,
         compareItems: (a, b) => a.mpropinsiId == b.mpropinsiId,
         validatorCallback: (v) => v == null ? kStringProvinsiError : null,
+        errorText: err('provinsi'),
         onChangedCallback: (v) {
           setState(() {
             fieldComboMPropinsi = v;
             fieldComboMKota = null;
             fieldComboRKodepos = null;
           });
+          if (v != null) clearErr('provinsi');
         },
         onSaveCallback: (value) => fieldComboMPropinsi = value,
       );
@@ -347,11 +387,13 @@ class MRekanContactCrudFormPageFormState
         displayText: (item) => item.kotaDesc,
         compareItems: (a, b) => a.mkotaId == b.mkotaId,
         validatorCallback: (v) => v == null ? kStringKotaError : null,
+        errorText: err('kota'),
         onChangedCallback: (v) {
           setState(() {
             fieldComboMKota = v;
             fieldComboRKodepos = null;
           });
+          if (v != null) clearErr('kota');
         },
         onSaveCallback: (value) => fieldComboMKota = value,
       );
@@ -392,6 +434,7 @@ class MRekanContactCrudFormPageFormState
       );
 
   Future<void> onSaveForm() async {
+    if (!validateContactForm()) return;
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 
@@ -425,5 +468,20 @@ class MRekanContactCrudFormPageFormState
     mRekanContactCrudBloc.add(
       MRekanContactCrudUbahEvent(record: record),
     );
+  }
+
+  String? err(String key) => fieldErrors[key];
+
+  void setErr(String key, String? msg) {
+    setState(() => fieldErrors[key] = msg);
+  }
+
+  void clearErr(String key) {
+    if (!fieldErrors.containsKey(key)) return;
+    setState(() => fieldErrors.remove(key));
+  }
+
+  void clearErrs() {
+    setState(() => fieldErrors.clear());
   }
 }

@@ -1201,7 +1201,8 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   Widget _buildComboMMvgrupOjk() => ReusableComboBoxV2<ComboMMvgrupOjkModel>(
         hintText: "Jenis Kendaraan",
         initItem: fieldComboMMvgrupOjk,
-        loader: (q) => ComboMMvgrupOjkRepository().getComboMMvgrupOjk(),
+        loader: (q) =>
+            ComboMMvgrupOjkRepository().getComboMMvgrupOjk(q.searchText),
         displayText: (i) => i.grupNama,
         compareItems: (a, b) => a.mmvgrupojkId == b.mmvgrupojkId,
         validatorCallback: (v) => v == null ? kStringNullError : null,
@@ -1216,6 +1217,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
         },
         onSaveCallback: (value) => fieldComboMMvgrupOjk = value,
       );
+
   Widget _buildComboMMvjnscover() => ReusableComboBoxV2<ComboMMvjnscoverModel>(
         hintText: "Jenis Jaminan",
         initItem: fieldComboMMvjnscover,

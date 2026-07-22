@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
@@ -216,13 +218,17 @@ class _SettingsPageState extends State<SettingsPage> {
     return authState.user.userType.trim();
   }
 
+  Future<void> _closeGuestApp() async {
+    await SystemNavigator.pop();
+  }
+
   Future<void> handleLogout(BuildContext context) async {
     final shouldLogout = await showLogoutConfirmDialog(context);
     if (!context.mounted) return;
 
     if (shouldLogout == true) {
       if (_resolveUserType(context).isEmpty) {
-        await SystemNavigator.pop();
+        await _closeGuestApp();
         return;
       }
 
@@ -269,6 +275,14 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildContent(BuildContext context, String mjenisClient) {
+    final currentUserType = context.select((AuthenticationBloc b) {
+      final state = b.state;
+      return state is AuthenticationAuthenticated
+          ? state.user.userType.trim()
+          : '';
+    });
+    final hideLogoutForIosGuest = Platform.isIOS && currentUserType.isEmpty;
+
     return Container(
       constraints: BoxConstraints(
         minHeight: MediaQuery.of(context).size.height,
@@ -555,22 +569,24 @@ class _SettingsPageState extends State<SettingsPage> {
                   );
                 },
               ),
-              const SizedBox(height: vPadding),
-              _buildSectionTitle(context, 'Keluar'),
-              _buildCardContainer(
-                children: [
-                  _buildMenuItem(
-                    svgAsset: 'assets/icons/logout.svg',
-                    title: 'Keluar',
-                    titleColor: pDarkRed,
-                    showForwardsvgAsset: false,
-                    svgAssetColor: pRed,
-                    onTap: () async {
-                      await handleLogout(context);
-                    },
-                  ),
-                ],
-              ),
+              if (!hideLogoutForIosGuest) ...[
+                const SizedBox(height: vPadding),
+                _buildSectionTitle(context, 'Keluar'),
+                _buildCardContainer(
+                  children: [
+                    _buildMenuItem(
+                      svgAsset: 'assets/icons/logout.svg',
+                      title: 'Keluar',
+                      titleColor: pDarkRed,
+                      showForwardsvgAsset: false,
+                      svgAssetColor: pRed,
+                      onTap: () async {
+                        await handleLogout(context);
+                      },
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: hPadding),
               _buildSectionTitle(context, 'v1.0.1'),
               const SizedBox(height: 50),

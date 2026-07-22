@@ -34,6 +34,7 @@ class MRekanGeneralIdvCrudFormPageFormState
   late final MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
   final _formKey = GlobalKey<FormState>();
   bool isSaving = false;
+  final Map<String, String?> fieldErrors = {};
 
   late Future<List<ComboMJnskelModel>> _futureJenisKelamin =
       ComboMJnskelRepository().getComboMJnskel();
@@ -374,12 +375,14 @@ class MRekanGeneralIdvCrudFormPageFormState
       clientSideSearch: true,
       displayText: (item) => item.kerjaNama,
       compareItems: (a, b) => a.mpekerjaanId == b.mpekerjaanId,
+      errorText: err('pekerjaan'),
       onChangedCallback: (value) {
         if (value != null) {
           setState(() {
             removeError(error: "Field ComboMPekerjaan tidak boleh kosong.");
             fieldComboMPekerjaan = value;
           });
+          clearErr('pekerjaan');
           mRekanGeneralIdvCrudBloc.add(
             ComboMPekerjaanChangedEvent(comboMPekerjaan: value),
           );
@@ -438,6 +441,7 @@ class MRekanGeneralIdvCrudFormPageFormState
                         setState(() {
                           fieldComboMJnskel = item;
                         });
+                        clearErr('jenisKelamin');
 
                         mRekanGeneralIdvCrudBloc.add(
                           ComboMJnskelChangedEvent(comboMJnskel: item),
@@ -483,19 +487,15 @@ class MRekanGeneralIdvCrudFormPageFormState
                 }).toList(),
               ),
               FormField<ComboMJnskelModel>(
-                validator: (value) {
-                  if (fieldComboMJnskel == null) {
-                    return kStringNullError;
-                  }
-                  return null;
-                },
+                validator: (_) => err('jenisKelamin'),
                 builder: (state) {
-                  if (!state.hasError) return const SizedBox.shrink();
+                  final errorText = err('jenisKelamin');
+                  if (errorText == null) return const SizedBox.shrink();
 
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
-                      state.errorText!,
+                      errorText,
                       style: TextStyle(color: pRed, fontSize: 12),
                     ),
                   );
@@ -513,11 +513,10 @@ class MRekanGeneralIdvCrudFormPageFormState
       label: "Nama",
       controller: fieldRekanNamaController,
       keyboardType: TextInputType.text,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return kStringNullError;
-        }
-        return null;
+      errorText: err('nama'),
+      validator: (_) => err('nama'),
+      onChanged: (value) {
+        if (value.trim().isNotEmpty) clearErr('nama');
       },
     );
   }
@@ -531,6 +530,7 @@ class MRekanGeneralIdvCrudFormPageFormState
   }
 
   Future<void> onSaveForm() async {
+    if (!validateGeneralIdvForm()) return;
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 
@@ -562,5 +562,43 @@ class MRekanGeneralIdvCrudFormPageFormState
         errors.remove(error);
       });
     }
+  }
+
+  bool validateGeneralIdvForm() {
+    clearErrs();
+
+    bool ok = true;
+
+    if (fieldComboMPekerjaan == null) {
+      setErr('pekerjaan', kStringNullError);
+      ok = false;
+    }
+
+    if (fieldComboMJnskel == null) {
+      setErr('jenisKelamin', kStringNullError);
+      ok = false;
+    }
+
+    if (fieldRekanNamaController.text.trim().isEmpty) {
+      setErr('nama', kStringNullError);
+      ok = false;
+    }
+
+    return ok;
+  }
+
+  String? err(String key) => fieldErrors[key];
+
+  void setErr(String key, String? msg) {
+    setState(() => fieldErrors[key] = msg);
+  }
+
+  void clearErr(String key) {
+    if (!fieldErrors.containsKey(key)) return;
+    setState(() => fieldErrors.remove(key));
+  }
+
+  void clearErrs() {
+    setState(() => fieldErrors.clear());
   }
 }

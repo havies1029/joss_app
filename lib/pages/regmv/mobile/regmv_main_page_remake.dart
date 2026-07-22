@@ -2905,9 +2905,18 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       case RegmvFormSection.form3:
         return validateForm3();
       case RegmvFormSection.form4:
-        return context.read<RegmvUploadStnkBloc>().state.items.isNotEmpty;
+        final ok4 = context.read<RegmvUploadStnkBloc>().state.items.isNotEmpty;
+        if (!ok4) {
+          setState(() => _showVal4 = true);
+        }
+        return ok4;
       case RegmvFormSection.form5:
-        return context.read<RegmvUploadFotoMobilBloc>().state.items.isNotEmpty;
+        final ok5 =
+            context.read<RegmvUploadFotoMobilBloc>().state.items.isNotEmpty;
+        if (!ok5) {
+          setState(() => _showVal5 = true);
+        }
+        return ok5;
       // case RegmvFormSection.form7: return context.read<RegmvUploadFotoAccBloc>().state.items.isNotEmpty;
       case RegmvFormSection.form7:
         return true; //opsional

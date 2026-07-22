@@ -32,6 +32,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
   late final MRekanBankCrudBloc mRekanBankCrudBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
+  final Map<String, String?> fieldErrors = {};
 
   final fieldMrekan1IdController = TextEditingController();
   final fieldRekNamaController = TextEditingController();
@@ -58,7 +59,6 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
   }
 
   void loadData() {
-
     final mrekan1Id = context.read<MRekan1CrudBloc>().state.record?.mrekan1Id;
     fieldMrekan1IdController.text = mrekan1Id ?? '';
 
@@ -88,13 +88,15 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                       horizontal: 15,
                       vertical: 20,
                     ),
-
-                    child: BlocListener<MRekanBankCrudBloc, MRekanBankCrudState>(
+                    child:
+                        BlocListener<MRekanBankCrudBloc, MRekanBankCrudState>(
                       listenWhen: (prev, curr) =>
-                      prev.isLoaded != curr.isLoaded ||
+                          prev.isLoaded != curr.isLoaded ||
                           prev.isSaved != curr.isSaved,
                       listener: (context, state) {
-                        if (state.isLoaded && _isFirstLoad && state.record != null) {
+                        if (state.isLoaded &&
+                            _isFirstLoad &&
+                            state.record != null) {
                           _injectPayload(state.record!);
                           _isFirstLoad = false;
                         }
@@ -133,7 +135,6 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
     );
   }
 
-
   Widget _buildFormContent(BuildContext context) {
     return Form(
       key: _formKey,
@@ -142,12 +143,14 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
         children: [
           Text(
             "Rekening Bank",
-            style: headingStyle(context, fontSize: getResponsiveFont(context, 22)),
+            style:
+                headingStyle(context, fontSize: getResponsiveFont(context, 22)),
           ),
           Text(
             "Lengkapi data rekening untuk pencairan klaim.",
-            style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 16))
-                .copyWith(color: hintGrey),
+            style:
+                bodyTextStyle(context, fontSize: getResponsiveFont(context, 16))
+                    .copyWith(color: hintGrey),
           ),
           const SizedBox(height: vPadding),
           Container(
@@ -167,17 +170,15 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
               ],
             ),
           ),
-
           const SizedBox(height: vPadding),
-
           AppButton.primary(
             text: "Simpan Perubahan",
             isLoading: isSaving,
             onPressed: isSaving
                 ? null
                 : () async {
-              await onSaveForm();
-            },
+                    await onSaveForm();
+                  },
           )
         ],
       ),
@@ -210,11 +211,13 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
       clientSideSearch: true,
       displayText: (item) => item.bankNama,
       compareItems: (a, b) => a.mbankId == b.mbankId,
+      errorText: err('bank'),
       onChangedCallback: (value) {
         if (value != null) {
           setState(() {
             fieldComboMBank = value;
           });
+          clearErr('bank');
           removeError(error: kStringNullError);
           mRekanBankCrudBloc.add(
             ComboMBankChangedEvent(comboMBank: value),
@@ -240,11 +243,10 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
       label: "Nama Rekening",
       controller: fieldRekNamaController,
       keyboardType: TextInputType.text,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return kStringNullError;
-        }
-        return null;
+      errorText: err('rekNama'),
+      validator: (_) => err('rekNama'),
+      onChanged: (value) {
+        if (value.trim().isNotEmpty) clearErr('rekNama');
       },
     );
   }
@@ -257,16 +259,42 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
       inputFormatters: [
         FilteringTextInputFormatter.digitsOnly,
       ],
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return kStringNullError;
-        }
-        return null;
+      errorText: err('rekNo'),
+      validator: (_) => err('rekNo'),
+      onChanged: (value) {
+        if (value.trim().isNotEmpty) clearErr('rekNo');
       },
     );
   }
 
+  bool validateBankForm() {
+    clearErrs();
+
+    bool ok = true;
+
+    if (fieldComboMBank == null) {
+      setErr('bank', kStringNullError);
+      ok = false;
+    }
+
+    if (fieldRekNamaController.text.trim().isEmpty) {
+      setErr('rekNama', kStringNullError);
+      ok = false;
+    }
+
+    if (fieldRekNoController.text.trim().isEmpty) {
+      setErr('rekNo', kStringNullError);
+      ok = false;
+    }
+
+    return ok;
+  }
+
   Future<void> onSaveForm() async {
+    if (!validateBankForm()) {
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -300,5 +328,20 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
         errors.remove(error);
       });
     }
+  }
+
+  String? err(String key) => fieldErrors[key];
+
+  void setErr(String key, String? msg) {
+    setState(() => fieldErrors[key] = msg);
+  }
+
+  void clearErr(String key) {
+    if (!fieldErrors.containsKey(key)) return;
+    setState(() => fieldErrors.remove(key));
+  }
+
+  void clearErrs() {
+    setState(() => fieldErrors.clear());
   }
 }

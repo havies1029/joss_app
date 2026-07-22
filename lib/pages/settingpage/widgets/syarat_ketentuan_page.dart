@@ -184,7 +184,7 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
                         child: AnimatedAlign(
                           duration: const Duration(milliseconds: 350),
                           curve: Curves.easeInOut,
-                          alignment: Alignment.topCenter,
+                          alignment: Alignment.topLeft,
                           heightFactor: isExpanded ? 1 : 0,
                           child: AnimatedOpacity(
                             duration: const Duration(milliseconds: 220),
@@ -198,6 +198,7 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
                                     padding: const EdgeInsets.only(top: 8),
                                     child: Text(
                                       point,
+                                      textAlign: TextAlign.left,
                                       style:
                                           bodyTextStyle(context, fontSize: 16)
                                               .copyWith(color: hintGrey),

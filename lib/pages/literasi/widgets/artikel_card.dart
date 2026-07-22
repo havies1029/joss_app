@@ -4,17 +4,27 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/common/loading_indicator.dart';
 
 Widget sectionTitleBar(BuildContext context, String text) {
+  final maxWidth = MediaQuery.sizeOf(context).width - 30;
+
   return Container(
     margin: const EdgeInsets.all(15),
-    width: 108,
-    height: 25,
-    padding: EdgeInsets.only(left: 3),
+    constraints: BoxConstraints(
+      minWidth: 108,
+      maxWidth: maxWidth,
+      minHeight: 25,
+    ),
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
     decoration: BoxDecoration(
       color: const Color(0x80EF7A28),
       border: const Border(left: BorderSide(color: primaryColor, width: 1.7)),
     ),
     alignment: Alignment.centerLeft,
-    child: Text(text, style: bodyTextStyle(context)),
+    child: Text(
+      text,
+      style: bodyTextStyle(context),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    ),
   );
 }
 

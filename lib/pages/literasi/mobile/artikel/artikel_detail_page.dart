@@ -23,7 +23,8 @@ class ArtikelDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selectedArticle = context.watch<ArticleSelectionCubit>().state;
-    final isMobile = MediaQuery.of(context).size.width < 500;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 500;
     return Scaffold(
       backgroundColor: secondaryBlackColor,
       appBar: AppBar(
@@ -117,13 +118,12 @@ class ArtikelDetailPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
                 child: CachedNetworkImage(
                   imageUrl: selectedArticle.gambarArtikel!,
-                  height: 187,
                   width: double.infinity,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fitWidth,
 
                   placeholder: (context, url) {
                     return Container(
-                      height: 187,
+                      height: 220,
                       width: double.infinity,
                       color: secondaryBlackColor,
                       alignment: Alignment.center,
@@ -137,7 +137,7 @@ class ArtikelDetailPage extends StatelessWidget {
 
                   errorWidget: (context, url, error) {
                     return Container(
-                      height: 187,
+                      height: 220,
                       width: double.infinity,
                       color: sGrey,
                       alignment: Alignment.center,

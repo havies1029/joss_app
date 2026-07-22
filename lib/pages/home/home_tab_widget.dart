@@ -192,13 +192,17 @@ class HomeTabWidgetState extends State<HomeTabWidget> {
     return authState.user.userType.trim();
   }
 
+  Future<void> _closeGuestApp() async {
+    await SystemNavigator.pop();
+  }
+
   Future<void> handleLogout(BuildContext context) async {
     final shouldLogout = await showLogoutConfirmDialog(context);
     if (!context.mounted) return;
 
     if (shouldLogout == true) {
       if (_resolveUserType(context).isEmpty) {
-        await SystemNavigator.pop();
+        await _closeGuestApp();
         return;
       }
 
@@ -210,7 +214,11 @@ class HomeTabWidgetState extends State<HomeTabWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final userType = _resolveUserType(context);
+    final disableIosGuestSwipe = Platform.isIOS && userType.isEmpty;
+
     return IosLeftEdgeSwipe(
+      enabled: !disableIosGuestSwipe,
       onSwipeBack: () async {
         await handleLogout(context);
       },
