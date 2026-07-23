@@ -46,15 +46,23 @@ class Klaim5cariTileWidget extends StatelessWidget {
   bool get isImage {
     final m = (mime ?? '').toLowerCase();
     if (m.startsWith('image/')) return true;
-    final p = (localPath ?? fileUrl ?? '').toLowerCase();
-    return p.endsWith('.jpg') || p.endsWith('.jpeg') || p.endsWith('.png') || p.endsWith('.webp');
+    final sources = [localPath, fileUrl, fileName]
+        .whereType<String>()
+        .map((value) => value.toLowerCase());
+    return sources.any((p) =>
+        p.endsWith('.jpg') ||
+        p.endsWith('.jpeg') ||
+        p.endsWith('.png') ||
+        p.endsWith('.webp'));
   }
 
   bool get isPdf {
     final m = (mime ?? '').toLowerCase();
     if (m.contains('pdf')) return true;
-    final p = (localPath ?? fileUrl ?? '').toLowerCase();
-    return p.endsWith('.pdf');
+    final sources = [localPath, fileUrl, fileName]
+        .whereType<String>()
+        .map((value) => value.toLowerCase());
+    return sources.any((p) => p.endsWith('.pdf'));
   }
 
   @override

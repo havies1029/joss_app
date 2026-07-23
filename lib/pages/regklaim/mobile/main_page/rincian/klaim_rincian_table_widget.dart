@@ -43,7 +43,7 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final bool isNarrow = width < 900;
+    final bool isNarrow = width < 600;
 
     return BlocConsumer<GroupcobCariBloc, GroupcobCariState>(
       buildWhen: (previous, current) {

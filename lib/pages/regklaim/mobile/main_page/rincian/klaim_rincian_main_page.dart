@@ -8,6 +8,7 @@ import 'package:joss_app/blocs/klaimrinci/mstatusrincicari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/helper/expert_helper.dart';
 import 'package:joss_app/helper/mobile_expert_helper.dart';
+import 'package:joss_app/helper/share_position_origin_helper.dart';
 import 'package:joss_app/models/klaimrinci/klaimdetailcari_model.dart';
 import 'package:joss_app/widgets/apptheme/polis_button.dart';
 import 'package:joss_app/widgets/apptheme/popup_widget.dart';
@@ -252,9 +253,13 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
       "No Polis": d.noPolis,
       if (isLainnya) "COB Desc": d.cobDesc,
       "Tanggal Kejadian": _formatTanggalKejadian(d.tglKejadian),
-      "Curr": d.curr,
-      "Nilai Klaim": d.klaimAmount,
+      "Mata Uang": d.curr,
+      "Nilai Klaim": _formatCurrencyValue(d.klaimAmount),
     };
+  }
+
+  String _formatCurrencyValue(num? value) {
+    return NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
   }
 
   String _formatTanggalKejadian(DateTime? value) {
@@ -335,6 +340,7 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
         text: data.length == 1
             ? "Berikut terlampir rincian klaim."
             : "Berikut terlampir ${data.length} rincian klaim terpilih.",
+        sharePositionOrigin: sharePositionOrigin(context),
       );
     } catch (e) {
       if (context.mounted) {

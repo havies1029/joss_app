@@ -11,7 +11,6 @@ import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../../common/loading_indicator.dart';
-import '../../../common/plat_nomor_formatter.dart';
 import '../../../models/combobox/combomjenisrugimv_model.dart';
 import '../../../repositories/combobox/combomjenisrugimv_repository.dart';
 import '../../../widgets/apptheme/dropdown2.dart';
@@ -43,8 +42,7 @@ class KlaimmvklaimcrudFormPageFormState
 	final comboRMatauangKey =
 	GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
 
-	final fieldDolController =
-	TextEditingController(text: DateTime.now().toIso8601String());
+	final fieldDolController = TextEditingController();
 	final fieldKlaimAmountController = TextEditingController();
 	final fieldKlaimBayarController = TextEditingController();
 	final fieldKronologisController = TextEditingController();
@@ -195,6 +193,8 @@ class KlaimmvklaimcrudFormPageFormState
 						if (state.record != null) {
 							if (state.record!.dol != null) {
 								fieldDolController.text = state.record!.dol!.toIso8601String();
+							} else {
+								fieldDolController.clear();
 							}
 
 							fieldKlaimAmountController.text =

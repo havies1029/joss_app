@@ -50,7 +50,12 @@ class Regmv6FormBloc extends Bloc<Regmv6FormEvents, Regmv6FormState> {
 			Regmv6FormLihatEvent event, Emitter<Regmv6FormState> emit) async {
 		emit(state.copyWith(isLoading: true, isLoaded: false));
 		Regmv6FormModel record = await repository.regmv6FormLihat(event.recordId);
-		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
+		emit(state.copyWith(
+			isLoading: false,
+			isLoaded: true,
+			record: record,
+			recordOwnerId: event.recordId,
+		));
 	}
 
 	Future<void> onHitungPremiRegmv6Form(
@@ -69,6 +74,7 @@ class Regmv6FormBloc extends Bloc<Regmv6FormEvents, Regmv6FormState> {
 				isCalculating: false,
 				isCalculated: true,
 				record: record,
+				recordOwnerId: event.regmv1Id,
 			));
 		} catch (e, st) {
 			debugPrintStack(stackTrace: st);

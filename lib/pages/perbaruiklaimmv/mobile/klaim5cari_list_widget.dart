@@ -7,8 +7,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaim5cari_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdfx/pdfx.dart';
 
 import '../../../common/app_data.dart';
@@ -558,22 +560,102 @@ Future<void> showPreviewDialog({
     // );
   }
 
-
-  bool _isRemoteUrl(String value) {
-    final uri = Uri.tryParse(value);
-    return uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
-  }
-
   String? _detectMime(Klaim5cariModel it, String path) {
     final fromModel = it.mimeType?.trim();
-    if (fromModel != null && fromModel.isNotEmpty) return fromModel;
+    if (fromModel != null &&
+        fromModel.isNotEmpty &&
+        fromModel.toLowerCase() != 'application/octet-stream') {
+      return fromModel;
+    }
 
-    return lookupMimeType(path);
+    final fromFileName = it.fileName?.trim();
+    if (fromFileName != null && fromFileName.isNotEmpty) {
+      final fileNameMime = lookupMimeType(fromFileName);
+      if (fileNameMime != null && fileNameMime.isNotEmpty) {
+        return fileNameMime;
+      }
+    }
+
+    return lookupMimeType(path) ?? fromModel;
   }
 
   Map<String, String> get _authHeaders => {
     'Authorization': 'Bearer ${AppData.userToken}',
   };
+
+  String _safePreviewFileName(Klaim5cariModel it, String source) {
+    final uri = Uri.tryParse(source);
+    final sourceName = (uri != null && uri.pathSegments.isNotEmpty)
+        ? uri.pathSegments.last
+        : 'preview_file';
+    final rawName = (it.fileName?.trim().isNotEmpty ?? false)
+        ? it.fileName!.trim()
+        : sourceName;
+
+    final sanitized = rawName
+        .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+
+    return sanitized.isEmpty ? 'preview_file' : sanitized;
+  }
+
+  String _extensionFromMime(String mime) {
+    final cleanMime = mime.split(';').first.trim().toLowerCase();
+    if (cleanMime.contains('pdf')) return '.pdf';
+    if (cleanMime.contains('jpeg')) return '.jpg';
+    if (cleanMime.contains('png')) return '.png';
+    if (cleanMime.contains('webp')) return '.webp';
+
+    return '';
+  }
+
+  String _previewExtension(Klaim5cariModel it, String source, [String? contentType]) {
+    final fileName = it.fileName?.trim();
+    if (fileName != null && fileName.contains('.')) {
+      final ext = fileName.split('.').last.trim().toLowerCase();
+      if (ext.isNotEmpty && ext.length <= 6) return '.$ext';
+    }
+
+    final path = Uri.tryParse(source)?.path.toLowerCase() ?? source.toLowerCase();
+    if (path.contains('.') && !path.endsWith('.')) {
+      final ext = path.split('.').last.trim().toLowerCase();
+      if (ext.isNotEmpty && ext.length <= 6) return '.$ext';
+    }
+
+    final responseExt = _extensionFromMime(contentType ?? '');
+    if (responseExt.isNotEmpty) return responseExt;
+
+    final mime = _detectMime(it, source)?.toLowerCase() ?? '';
+    final mimeExt = _extensionFromMime(mime);
+    if (mimeExt.isNotEmpty) return mimeExt;
+
+    return '';
+  }
+
+  Future<String> _downloadRemotePreviewFile(Klaim5cariModel it, String source) async {
+    final response = await http.get(Uri.parse(source), headers: _authHeaders);
+    if (response.statusCode != 200 || response.bodyBytes.isEmpty) {
+      throw Exception('File tidak bisa diakses (${response.statusCode})');
+    }
+
+    final tempDir = await getTemporaryDirectory();
+    final previewDir = await Directory(
+      '${tempDir.path}${Platform.pathSeparator}klaim5_preview',
+    ).create(recursive: true);
+
+    final ext = _previewExtension(it, source, response.headers['content-type']);
+    final safeName = _safePreviewFileName(it, source);
+    final hasExt = safeName.toLowerCase().endsWith(ext.toLowerCase());
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final fileName = hasExt
+        ? '${timestamp}_$safeName'
+        : '${timestamp}_$safeName$ext';
+    final file = File('${previewDir.path}${Platform.pathSeparator}$fileName');
+
+    await file.writeAsBytes(response.bodyBytes, flush: true);
+    return file.path;
+  }
 
   Future<void> _preview(Klaim5cariModel it) async {
     final localPath = it.localPath?.trim();
@@ -584,8 +666,23 @@ Future<void> showPreviewDialog({
       return;
     }
 
-    final bool isLocal = localPath != null && localPath.isNotEmpty;
-    final String source = isLocal ? localPath! : fileUrl!;
+    bool isLocal = localPath != null && localPath.isNotEmpty;
+    String source = isLocal ? localPath : fileUrl!;
+
+    if (!isLocal) {
+      try {
+        source = await _downloadRemotePreviewFile(it, source);
+        isLocal = true;
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar('File tidak bisa dibuka dari server. $e'),
+        );
+        return;
+      }
+
+      if (!mounted) return;
+    }
 
     final mime = _detectMime(it, source)?.toLowerCase() ?? '';
     final lowerSource = source.toLowerCase();
@@ -620,31 +717,7 @@ Future<void> showPreviewDialog({
                       ),
                     ),
                   )
-                      : Image.network(
-                    source,
-                    headers: _authHeaders,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, error, ___) => Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(
-                        'Gambar dari server tidak bisa dibuka\n$error',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    loadingBuilder: (context, child, progress) {
-                      if (progress == null) return child;
-
-                      return const SizedBox(
-                        width: 36,
-                        height: 36,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      );
-                    },
-                  ),
+                      : const SizedBox.shrink(),
                 ),
               ),
               Positioned(
@@ -663,15 +736,6 @@ Future<void> showPreviewDialog({
     }
 
     if (isPdf) {
-      if (!isLocal) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Preview PDF dari URL belum didukung.'),
-          ),
-        );
-        return;
-      }
-
       final controller = PdfController(
         document: PdfDocument.openFile(source),
       );
@@ -688,15 +752,11 @@ Future<void> showPreviewDialog({
       return;
     }
 
-    if (isLocal) {
-      await OpenFilex.open(source);
-      return;
+    final result = await OpenFilex.open(source);
+    if (result.type != ResultType.done && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(result.message),
+      );
     }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Preview file dari URL belum didukung.'),
-      ),
-    );
   }
 }

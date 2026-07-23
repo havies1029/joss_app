@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/helper/share_position_origin_helper.dart';
 import 'package:joss_app/models/klaimrasio/klaimrasiodetailcari_model.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../../blocs/klaimrasio/klaimrasiocobcari_bloc.dart';
@@ -262,6 +263,7 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
         text: allDetails.length == 1
             ? "Berikut terlampir laporan klaim rasio."
             : "Berikut terlampir ${allDetails.length} data klaim rasio.",
+        sharePositionOrigin: sharePositionOrigin(context),
       );
     } catch (e) {
       if (context.mounted) {

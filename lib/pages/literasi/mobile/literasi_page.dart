@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/blocs/gen_berita/berita1cari_bloc.dart';
+import 'package:joss_app/blocs/gen_berita/beritakecilcari_bloc.dart';
+import 'package:joss_app/blocs/gen_berita/beritalaincari_bloc.dart';
 import 'package:joss_app/pages/base/base_background_firstpage.dart';
 import 'package:joss_app/pages/literasi/mobile/artikel/artikel_page.dart';
 import 'package:joss_app/pages/literasi/mobile/tentang_jps_page.dart';
@@ -25,6 +29,32 @@ class _LiterasiPageState extends State<LiterasiPage> {
     {'label': 'Rating', 'page': const TestimoniPage2()},
   ];
 
+  void _ensureArtikelLoaded() {
+    final beritaBesarBloc = context.read<Berita1CariBloc>();
+    final beritaKecilBloc = context.read<BeritaKecilCariBloc>();
+    final beritaLainBloc = context.read<BeritaLainCariBloc>();
+
+    if (beritaBesarBloc.state.status == ListStatus.initial) {
+      beritaBesarBloc.add(const RefreshBerita1CariEvent(1));
+    }
+    if (beritaKecilBloc.state.status == ListStatus.initial) {
+      beritaKecilBloc.add(const RefreshBeritaKecilCariEvent(2));
+    }
+    if (beritaLainBloc.state.status == ListStatus.initial) {
+      beritaLainBloc.add(const RefreshBeritaLainCariEvent(3));
+    }
+  }
+
+  void _selectTab(int index) {
+    if (selectedTab == index) {
+      return;
+    }
+    if (index == 1) {
+      _ensureArtikelLoaded();
+    }
+    setState(() => selectedTab = index);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +76,7 @@ class _LiterasiPageState extends State<LiterasiPage> {
                     final isActive = i == selectedTab;
                     return Expanded(
                       child: GestureDetector(
-                        onTap: () => setState(() => selectedTab = i),
+                        onTap: () => _selectTab(i),
                         child: Container(
                           height: 54,
                           alignment: Alignment.center,

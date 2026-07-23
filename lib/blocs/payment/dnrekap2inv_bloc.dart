@@ -71,6 +71,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         paymentStatus: invoiceStatus.status,
         totalBayar: invoiceStatus.totalBayar,
         curr: state.curr,
+        statusCheckSource: InvoiceStatusCheckSource.general,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -107,6 +108,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         invoiceId: invoiceStatus.invoiceId,
         paymentStatus: invoiceStatus.status,
         totalBayar: invoiceStatus.totalBayar,
+        statusCheckSource: InvoiceStatusCheckSource.general,
         // curr: invoiceStatus.curr ?? state.curr,
       ));
     } catch (e) {
@@ -128,6 +130,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       isProcessing: true,
       isProcessed: false,
       hasFailure: false,
+      statusCheckSource: event.source,
     ));
     try {
       PaymentDnAPI api = PaymentDnAPI();
@@ -145,6 +148,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         isProcessed: true,
         paymentStatus: invoiceStatus.status,
         totalBayar: finalTotalBayar,
+        statusCheckSource: event.source,
       ));
 
     } catch (e) {
@@ -167,6 +171,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         isProcessed: true,
         paymentStatus: invoiceStatus.status,
         totalBayar: invoiceStatus.totalBayar,
+        statusCheckSource: InvoiceStatusCheckSource.general,
       ));    
   }
 
@@ -197,6 +202,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         invoiceId: invoiceStatus.invoiceId,
         paymentStatus: invoiceStatus.status,
         totalBayar: invoiceStatus.totalBayar,
+        statusCheckSource: InvoiceStatusCheckSource.general,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -222,6 +228,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         isProcessed: true,
         paymentStatus: invoiceStatus.status,
         totalBayar: invoiceStatus.totalBayar,
+        statusCheckSource: InvoiceStatusCheckSource.general,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -305,6 +312,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         invoiceId: invoiceStatus.invoiceId,
         paymentStatus: invoiceStatus.status,
         totalBayar: invoiceStatus.totalBayar,
+        statusCheckSource: InvoiceStatusCheckSource.general,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -330,6 +338,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         invoiceId: invoiceStatus.invoiceId,
         paymentStatus: invoiceStatus.status,
         totalBayar: invoiceStatus.totalBayar,
+        statusCheckSource: InvoiceStatusCheckSource.general,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -364,6 +373,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         invoiceId: invoiceStatus.invoiceId,
         paymentStatus: invoiceStatus.status,
         totalBayar: invoiceStatus.totalBayar,
+        statusCheckSource: InvoiceStatusCheckSource.general,
       ));
     } catch (e) {
       emit(state.copyWith(

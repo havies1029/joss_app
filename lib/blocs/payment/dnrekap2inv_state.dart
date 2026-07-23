@@ -11,6 +11,7 @@ class DnRekap2invState extends Equatable {
   final double totalBayar;
   final String curr;
   final bool silentPaymentMessage;
+  final InvoiceStatusCheckSource statusCheckSource;
 
   DnRekap2invState({
     this.invoiceId = "",
@@ -23,6 +24,7 @@ class DnRekap2invState extends Equatable {
     this.totalBayar = 0.0,
     this.curr = "",
     this.silentPaymentMessage = false,
+    this.statusCheckSource = InvoiceStatusCheckSource.general,
   }) : rincianSOA = rincianSOA ?? RincianSOAModel(headers: [], grandtotal: []);
 
   factory DnRekap2invState.initial() {
@@ -40,6 +42,7 @@ class DnRekap2invState extends Equatable {
     double? totalBayar,
     String? curr,
     bool? silentPaymentMessage,
+    InvoiceStatusCheckSource? statusCheckSource,
   }) {
     return DnRekap2invState(
       invoiceId: invoiceId ?? this.invoiceId,
@@ -52,6 +55,7 @@ class DnRekap2invState extends Equatable {
       totalBayar: totalBayar ?? this.totalBayar,
       curr: curr ?? this.curr,
       silentPaymentMessage: silentPaymentMessage ?? this.silentPaymentMessage,
+      statusCheckSource: statusCheckSource ?? this.statusCheckSource,
     );
   }
 
@@ -67,5 +71,6 @@ class DnRekap2invState extends Equatable {
     totalBayar,
     curr,
     silentPaymentMessage,
+    statusCheckSource,
   ];
 }

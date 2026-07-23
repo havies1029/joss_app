@@ -90,8 +90,6 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
   }
 
   Widget _buildCompactTable() {
-    final widths = _compactColumnWidths(context, widget.items);
-
     final useVerticalScroll = widget.items.length > widget.maxVisibleRows;
     final bodyHeight = widget.maxVisibleRows * widget.rowHeight;
     final tableHeight = widget.headerHeight + bodyHeight + 12;
@@ -103,6 +101,12 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
         decoration: _boxDecoration(),
         child: LayoutBuilder(
           builder: (context, constraints) {
+            final widths = _compactColumnWidths(
+              context,
+              widget.items,
+              minTableWidth: constraints.maxWidth,
+            );
+
             return ScrollbarTheme(
               data: _scrollbarTheme(),
               child: Scrollbar(
@@ -456,10 +460,11 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
 
   Map<int, TableColumnWidth> _compactColumnWidths(
     BuildContext context,
-    List<T> items,
-  ) {
-    final map = <int, TableColumnWidth>{
-      0: const FixedColumnWidth(48),
+    List<T> items, {
+    double? minTableWidth,
+  }) {
+    final widths = <int, double>{
+      0: 48,
     };
 
     for (var i = 0; i < widget.columns.length; i++) {
@@ -473,10 +478,32 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
             max: col.compactMaxWidth,
           );
 
-      map[i + 1] = FixedColumnWidth(width);
+      widths[i + 1] = width;
     }
 
-    return map;
+    final totalWidth = widths.values.fold<double>(0, (sum, w) => sum + w);
+    final shouldStretch = minTableWidth != null &&
+        minTableWidth.isFinite &&
+        minTableWidth > totalWidth &&
+        widget.columns.isNotEmpty;
+
+    if (shouldStretch) {
+      final extraWidth = minTableWidth - totalWidth;
+      final totalFlex =
+          widget.columns.fold<double>(0, (sum, col) => sum + col.normalFlex);
+
+      if (totalFlex > 0) {
+        for (var i = 0; i < widget.columns.length; i++) {
+          final col = widget.columns[i];
+          widths[i + 1] =
+              widths[i + 1]! + (extraWidth * col.normalFlex / totalFlex);
+        }
+      }
+    }
+
+    return widths.map(
+      (index, width) => MapEntry(index, FixedColumnWidth(width)),
+    );
   }
 
   double _measureTextWidth(

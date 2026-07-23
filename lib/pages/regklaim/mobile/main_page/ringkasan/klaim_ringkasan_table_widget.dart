@@ -43,53 +43,48 @@ class KlaimRingkasanTableWidgetState extends State<KlaimRingkasanTableWidget> {
           );
         }
 
-        return Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 720,
-            ),
-            child: CobPolicyTable<KlaimringkasCariModel>(
-              items: state.items,
-              selectedIds: const [],
-              enablePagination: false,
-              enableSelection: false,
-              enableDetailTap: false,
-              filterSelectedWhenReadOnly: false,
-              readOnly: true,
-              idGetter: (d) => d.nourut.toString(),
-              nomorGetter: (d, index) => d.nourut.toString(),
-              onSelect: (_) {},
-              onUnselect: (_) {},
-              onOpenDetail: (_, __) {},
-              columns: [
-                CobPolicyColumn<KlaimringkasCariModel>(
-                  title: "KATEGORI",
-                  valueGetter: (d) => d.cobNama,
-                  normalFlex: 2.3,
-                  compactWidth: 160,
-                  normalMaxLines: 1,
-                  compactMaxLines: 2,
-                ),
-                CobPolicyColumn<KlaimringkasCariModel>(
-                  title: "JUMLAH KLAIM",
-                  valueGetter: (d) => formatNum(d.klaimQty),
-                  normalFlex: 1.4,
-                  compactWidth: 120,
-                  normalSoftWrap: false,
-                  compactSoftWrap: false,
-                ),
-                CobPolicyColumn<KlaimringkasCariModel>(
-                  title: "TOTAL NILAI",
-                  valueGetter: (d) =>
-                  "${d.currNama} ${formatNum(d.klaimAmount)}",
-                  normalFlex: 2.2,
-                  compactWidth: 200,
-                  normalSoftWrap: false,
-                  compactSoftWrap: false,
-                ),
-              ],
-            ),
+        return SizedBox(
+          width: double.infinity,
+          child: CobPolicyTable<KlaimringkasCariModel>(
+            items: state.items,
+            selectedIds: const [],
+            narrowBreakpoint: 600,
+            enablePagination: false,
+            enableSelection: false,
+            enableDetailTap: false,
+            filterSelectedWhenReadOnly: false,
+            readOnly: true,
+            idGetter: (d) => d.nourut.toString(),
+            nomorGetter: (d, index) => d.nourut.toString(),
+            onSelect: (_) {},
+            onUnselect: (_) {},
+            onOpenDetail: (_, __) {},
+            columns: [
+              CobPolicyColumn<KlaimringkasCariModel>(
+                title: "KATEGORI",
+                valueGetter: (d) => d.cobNama,
+                normalFlex: 2.3,
+                compactWidth: 160,
+                normalMaxLines: 1,
+                compactMaxLines: 2,
+              ),
+              CobPolicyColumn<KlaimringkasCariModel>(
+                title: "JUMLAH KLAIM",
+                valueGetter: (d) => formatNum(d.klaimQty),
+                normalFlex: 1.4,
+                compactWidth: 120,
+                normalSoftWrap: false,
+                compactSoftWrap: false,
+              ),
+              CobPolicyColumn<KlaimringkasCariModel>(
+                title: "TOTAL NILAI",
+                valueGetter: (d) => "${d.currNama} ${formatNum(d.klaimAmount)}",
+                normalFlex: 2.2,
+                compactWidth: 200,
+                normalSoftWrap: false,
+                compactSoftWrap: false,
+              ),
+            ],
           ),
         );
       },

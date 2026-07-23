@@ -78,40 +78,7 @@ class KlaimmvbengkelcrudFormPageFormState
 
   bool validateForm() {
     clearErrsByPrefix('form.');
-
-    bool ok = true;
-
-    if (fieldComboMJnsbengkel == null) {
-      setErr('form.mjnsbengkelId', 'Field Jenis Bengkel tidak boleh kosong.');
-      ok = false;
-    }
-
-    final jenisId = fieldComboMJnsbengkel?.mjnsbengkelId;
-
-    if (jenisId == "10") {
-      if (fieldComboMWilayahBengkel == null) {
-        setErr(
-          'form.mwilayahbengkelId',
-          'Field Wilayah Bengkel tidak boleh kosong.',
-        );
-        ok = false;
-      }
-
-      if (fieldComboMBengkel == null) {
-        setErr('form.mbengkelId', 'Field Nama Bengkel tidak boleh kosong.');
-        ok = false;
-      }
-    }
-
-    if (jenisId == "20") {
-      final namaBengkelLain = fieldNamaBengkelLainController.text.trim();
-      if (namaBengkelLain.isEmpty) {
-        setErr('form.namaBengkelLain', kStringNullError);
-        ok = false;
-      }
-    }
-
-    return ok;
+    return true;
   }
 
   @override
@@ -206,7 +173,7 @@ class KlaimmvbengkelcrudFormPageFormState
       enableSearch: true,
       showClearButton: false,
       errorText: err('form.mbengkelId'),
-      validatorCallback: (v) => v == null ? kStringNullError : null,
+      validatorCallback: (_) => null,
       onChangedCallback: (value) {
         setState(() {
           fieldComboMBengkel = value;
@@ -237,7 +204,7 @@ class KlaimmvbengkelcrudFormPageFormState
       displayText: (item) => item.jenisNama,
       compareItems: (a, b) => a.mjnsbengkelId == b.mjnsbengkelId,
       errorText: err('form.mjnsbengkelId'),
-      validatorCallback: (v) => v == null ? kStringNullError : null,
+      validatorCallback: (_) => null,
       onChangedCallback: (value) {
         setState(() {
           fieldComboMJnsbengkel = value;
@@ -275,7 +242,7 @@ class KlaimmvbengkelcrudFormPageFormState
       enableSearch: true,
       showClearButton: true,
       errorText: err('form.mwilayahbengkelId'),
-      validatorCallback: (v) => v == null ? kStringNullError : null,
+      validatorCallback: (_) => null,
       onChangedCallback: (value) {
         setState(() {
           fieldComboMWilayahBengkel = value;

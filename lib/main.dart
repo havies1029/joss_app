@@ -256,7 +256,6 @@ import 'blocs/gallery/gallerymembercari_bloc.dart';
 import 'blocs/gen_review/reviewcari_bloc.dart';
 
 import 'blocs/gen_berita/berita1cari_bloc.dart';
-import 'blocs/gen_berita/berita2cari_bloc.dart';
 import 'blocs/gen_berita/berita3cari_bloc.dart';
 import 'blocs/gen_berita/beritakecilcari_bloc.dart';
 import 'blocs/gen_berita/beritalaincari_bloc.dart';
@@ -479,15 +478,9 @@ Future<void> main() async {
         BlocProvider(create: (_) => Regendors2CariBloc()),
 
         // News
-        BlocProvider(
-            create: (_) => Berita1CariBloc()..add(RefreshBerita1CariEvent(1))),
-        BlocProvider(
-            create: (_) =>
-                BeritaKecilCariBloc()..add(RefreshBeritaKecilCariEvent(2))),
-        BlocProvider(
-            create: (_) =>
-                BeritaLainCariBloc()..add(RefreshBeritaLainCariEvent(3))),
-        BlocProvider(create: (_) => Berita2CariBloc()),
+        BlocProvider(create: (_) => Berita1CariBloc()),
+        BlocProvider(create: (_) => BeritaKecilCariBloc()),
+        BlocProvider(create: (_) => BeritaLainCariBloc()),
         BlocProvider(create: (_) => Berita3CariBloc()),
         BlocProvider<ArticleSelectionCubit>(
             create: (_) => ArticleSelectionCubit(appPrefs)),

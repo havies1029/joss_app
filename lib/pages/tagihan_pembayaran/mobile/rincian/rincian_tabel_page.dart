@@ -6,7 +6,6 @@ import 'package:joss_app/models/payment/dnheadercob_model.dart';
 
 import '../../../../common/constants.dart';
 import '../../../../widgets/apptheme/dialog_detail_polis.dart';
-import '../../../../widgets/apptheme/nested_scrollable_table_shell.dart';
 
 class RincianTablePage extends StatefulWidget {
   final List<DnHeaderCobModel> headers;
@@ -173,7 +172,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final bool isNarrow = width < 900;
+    final bool isNarrow = width < 600;
 
     final visibleHeaders = widget.readOnly
         ? widget.headers.where((header) {

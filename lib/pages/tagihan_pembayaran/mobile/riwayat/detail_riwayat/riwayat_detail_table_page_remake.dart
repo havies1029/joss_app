@@ -200,7 +200,10 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
                               );
 
                               context.read<DnRekap2invBloc>().add(
-                                CheckInvoiceStatusEvent(invoiceId: selected.inv1Id),
+                                CheckInvoiceStatusEvent(
+                                  invoiceId: selected.inv1Id,
+                                  source: InvoiceStatusCheckSource.riwayatContinuePayment,
+                                ),
                                 // SetPaymentSummaryEvent(curr: state.)
                               );
                               // showDialog(

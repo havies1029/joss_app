@@ -43,24 +43,29 @@ class Klaim5cariTileWidget extends StatelessWidget {
   bool get isImage {
     final m = (mime ?? '').toLowerCase();
     if (m.startsWith('image/')) return true;
-    final p = (localPath ?? fileUrl ?? '').toLowerCase();
-    return p.endsWith('.jpg') || p.endsWith('.jpeg') || p.endsWith('.png') || p.endsWith('.webp');
+    final sources = [localPath, fileUrl, fileName]
+        .whereType<String>()
+        .map((value) => value.toLowerCase());
+    return sources.any((p) =>
+        p.endsWith('.jpg') ||
+        p.endsWith('.jpeg') ||
+        p.endsWith('.png') ||
+        p.endsWith('.webp'));
   }
 
   bool get isPdf {
     final m = (mime ?? '').toLowerCase();
     if (m.contains('pdf')) return true;
-    final p = (localPath ?? fileUrl ?? '').toLowerCase();
-    return p.endsWith('.pdf');
+    final sources = [localPath, fileUrl, fileName]
+        .whereType<String>()
+        .map((value) => value.toLowerCase());
+    return sources.any((p) => p.endsWith('.pdf'));
   }
 
   @override
   Widget build(BuildContext context) {
     final cardBg = const Color(0xFF2F2F2F);
     final border = Colors.white.withOpacity(0.12);
-
-    final displayName = fileName ?? _inferName(localPath, fileUrl) ?? 'Belum ada file';
-    final displaySize = fileSizeBytes != null ? _formatBytes(fileSizeBytes!) : null;
 
     return InkWell(
       onTap: onPreview,

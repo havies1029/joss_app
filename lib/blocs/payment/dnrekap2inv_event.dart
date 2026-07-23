@@ -1,5 +1,10 @@
 part of 'dnrekap2inv_bloc.dart';
 
+enum InvoiceStatusCheckSource {
+  general,
+  riwayatContinuePayment,
+}
+
 abstract class DnRekap2invEvent extends Equatable {
   const DnRekap2invEvent();
 
@@ -37,11 +42,15 @@ class DnToInvByListDnProcessEvent extends DnRekap2invEvent {
 
 class CheckInvoiceStatusEvent extends DnRekap2invEvent {
   final String invoiceId;
+  final InvoiceStatusCheckSource source;
 
-  const CheckInvoiceStatusEvent({required this.invoiceId});
+  const CheckInvoiceStatusEvent({
+    required this.invoiceId,
+    this.source = InvoiceStatusCheckSource.general,
+  });
 
   @override
-  List<Object> get props => [invoiceId];
+  List<Object> get props => [invoiceId, source];
 }
 
 class SetRecordInvoiceStatusEvent extends DnRekap2invEvent {

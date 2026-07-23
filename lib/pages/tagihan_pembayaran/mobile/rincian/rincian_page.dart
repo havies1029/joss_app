@@ -11,6 +11,7 @@ import '../../../../blocs/payment/invoicestatuscard_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../../helper/expert_helper.dart';
 import '../../../../helper/mobile_expert_helper.dart';
+import '../../../../helper/share_position_origin_helper.dart';
 import '../../../../widgets/apptheme/empty_state_page.dart';
 import '../../../../widgets/apptheme/hubungi_cs.dart';
 import '../../../../widgets/apptheme/polis_button.dart';
@@ -754,6 +755,7 @@ class _RincianPageState extends State<RincianPage> {
         text: isAllData
             ? 'Berikut terlampir seluruh rincian polis.'
             : 'Berikut terlampir rincian polis terpilih.',
+        sharePositionOrigin: sharePositionOrigin(context),
       );
     } catch (e) {
       if (context.mounted) {

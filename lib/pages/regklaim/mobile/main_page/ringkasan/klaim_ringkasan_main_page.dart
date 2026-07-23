@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/helper/expert_helper.dart';
 import 'package:joss_app/helper/mobile_expert_helper.dart';
+import 'package:joss_app/helper/share_position_origin_helper.dart';
 import 'package:joss_app/widgets/apptheme/polis_button.dart';
 import 'package:joss_app/widgets/apptheme/popup_widget.dart';
+import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../../common/loading_indicator.dart';
@@ -146,10 +148,14 @@ class KlaimRingkasanMainPage extends StatefulWidget {
         "No": d.nourut,
         "COB": d.cobNama,
         "Qty Klaim": d.klaimQty,
-        "Curr": d.currNama,
-        "Nilai Klaim": d.klaimAmount,
+        "Mata Uang": d.currNama,
+        "Nilai Klaim": _formatCurrencyValue(d.klaimAmount),
       })
           .toList();
+    }
+
+    String _formatCurrencyValue(num? value) {
+      return NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
     }
 
   CategoryType _exportCategory() => CategoryType.klaim;
@@ -267,6 +273,7 @@ class KlaimRingkasanMainPage extends StatefulWidget {
         [XFile(file.path, mimeType: 'application/pdf')],
         subject: 'Ringkasan Klaim',
         text: 'Berikut terlampir ringkasan klaim.',
+        sharePositionOrigin: sharePositionOrigin(context),
       );
     } catch (e) {
       if (context.mounted) {

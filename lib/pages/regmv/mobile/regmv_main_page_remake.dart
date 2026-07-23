@@ -814,7 +814,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                   }
 
                   _payloadform6(record);
-                  openSection(RegmvFormSection.form6);
+                  openPremiSection(recordId: regmv1Id);
                 }
               },
             ),
@@ -1822,6 +1822,16 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     openSection(RegmvFormSection.form6);
     refreshForm6(recordId: recordId);
   }
+
+  void openPremiSection({required String? recordId}) => openSection(
+        RegmvFormSection.form6,
+        onRefresh: () {
+          final st = context.read<Regmv6FormBloc>().state;
+          if (st.record == null) {
+            refreshForm6(recordId: recordId);
+          }
+        },
+      );
 
   void openForm7({required String? recordId}) {
     openSection(RegmvFormSection.form7);
@@ -2884,7 +2894,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   // bool isForm7Complete() => context.read<RegmvUploadFotoAccBloc>().state.items.isNotEmpty;
   bool isForm7Complete() => true;
   // form6 = premi sudah terhitung
-  bool isForm6Complete() => context.read<Regmv6FormBloc>().state.record != null;
+  bool isForm6Complete() =>
+      context.read<Regmv6FormBloc>().state.record != null;
 
   bool validateOpenedForm() {
     final opened = getOpenedIndex();

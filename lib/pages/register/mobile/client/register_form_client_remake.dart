@@ -363,6 +363,13 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       ),
       borderColor: isVerified ? successGreen : null,
       focusedBorderColor: isVerified ? successGreen : null,
+      suffixIcon: isVerified
+          ? const Icon(
+              Icons.check,
+              color: successGreen,
+              size: 22,
+            )
+          : null,
       validator: (_) => err('form1.telepon'),
       onChanged: (v) {
         if (v.trim().isNotEmpty) {
@@ -397,6 +404,13 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       ),
       borderColor: isVerified ? successGreen : null,
       focusedBorderColor: isVerified ? successGreen : null,
+      suffixIcon: isVerified
+          ? const Icon(
+              Icons.check,
+              color: successGreen,
+              size: 22,
+            )
+          : null,
       validator: (_) => err('form1.email'),
       onChanged: (v) {
         final email = v.trim();

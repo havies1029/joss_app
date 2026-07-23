@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/common/loading_indicator.dart';
 
 Widget sectionTitleBar(BuildContext context, String text) {
   final maxWidth = MediaQuery.sizeOf(context).width - 30;
@@ -29,6 +28,9 @@ Widget sectionTitleBar(BuildContext context, String text) {
 }
 
 class ArticleCardWidget extends StatelessWidget {
+  static const double _imageWidth = 160;
+  static const double _imageHeight = 113;
+
   final String judul;
   final VoidCallback onTap;
   final String? subjudul;
@@ -115,7 +117,7 @@ class ArticleCardWidget extends StatelessWidget {
 
   List<Widget> _buildImageLeftLayout(BuildContext context) {
     return [
-      _buildImageWidget(),
+      _buildImageWidget(context),
       const SizedBox(width: 16),
       Expanded(child: _buildContentWidget(context)),
     ];
@@ -125,49 +127,50 @@ class ArticleCardWidget extends StatelessWidget {
     return [
       Expanded(child: _buildContentWidget(context)),
       const SizedBox(width: 16),
-      _buildImageWidget(),
+      _buildImageWidget(context),
     ];
   }
 
-  Widget _buildImageWidget() {
+  Widget _buildImageWidget(BuildContext context) {
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: (imageUrl != null && imageUrl!.isNotEmpty)
           ? CachedNetworkImage(
-        imageUrl: imageUrl!,
-        width: 160,
-        height: 113,
-        fit: BoxFit.cover,
-        placeholder: (context, url) {
-          return Container(
-            width: 160,
-            height: 113,
-            color: secondaryBlackColor,
-            alignment: Alignment.center,
-            child: const SizedBox(
-              width: 22,
-              height: 22,
-              child: LoadingIndicator(),
-            ),
-          );
-        },
-        errorWidget: (context, url, error) {
-          return Container(
-            width: 160,
-            height: 113,
-            color: sGrey,
-            alignment: Alignment.center,
-            child: const Icon(Icons.image, color: sGrey, size: 32),
-          );
-        },
-      )
+              imageUrl: imageUrl!,
+              width: _imageWidth,
+              height: _imageHeight,
+              memCacheWidth: (_imageWidth * pixelRatio).round(),
+              memCacheHeight: (_imageHeight * pixelRatio).round(),
+              fadeInDuration: Duration.zero,
+              fadeOutDuration: Duration.zero,
+              placeholderFadeInDuration: Duration.zero,
+              fit: BoxFit.cover,
+              placeholder: (context, url) {
+                return Container(
+                  width: _imageWidth,
+                  height: _imageHeight,
+                  color: secondaryBlackColor,
+                );
+              },
+              errorWidget: (context, url, error) {
+                return Container(
+                  width: _imageWidth,
+                  height: _imageHeight,
+                  color: sGrey,
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.image, color: sGrey, size: 32),
+                );
+              },
+            )
           : Container(
-        width: 160,
-        height: 113,
-        color: sGrey,
-        alignment: Alignment.center,
-        child: const Icon(Icons.image, color: sGrey, size: 32),
-      ),
+              width: _imageWidth,
+              height: _imageHeight,
+              color: sGrey,
+              alignment: Alignment.center,
+              child: const Icon(Icons.image, color: sGrey, size: 32),
+            ),
     );
   }
 

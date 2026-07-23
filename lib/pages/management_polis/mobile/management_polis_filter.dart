@@ -21,6 +21,7 @@ import '../../../blocs/loading_flow/loading_flow_bloc.dart';
 import '../../../common/loading_indicator.dart';
 import '../../../helper/expert_helper.dart';
 import '../../../helper/mobile_expert_helper.dart';
+import '../../../helper/share_position_origin_helper.dart';
 import '../../../widgets/EmptyStateWidget.dart';
 import '../../../widgets/apptheme/polis_button.dart';
 import '../../../widgets/apptheme/popup_widget.dart';
@@ -978,7 +979,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         text: rows.length == 1
             ? "Berikut terlampir rincian ${_exportLabel()}."
             : "Berikut terlampir ${rows.length} data ${_exportLabel()} terpilih.",
-        sharePositionOrigin: _sharePositionOrigin(context),
+        sharePositionOrigin: sharePositionOrigin(context),
       );
     } catch (e) {
       if (context.mounted) {
@@ -988,25 +989,4 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     }
   }
 
-  Rect _sharePositionOrigin(BuildContext context) {
-    final renderObject = context.findRenderObject();
-    if (renderObject is RenderBox &&
-        renderObject.hasSize &&
-        renderObject.size.width > 0 &&
-        renderObject.size.height > 0) {
-      return renderObject.localToGlobal(Offset.zero) & renderObject.size;
-    }
-
-    final mediaSize = MediaQuery.maybeOf(context)?.size;
-    if (mediaSize != null && mediaSize.width > 0 && mediaSize.height > 0) {
-      return Rect.fromLTWH(
-        mediaSize.width / 2,
-        mediaSize.height / 2,
-        1,
-        1,
-      );
-    }
-
-    return const Rect.fromLTWH(1, 1, 1, 1);
-  }
 }

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../blocs/gen_berita/berita1cari_bloc.dart';
 import '../../../../blocs/gen_berita/beritakecilcari_bloc.dart';
 import '../../../../blocs/gen_berita/beritalaincari_bloc.dart';
-import '../../../../blocs/gen_berita/berita2cari_bloc.dart';
 import '../../../../blocs/gen_berita/berita3cari_bloc.dart';
 import '../../../../blocs/local_prefs/article_selection_cubit.dart';
 
@@ -21,9 +20,6 @@ class ArtikelListPage extends StatelessWidget {
       judulArtikel: artikel.judul,
     );
 
-    context.read<Berita2CariBloc>().add(
-      RefreshBerita2CariEvent(berita1Id: artikel.berita1Id!),
-    );
     context.read<Berita3CariBloc>().add(
       RefreshBerita3CariEvent(berita1Id: artikel.berita1Id!),
     );
@@ -66,6 +62,7 @@ class ArtikelListPage extends StatelessWidget {
                   kDivider(),
                   ...state1.items.map(
                         (artikel) => ArticleCardWidget.bigNews(
+                      key: ValueKey('big-${artikel.berita1Id}'),
                       judul: artikel.judul ?? '-',
                       subjudul: artikel.sumber,
                       onTap: () => _goToDetail(context, artikel),
@@ -92,6 +89,7 @@ class ArtikelListPage extends StatelessWidget {
                   kDivider(),
                   ...state2.items.map(
                         (artikel) => ArticleCardWidget.otherArticle(
+                      key: ValueKey('small-${artikel.berita1Id}'),
                       judul: artikel.judul ?? '-',
                       subjudul: artikel.sumber,
                       onTap: () => _goToDetail(context, artikel),
@@ -118,6 +116,7 @@ class ArtikelListPage extends StatelessWidget {
                   kDivider(),
                   ...state3.items.map(
                         (artikel) => ArticleCardWidget.otherArticle(
+                      key: ValueKey('other-${artikel.berita1Id}'),
                       judul: artikel.judul ?? '-',
                       subjudul: artikel.sumber,
                       onTap: () => _goToDetail(context, artikel),

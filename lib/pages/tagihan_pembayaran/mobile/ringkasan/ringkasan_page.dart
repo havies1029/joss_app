@@ -8,6 +8,7 @@ import '../../../../common/constants.dart';
 import '../../../../common/loading_indicator.dart';
 import '../../../../helper/expert_helper.dart';
 import '../../../../helper/mobile_expert_helper.dart';
+import '../../../../helper/share_position_origin_helper.dart';
 import '../../../../widgets/apptheme/polis_button.dart';
 import '../../../../widgets/apptheme/popup_widget.dart';
 import '../payment_page/payment_method/payment_method_page.dart';
@@ -376,6 +377,7 @@ class RingkasanPageState extends State<RingkasanPage> {
         [XFile(file.path, mimeType: 'application/pdf')],
         subject: 'Ringkasan Tagihan & Pembayaran',
         text: 'Berikut terlampir ringkasan tagihan.',
+        sharePositionOrigin: sharePositionOrigin(context),
       );
     } catch (e) {
       if (context.mounted) {

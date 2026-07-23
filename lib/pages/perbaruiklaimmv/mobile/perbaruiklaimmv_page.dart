@@ -103,7 +103,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
         ),
         BlocListener<KlaimmvbengkelcrudBloc, KlaimmvbengkelcrudState>(
           listener: (context, state) {
-            if (_submitInProgress && state.hasFailure) {
+            if (_submitInProgress &&
+                state.hasFailure &&
+                _shouldBlockOnBengkelFailure(state)) {
               _submitInProgress = false;
               ScaffoldMessenger.of(context).showSnackBar(
                 errorSnackBar("Gagal menyimpan Data Bengkel"),
@@ -337,6 +339,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
         "BENGKEL saving:${bengkelState.isSaving}, dirty:${bengkelState.isDirty}, failure:${bengkelState.hasFailure}");
     debugPrint("========================");
 
+    final bengkelFailureBlocks = bengkelState.hasFailure &&
+        _shouldBlockOnBengkelFailure(bengkelState);
+
     final allDone = !polisState.isSaving &&
         !klaimState.isSaving &&
         !bengkelState.isSaving &&
@@ -344,7 +349,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
         !klaimState.isDirty &&
         !bengkelState.isDirty &&
         !polisState.hasFailure &&
-        !bengkelState.hasFailure &&
+        !bengkelFailureBlocks &&
         !(klaimState.hasFailure && klaimState.isDirty);
 
     if (!allDone) return;
@@ -370,5 +375,23 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
         ),
       ),
     );
+  }
+
+  bool _shouldBlockOnBengkelFailure(KlaimmvbengkelcrudState state) {
+    final record = state.record;
+    if (record == null) return false;
+
+    final jenisId = record.mjnsbengkelId?.trim() ?? '';
+    if (jenisId == '10') {
+      final wilayahId = record.mwilayahbengkelId?.trim() ?? '';
+      final bengkelId = record.mbengkelId?.trim() ?? '';
+      return wilayahId.isNotEmpty && bengkelId.isNotEmpty;
+    }
+
+    if (jenisId == '20') {
+      return record.namaBengkelLain.trim().isNotEmpty;
+    }
+
+    return false;
   }
 }

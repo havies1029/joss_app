@@ -43,7 +43,7 @@ class ListMenuWidget extends StatelessWidget {
 
     final needsExtraHeight =
         menuItems.any((m) => willWrapToSecondLine(m.title));
-    final double menuHeight = needsExtraHeight ? 140 : 120;
+    final double menuHeight = needsExtraHeight ? 156 : 128;
 
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
@@ -300,7 +300,7 @@ class ListMenuWidget extends StatelessWidget {
             final fontSize = titleStyle.fontSize ?? 14;
             final lineHeight = fontSize * (titleStyle.height ?? 1.2);
 
-            final desiredTitleHeight = (lineHeight * 2) + 6;
+            final desiredTitleHeight = (lineHeight * 2) + 8;
 
             const iconSize = 68.0;
             const topMargin = 15.0;
@@ -309,9 +309,10 @@ class ListMenuWidget extends StatelessWidget {
 
             final fixedHeights =
                 iconSize + topMargin + gapAfterIcon + bottomGap;
-            final remaining =
-                (c.maxHeight - fixedHeights).clamp(0.0, double.infinity);
-            final titleHeight = desiredTitleHeight.clamp(0.0, remaining);
+            final remaining = c.maxHeight - fixedHeights;
+            final titleHeight = remaining < desiredTitleHeight
+                ? remaining.clamp(lineHeight, desiredTitleHeight)
+                : desiredTitleHeight;
             final bottomFill =
                 (remaining - titleHeight).clamp(0.0, double.infinity);
 
@@ -370,7 +371,7 @@ class ListMenuWidget extends StatelessWidget {
                     textAlign: TextAlign.center,
                     softWrap: true,
                     maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                    overflow: TextOverflow.visible,
                     style: titleStyle,
                   ),
                 ),

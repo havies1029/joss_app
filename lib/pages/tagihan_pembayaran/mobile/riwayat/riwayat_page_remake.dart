@@ -108,6 +108,23 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                 ),
               );
             } else if (state.paymentStatus == "91" && state.isProcessed) {
+              if (state.statusCheckSource ==
+                  InvoiceStatusCheckSource.riwayatContinuePayment) {
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  infoSnackBar(
+                    'Tagihan sudah kedaluwarsa atau dibatalkan. Silakan cek riwayat pembayaran.',
+                  ),
+                );
+
+                context.read<DnRekap2invBloc>().add(InitializeDnRekap2invEvent());
+                refreshData();
+                return;
+              }
+
               if (_hasHandledPaymentCancel) return;
               _hasHandledPaymentCancel = true;
 

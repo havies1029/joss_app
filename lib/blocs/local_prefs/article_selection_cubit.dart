@@ -44,15 +44,15 @@ class ArticleSelectionCubit extends Cubit<ArticleSelectionState> {
     String? gambarArtikel,
     String? judulArtikel,
   }) async {
-    await prefs.setBerita1Id(berita1Id);
-    await prefs.setGambarArtikel(gambarArtikel);
-    await prefs.setJudulArtikel(judulArtikel);
-
     emit(ArticleSelectionState(
       berita1Id: berita1Id,
       gambarArtikel: gambarArtikel,
       judulArtikel: judulArtikel,
     ));
+
+    await prefs.setBerita1Id(berita1Id);
+    await prefs.setGambarArtikel(gambarArtikel);
+    await prefs.setJudulArtikel(judulArtikel);
   }
 
   Future<void> clearSelection() async {

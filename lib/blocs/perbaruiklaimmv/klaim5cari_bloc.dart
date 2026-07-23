@@ -184,9 +184,12 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
     // debugPrint('state.klaim1Id     : ${state.klaim1Id}');
     // debugPrint('state.items.length : ${state.items.length}');
 
-    int idx = state.items.indexWhere((x) =>
-    ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
-        ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
+    int idx = _findItemIndex(
+      state.items,
+      klaim5Id: event.klaim5Id,
+      mjenisdocId: event.mjenisdocId,
+      jenisDocLain: event.jenisDocLain,
+    );
 
     if (idx < 0) {
       // debugPrint('DELETE ABORT: item tidak ditemukan di state');
@@ -223,9 +226,12 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
           isRefreshing: false,
         ));
 
-        idx = freshItems.indexWhere((x) =>
-        ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
-            ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
+        idx = _findItemIndex(
+          freshItems,
+          klaim5Id: event.klaim5Id,
+          mjenisdocId: event.mjenisdocId,
+          jenisDocLain: event.jenisDocLain,
+        );
 
         if (idx >= 0) {
           klaim5Id = freshItems[idx].klaim5Id;
@@ -245,9 +251,12 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
     }
 
     // cari lagi index berdasarkan state terbaru
-    idx = state.items.indexWhere((x) =>
-    ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
-        ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
+    idx = _findItemIndex(
+      state.items,
+      klaim5Id: klaim5Id,
+      mjenisdocId: event.mjenisdocId,
+      jenisDocLain: event.jenisDocLain,
+    );
 
     if (idx < 0) {
       // debugPrint('DELETE ABORT: item tidak ditemukan setelah refresh');
@@ -292,9 +301,12 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
       if (!success) {
         final rollbackItems = List<Klaim5cariModel>.from(state.items);
 
-        final restoreIdx = rollbackItems.indexWhere((x) =>
-        ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
-            ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
+        final restoreIdx = _findItemIndex(
+          rollbackItems,
+          klaim5Id: klaim5Id,
+          mjenisdocId: event.mjenisdocId,
+          jenisDocLain: event.jenisDocLain,
+        );
 
         if (shouldClear) {
           if (restoreIdx >= 0) {
@@ -329,9 +341,12 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
 
       final rollbackItems = List<Klaim5cariModel>.from(state.items);
 
-      final restoreIdx = rollbackItems.indexWhere((x) =>
-      ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
-          ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
+      final restoreIdx = _findItemIndex(
+        rollbackItems,
+        klaim5Id: klaim5Id,
+        mjenisdocId: event.mjenisdocId,
+        jenisDocLain: event.jenisDocLain,
+      );
 
       if (shouldClear) {
         if (restoreIdx >= 0) {
@@ -414,15 +429,21 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
     // mulai upload
     Klaim5uploadRepository repository = Klaim5uploadRepository();
     try {
-      await repository.uploadFile(state.klaim1Id, newItem);
+      final success = await repository.uploadFile(state.klaim1Id, newItem);
+      if (!success) {
+        throw Exception('Upload dokumen gagal');
+      }
 
-      // jika sukses
-      newItem = newItem.copyWith(
-        uploadStatus: 'uploaded',
-        uploadProgress: 1.0,
-      );
-      newItems[idx] = newItem;
-      emit(state.copyWith(items: newItems));
+      final repo = Klaim5cariRepository();
+      final latestItems = await repo.getKlaim5cari(state.klaim1Id);
+
+      emit(state.copyWith(
+        items: latestItems,
+        klaim1Id: state.klaim1Id,
+        status: ListStatus.success,
+        hasReachedMax: true,
+        isRefreshing: false,
+      ));
     } catch (e) {
       // jika gagal
       newItem = newItem.copyWith(

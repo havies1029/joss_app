@@ -34,14 +34,35 @@ class Klaim5cariModel {
     this.errorMessage,
   });
 
+  static String _canonicalFileUrl(String klaim5Id) {
+    final baseUri = Uri.parse(AppData.apiDomain);
+    final apiUri = baseUri.resolve('api/perbaruiklaimmv/klaim5cari/getfile');
+    return apiUri.replace(queryParameters: {
+      'klaim5Id': klaim5Id,
+    }).toString();
+  }
+
   static String? _buildFileUrl(Map<String, dynamic> data) {
-    final rawFileUrl = data['fileUrl']?.toString();
-    if (rawFileUrl == null || rawFileUrl.isEmpty) return null;
+    final klaim5Id = data['klaim5Id']?.toString() ?? '';
+    final rawFileUrl = data['fileUrl']?.toString().trim();
+    final fileName = data['fileName']?.toString().trim() ?? '';
+    final mimeType = data['mimeType']?.toString().trim() ?? '';
+    final hasFileMeta = fileName.isNotEmpty || mimeType.isNotEmpty;
+
+    if (rawFileUrl == null || rawFileUrl.isEmpty) {
+      if (klaim5Id.isNotEmpty && hasFileMeta) {
+        return _canonicalFileUrl(klaim5Id);
+      }
+      return null;
+    }
+
+    if (klaim5Id.isNotEmpty && rawFileUrl.contains('\\')) {
+      return _canonicalFileUrl(klaim5Id);
+    }
 
     final baseUri = Uri.parse(AppData.apiDomain);
     final rawUri = Uri.parse(rawFileUrl);
     final fullUri = rawUri.hasScheme ? rawUri : baseUri.resolve(rawFileUrl);
-    final klaim5Id = data['klaim5Id']?.toString() ?? '';
 
     if (fullUri.queryParameters.containsKey('klaim5Id')) {
       return fullUri.replace(queryParameters: {
@@ -51,11 +72,8 @@ class Klaim5cariModel {
     }
 
     if (klaim5Id.isNotEmpty &&
-        fullUri.path.contains('/api/perbaruiklaimmv/klaim5cari/getfile/')) {
-      final apiUri = baseUri.resolve('api/perbaruiklaimmv/klaim5cari/getfile');
-      return apiUri.replace(queryParameters: {
-        'klaim5Id': klaim5Id,
-      }).toString();
+        fullUri.path.contains('/api/perbaruiklaimmv/klaim5cari/getfile')) {
+      return _canonicalFileUrl(klaim5Id);
     }
 
     return fullUri.toString();

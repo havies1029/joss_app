@@ -10,6 +10,7 @@ class Regmv6FormState extends Equatable {
 	final bool hasFailure;
 	final bool isCalculating;
 	final bool isCalculated;
+	final String recordOwnerId;
 
 	const Regmv6FormState(
 			{this.record,
@@ -20,6 +21,7 @@ class Regmv6FormState extends Equatable {
 				this.hasFailure = false,
 				this.isCalculating = false,
 				this.isCalculated = false,
+				this.recordOwnerId = '',
 			});
 
 	Regmv6FormState copyWith({
@@ -31,6 +33,7 @@ class Regmv6FormState extends Equatable {
 		bool? hasFailure,
 		bool? isCalculating,
 		bool? isCalculated,
+		String? recordOwnerId,
 	}){
 		return Regmv6FormState(
 			record: record ?? this.record,
@@ -41,6 +44,7 @@ class Regmv6FormState extends Equatable {
 			hasFailure: hasFailure ?? this.hasFailure,
 			isCalculating: isCalculating ?? this.isCalculating,
 			isCalculated: isCalculated ?? this.isCalculated,
+			recordOwnerId: recordOwnerId ?? this.recordOwnerId,
 		);
 	}
 
@@ -54,6 +58,7 @@ class Regmv6FormState extends Equatable {
 		hasFailure,
 		isCalculating,
 		isCalculated,
+		recordOwnerId,
 	];
 
 }

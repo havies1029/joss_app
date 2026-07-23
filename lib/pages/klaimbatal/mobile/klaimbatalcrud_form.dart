@@ -22,6 +22,7 @@ class _KlaimbatalcrudFormPageState extends State<KlaimbatalcrudFormPage> {
   late KlaimbatalcrudBloc klaimbatalcrudBloc;
 
   final fieldAlasanBatalController = TextEditingController();
+  bool _submitHandled = false;
 
   final Map<String, String?> fieldErrors = {};
   String? err(String key) => fieldErrors[key];
@@ -53,7 +54,11 @@ class _KlaimbatalcrudFormPageState extends State<KlaimbatalcrudFormPage> {
 
     return BlocConsumer<KlaimbatalcrudBloc, KlaimbatalcrudState>(
       listener: (context, state) {
-        if (state.isSaved || !state.hasFailure) {
+        if (!state.isSaved || _submitHandled) return;
+
+        _submitHandled = true;
+
+        if (!state.hasFailure) {
           context.read<MstatusrinciCariBloc>().add(
             SelectedIdChanged("30"),
           );
@@ -75,11 +80,12 @@ class _KlaimbatalcrudFormPageState extends State<KlaimbatalcrudFormPage> {
               ),
             ),
           );
+          return;
         }
 
-        if (state.isSaved || state.hasFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('Pembatalan klaim gagal'));
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar('Pembatalan klaim gagal'),
+        );
       },
       builder: (context, state) {
         return BaseBackgroundSidePage(
@@ -178,9 +184,8 @@ class _KlaimbatalcrudFormPageState extends State<KlaimbatalcrudFormPage> {
       klaim1Id: widget.klaim1Id,
     );
 
+    _submitHandled = false;
     klaimbatalcrudBloc.add(KlaimbatalcrudUbahEvent(record: record));
-
-    if (mounted) Navigator.pop(context);
   }
 
   Future<bool?> _showConfirmDialog() {
