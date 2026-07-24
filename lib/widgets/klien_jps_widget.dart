@@ -32,7 +32,7 @@ class _ClientSectionState extends State<ClientSection> {
   void initState() {
     super.initState();
 
-    _pageController = PageController(viewportFraction: 0.33);
+    _pageController = PageController(viewportFraction: 0.24);
 
     context.read<GallerymemberCariBloc>().add(
       RefreshGallerymemberCariEvent(),
@@ -173,7 +173,7 @@ class _ClientSectionState extends State<ClientSection> {
               final item = items[index];
 
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 2),
                 child: AnimatedBuilder(
                   animation: _pageController,
                   child: _ClientLogoPageItem(

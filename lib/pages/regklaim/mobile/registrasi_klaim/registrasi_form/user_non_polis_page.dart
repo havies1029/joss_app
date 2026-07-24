@@ -382,14 +382,16 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     debugPrint("#2");
 
     final authState = context.read<AuthenticationBloc>().state;
-    if (authState is! AuthenticationAuthenticated) return;
-    debugPrint("#3");
+    final userType = authState is AuthenticationAuthenticated
+        ? authState.user.userType.trim().toUpperCase()
+        : "";
 
-    final user = authState.user;
-    if (user.userType != "C") {
+    if (authState is! AuthenticationAuthenticated || userType != "C") {
       _showRegisterClientDialog();
       return;
     }
+    debugPrint("#3");
+
     debugPrint("#4");
 
     if (!_canSubmitWithCompleteGeneralData()) return;
@@ -521,11 +523,13 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   }
 
   void _showRegisterClientDialog() {
+    final pageContext = context;
+
     showDialog(
-      context: context,
+      context: pageContext,
       barrierDismissible: true,
       barrierColor: Colors.black.withOpacity(0.6),
-      builder: (context) => RegisterClientPopUp(
+      builder: (_) => RegisterClientPopUp(
         header: 'Data Klien Belum Terdaftar!',
         description:
             'Untuk melanjutkan ke proses Klaim Baru, Anda perlu mendaftarkan data klien terlebih dahulu.',
@@ -533,7 +537,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
         onPressed: () {
           _pendingAutoConfirm = true;
           Navigator.push(
-            context,
+            pageContext,
             MaterialPageRoute(
               builder: (context) => RegisterClient(
                 requestFrom: 'regisnonpolis_page',
@@ -627,17 +631,29 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       ok = false;
     }
 
-    if (fieldLokasiObjectController.text.trim().isEmpty) {
+    final lokasiObject = fieldLokasiObjectController.text.trim();
+    final isMvClaim = widget.cobKlaimId == '10002';
+
+    if (lokasiObject.isEmpty) {
       setErr(
         'form1.alamatTertanggung',
-        widget.cobKlaimId == '10002'
-            ? 'No Plat wajib diisi'
-            : kAddressNullError,
+        isMvClaim ? 'No Plat wajib diisi' : kAddressNullError,
+      );
+      ok = false;
+    } else if (isMvClaim && !_isValidPlatNomor(lokasiObject)) {
+      setErr(
+        'form1.alamatTertanggung',
+        'Format No Plat tidak valid',
       );
       ok = false;
     }
 
     return ok;
+  }
+
+  bool _isValidPlatNomor(String value) {
+    return RegExp(r'^[A-Z]{1,2} [0-9]{1,4} [A-Z]{1,3}$')
+        .hasMatch(value.trim().toUpperCase());
   }
 
   List<ComboMInsuranceModel> _filterInsurance(
@@ -907,6 +923,13 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
         // validator: (_) => err('form1.alamatTertanggung'),
         validator: (_) => null,
         onChanged: (v) {
+          if (widget.cobKlaimId == '10002') {
+            if (_isValidPlatNomor(v)) {
+              clearErr('form1.alamatTertanggung');
+            }
+            return;
+          }
+
           if (v.trim().isNotEmpty) clearErr('form1.alamatTertanggung');
         },
       );

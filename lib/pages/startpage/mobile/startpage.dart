@@ -86,6 +86,7 @@ class _StartScreenState extends State<StartScreen> {
     SizeConfig().init(context);
 
     return Scaffold(
+      backgroundColor: primaryBlackColor,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(100),
         child: SafeArea(
@@ -147,7 +148,6 @@ class _StartScreenState extends State<StartScreen> {
                   ),
                 ),
                 _buildBottomButton(),
-                SizedBox(height: getProportionateScreenHeight(40)),
               ],
             ),
           ),
@@ -278,9 +278,11 @@ class _StartScreenState extends State<StartScreen> {
     bool isLastPage = _currentIndex == _onboardingData.length - 1;
 
     return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: getProportionateScreenWidth(hPadding * 1.5),
-        vertical: getProportionateScreenHeight(10),
+      padding: EdgeInsets.fromLTRB(
+        getProportionateScreenWidth(hPadding * 1.5),
+        getProportionateScreenHeight(10),
+        getProportionateScreenWidth(hPadding * 1.5),
+        0,
       ),
       child: AnimatedSwitcher(
         duration: defaultDuration,

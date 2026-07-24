@@ -9,14 +9,14 @@ import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import 'package:joss_app/pages/login/mobile/client/new_login_client/new_login_client_page.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../blocs/reguser_otp/reguser_otp_bloc.dart';
-import '../../../../helper/indo_phone_result.dart';
-import '../../../../helper/phone_number_result.dart';
+import '../../../../helper/international_phone_result.dart';
 import '../../../../models/combobox/combomjnsclient_model.dart';
 import '../../../../models/combobox/combomreferral_model.dart';
 import '../../../../models/reguser/reguser_model.dart';
 import '../../../../repositories/combobox/combomjnsclient_repository.dart';
 import '../../../../repositories/combobox/combomreferral_repository.dart';
 import '../../../../widgets/apptheme/dropdown2.dart';
+import '../../../../widgets/apptheme/phone_number_field.dart';
 import '../../../login/welcome_header.dart';
 import '../../../../common/constants.dart';
 import 'widget/register_otp_popup_widget.dart';
@@ -41,6 +41,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   final fieldCompanyNamaController = TextEditingController();
   ComboMJnsclientModel? fieldComboJnsClient;
   ComboMReferralModel? fieldComboMReferral;
+  int fieldTeleponCountryCode = InternationalPhoneHelper.defaultCountryCode;
 
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
@@ -105,15 +106,12 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     }
   }
 
-  IndoPhoneResult _normalizeTeleponInput() {
-    final phoneRes = IndoPhoneHelper.normalize(
+  InternationalPhoneResult _normalizeTeleponInput() {
+    final phoneRes = InternationalPhoneHelper.normalize(
       fieldTeleponController.text,
+      countryCode: fieldTeleponCountryCode,
       emptyMessage: _indoPhoneOnlyEmptyError,
     );
-
-    if (phoneRes.isValid) {
-      fieldTeleponController.text = phoneRes.phone62!;
-    }
 
     return phoneRes;
   }
@@ -275,9 +273,12 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   }
 
   String _hpOtpTarget(String value) {
-    final phoneRes = IndoPhoneHelper.normalize(value,
-        emptyMessage: _indoPhoneOnlyEmptyError);
-    return phoneRes.phone62 ?? '';
+    final phoneRes = InternationalPhoneHelper.normalize(
+      value,
+      countryCode: fieldTeleponCountryCode,
+      emptyMessage: _indoPhoneOnlyEmptyError,
+    );
+    return phoneRes.phone ?? '';
   }
 
   bool _isEmailVerifiedForCurrent(RegUserOtpState otpState) {
@@ -326,36 +327,18 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     final isVerified = _isHpVerifiedForCurrent(otpState);
     final isCompanyClient = fieldComboJnsClient?.mjnsclientId == '20';
 
-    return appTextField(
+    return AppPhoneNumberField(
       label: isCompanyClient ? "No. Telp Perusahaan" : "No. HP",
       hint:
           isCompanyClient ? "Masukkan No. Telp Perusahaan" : "Masukkan No. HP",
       controller: fieldTeleponController,
-      keyboardType: TextInputType.phone,
-      inputFormatters: [
-        TextInputFormatter.withFunction((oldValue, newValue) {
-          final cleaned = PhoneNumberHelper.clean(newValue.text);
-          if (cleaned == newValue.text) return newValue;
-
-          final cursor = newValue.selection.baseOffset < 0
-              ? newValue.text.length
-              : newValue.selection.baseOffset.clamp(0, newValue.text.length);
-          final cleanedBeforeCursor = PhoneNumberHelper.clean(
-            newValue.text.substring(0, cursor),
-          );
-
-          return TextEditingValue(
-            text: cleaned,
-            selection: TextSelection.collapsed(
-              offset: cleanedBeforeCursor.length,
-            ),
-          );
-        }),
-      ],
-      prefix: Text(
-        "+62 | ",
-        style: inputTextStyle(context, color: primaryLightColor),
-      ),
+      countryCode: fieldTeleponCountryCode,
+      onCountryCodeChanged: (value) {
+        setState(() {
+          fieldTeleponCountryCode = value;
+        });
+        clearErr('form1.telepon');
+      },
       errorText: isVerified ? null : err('form1.telepon'),
       helperText: isVerified ? 'No telepon ini telah diverifikasi' : null,
       helperStyle: bodyTextStyle(context, fontSize: 12).copyWith(
@@ -466,26 +449,45 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       return _buildTeleponField(otpState);
     }
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          flex: 8,
-          child: _buildTeleponField(otpState),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          flex: 2,
-          child: AppButton.primary(
-            text: 'Kirim OTP',
-            isLoading: otpState.isHpSending,
-            backgroundColor:
-                otpState.isHpSending ? secondaryBlackColor : primaryColor,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            onPressed: otpState.isHpSending ? null : _sendHpOtp,
-          ),
-        ),
-      ],
+    Widget buildButton() {
+      return AppButton.primary(
+        text: 'Kirim OTP',
+        isLoading: otpState.isHpSending,
+        backgroundColor:
+            otpState.isHpSending ? secondaryBlackColor : primaryColor,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        onPressed: otpState.isHpSending ? null : _sendHpOtp,
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 340) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildTeleponField(otpState),
+              const SizedBox(height: 8),
+              buildButton(),
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 8,
+              child: _buildTeleponField(otpState),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 2,
+              child: buildButton(),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -651,7 +653,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
                     isSubmitting = false;
                   });
                 }
-                _showGlobalLoading();
                 context
                     .read<RegUserOtpBloc>()
                     .add(const RegUserOtpClearEvent());
@@ -660,163 +661,149 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
             builder: (context, state) {
               return BlocBuilder<RegUserOtpBloc, RegUserOtpState>(
                 builder: (context, otpState) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height,
-                      ),
-                      child: IntrinsicHeight(
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: vPadding,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 15,
-                                vertical: vPadding,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/logo.png',
-                                    height: isDesktop(context)
-                                        ? 56
-                                        : isTablet(context)
-                                            ? 48
-                                            : 42,
-                                    width: isDesktop(context)
-                                        ? 180
-                                        : isTablet(context)
-                                            ? 140
-                                            : 120,
-                                  ),
-                                  SizedBox(height: vPadding * 0.6),
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 4),
-                                      child: TextButton.icon(
-                                        onPressed: handleBack,
-                                        style: TextButton.styleFrom(
-                                          padding: EdgeInsets.zero,
-                                          minimumSize: const Size(0, 0),
-                                          tapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
-                                        ),
-                                        icon: Icon(
-                                          Icons.arrow_back_ios_new,
-                                          color: primaryColor,
-                                          size: getResponsiveFont(context, 18),
-                                        ),
-                                        label: Text(
-                                          "Kembali",
-                                          style: bodyTextStyle(context)
-                                              .copyWith(color: primaryColor),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: vPadding * 0.8),
-                                  WelcomeHeader(type: "register_client"),
-                                ],
-                              ),
+                            Image.asset(
+                              'assets/images/logo.png',
+                              height: isDesktop(context)
+                                  ? 56
+                                  : isTablet(context)
+                                      ? 48
+                                      : 42,
+                              width: isDesktop(context)
+                                  ? 180
+                                  : isTablet(context)
+                                      ? 140
+                                      : 120,
                             ),
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: cardBorderGradient,
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    topRight: Radius.circular(20),
+                            SizedBox(height: vPadding * 0.6),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: TextButton.icon(
+                                  onPressed: handleBack,
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(0, 0),
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
                                   ),
-                                ),
-                                child: Container(
-                                  margin: const EdgeInsets.all(1),
-                                  decoration: BoxDecoration(
-                                    color: secondaryBlackColor,
-                                    borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(20),
-                                      topRight: Radius.circular(20),
-                                    ),
+                                  icon: Icon(
+                                    Icons.arrow_back_ios_new,
+                                    color: primaryColor,
+                                    size: getResponsiveFont(context, 18),
                                   ),
-                                  child: Card(
-                                    color: secondaryBlackColor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Container(
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      padding: const EdgeInsets.all(20),
-                                      child: Column(
-                                        children: [
-                                          buildFieldComboMJnsclient(),
-                                          SizedBox(height: vPadding),
-                                          if (fieldComboJnsClient
-                                                  ?.mjnsclientId ==
-                                              '20') ...[
-                                            _buildCompanyNamaField(),
-                                            SizedBox(height: vPadding),
-                                          ],
-                                          _buildNameField(),
-                                          SizedBox(height: vPadding),
-                                          _buildEmailOtpRow(otpState),
-                                          SizedBox(height: vPadding),
-                                          _buildTeleponOtpRow(otpState),
-                                          SizedBox(height: vPadding),
-                                          _buildPasswordField(),
-                                          SizedBox(height: vPadding),
-                                          _PasswordRequirementRow(
-                                              controller:
-                                                  fieldPasswordController),
-                                          SizedBox(height: vPadding),
-                                          _buildKonfirmasiPasswordField(),
-                                          SizedBox(height: vPadding),
-                                          _buildReferralField(),
-                                          SizedBox(height: vPadding),
-                                          AppButton.primary(
-                                            text: "Simpan",
-                                            isLoading: isSubmitting,
-                                            backgroundColor: isSubmitting
-                                                ? secondaryBlackColor
-                                                : primaryColor,
-                                            onPressed: isSubmitting
-                                                ? null
-                                                : () async {
-                                                    if (!validateForm1()) {
-                                                      return;
-                                                    }
-                                                    if (!_validateOtpBeforeSubmit(
-                                                      context
-                                                          .read<
-                                                              RegUserOtpBloc>()
-                                                          .state,
-                                                    )) {
-                                                      return;
-                                                    }
-
-                                                    setState(() {
-                                                      isSubmitting = true;
-                                                    });
-                                                    _startSubmitTimeout();
-
-                                                    onSubmit();
-                                                  },
-                                          ),
-                                          SizedBox(height: vPadding),
-                                          _buildLoginFooter(context),
-                                          const Spacer(),
-                                        ],
-                                      ),
-                                    ),
+                                  label: Text(
+                                    "Kembali",
+                                    style: bodyTextStyle(context)
+                                        .copyWith(color: primaryColor),
                                   ),
                                 ),
                               ),
                             ),
+                            SizedBox(height: vPadding * 0.8),
+                            WelcomeHeader(type: "register_client"),
                           ],
                         ),
                       ),
-                    ),
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: cardBorderGradient,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
+                        ),
+                        child: Container(
+                          margin: const EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            color: secondaryBlackColor,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                            ),
+                          ),
+                          child: Card(
+                            color: secondaryBlackColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  buildFieldComboMJnsclient(),
+                                  SizedBox(height: vPadding),
+                                  if (fieldComboJnsClient?.mjnsclientId ==
+                                      '20') ...[
+                                    _buildCompanyNamaField(),
+                                    SizedBox(height: vPadding),
+                                  ],
+                                  _buildNameField(),
+                                  SizedBox(height: vPadding),
+                                  _buildEmailOtpRow(otpState),
+                                  SizedBox(height: vPadding),
+                                  _buildTeleponOtpRow(otpState),
+                                  SizedBox(height: vPadding),
+                                  _buildPasswordField(),
+                                  SizedBox(height: vPadding),
+                                  _PasswordRequirementRow(
+                                      controller: fieldPasswordController),
+                                  SizedBox(height: vPadding),
+                                  _buildKonfirmasiPasswordField(),
+                                  SizedBox(height: vPadding),
+                                  _buildReferralField(),
+                                  SizedBox(height: vPadding),
+                                  AppButton.primary(
+                                    text: "Simpan",
+                                    isLoading: isSubmitting,
+                                    backgroundColor: isSubmitting
+                                        ? secondaryBlackColor
+                                        : primaryColor,
+                                    onPressed: isSubmitting
+                                        ? null
+                                        : () async {
+                                            if (!validateForm1()) {
+                                              return;
+                                            }
+                                            if (!_validateOtpBeforeSubmit(
+                                              context
+                                                  .read<RegUserOtpBloc>()
+                                                  .state,
+                                            )) {
+                                              return;
+                                            }
+
+                                            setState(() {
+                                              isSubmitting = true;
+                                            });
+                                            _startSubmitTimeout();
+
+                                            onSubmit();
+                                          },
+                                  ),
+                                  SizedBox(height: vPadding),
+                                  _buildLoginFooter(context),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 },
               );
@@ -832,7 +819,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     if (!ok) return;
 
     final String email = fieldEmailController.text.trim();
-    final String telepon = _normalizeTeleponInput().phone62 ?? '';
+    final String telepon = _normalizeTeleponInput().phone ?? '';
     final record = RegUserModel(
       personalNama: fieldNameController.text.trim(),
       telepon: telepon,
@@ -867,7 +854,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     final email = fieldEmailController.text.trim();
 
     if (email.isEmpty) {
-      setErr('form1.email', kStringNullError);
+      setErr('form1.email', 'Email ini wajib diisi');
       return;
     }
 
@@ -894,7 +881,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       return;
     }
 
-    final target = phoneRes.phone62 ?? '';
+    final target = phoneRes.phone ?? '';
 
     clearErr('form1.telepon');
     _pendingOpenOtpFor = 'hp';

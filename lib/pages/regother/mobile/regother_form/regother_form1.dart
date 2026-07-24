@@ -46,6 +46,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   late Regother1CrudBloc regother1CrudBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
+  final Map<String, String?> fieldErrors = {};
   bool _isKonfirmasiLoading = false;
   bool _pendingAutoConfirm = false;
   bool _isDialogLoadingShown = false;
@@ -229,24 +230,11 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
                                       : primaryColor,
                                   onPressed: _isKonfirmasiLoading
                                       ? null
-                                      : () async {
-                                          setState(() {
-                                            _isKonfirmasiLoading = true;
-                                          });
-
+                                      : () {
                                           onSaveForm(
                                             idvState: idvState,
                                             cmpState: cmpState,
                                           );
-
-                                          await Future.delayed(
-                                              const Duration(seconds: 2));
-
-                                          if (mounted) {
-                                            setState(() {
-                                              _isKonfirmasiLoading = false;
-                                            });
-                                          }
                                         },
                                 );
                               },
@@ -274,6 +262,12 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
 
             if (state.isSaved) {
               _hideGlobalLoading();
+
+              if (mounted) {
+                setState(() {
+                  _isKonfirmasiLoading = false;
+                });
+              }
 
               if (state.hasFailure) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -307,6 +301,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
       fieldTsiController.clear();
       fieldComboMCobApp1 = null;
       fieldComboRMatauang = null;
+      fieldErrors.clear();
     });
 
     _loadDefaultCurrency();
@@ -330,9 +325,11 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   // );
 
   Widget buildFieldMcobId() {
+    final errorText = err('mcobId');
+
     return FormField<ComboMCobApp1Model>(
       initialValue: fieldComboMCobApp1,
-      validator: (_) => fieldComboMCobApp1 == null ? kStringNullError : null,
+      validator: (_) => err('mcobId'),
       builder: (fieldState) => GestureDetector(
         onTap: () async {
           final ComboMCobApp1Model? selected =
@@ -350,6 +347,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
 
             fieldState.didChange(selected);
             setState(() => fieldComboMCobApp1 = selected);
+            clearErr('mcobId');
           }
         },
         child: Column(
@@ -361,7 +359,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
                 color: formGrey,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: fieldState.hasError ? Colors.red : sGrey,
+                  color: errorText != null ? Colors.red : sGrey,
                 ),
               ),
               child: Row(
@@ -389,11 +387,11 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
                 ],
               ),
             ),
-            if (fieldState.hasError)
+            if (errorText != null)
               Padding(
                 padding: const EdgeInsets.only(left: 10, top: 4),
                 child: Text(
-                  fieldState.errorText ?? '',
+                  errorText,
                   style: bodyTextStyle(context).copyWith(
                     color: Colors.red,
                     fontSize: 12,
@@ -413,15 +411,11 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
       hint: "Jelaskan kebutuhan Anda terkait pembelian polis.",
       maxLines: 3,
       controller: fieldRemarkController,
+      errorText: err('remark'),
       onChanged: (value) {
-        if (value.isNotEmpty) {}
+        if (value.trim().isNotEmpty) clearErr('remark');
       },
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return kStringNullError;
-        }
-        return null;
-      },
+      validator: (_) => err('remark'),
     );
   }
 
@@ -431,12 +425,18 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
       currency: fieldComboRMatauang,
       onCurrencyChanged: (v) {
         setState(() => fieldComboRMatauang = v);
+        if (v != null && fieldTsiController.text.trim().isNotEmpty) {
+          clearErr('tsi');
+        }
       },
       valueController: fieldTsiController,
-      validator: (v) {
-        if (v == null || v.isEmpty) return kStringNullError;
-        return null;
+      errorText: err('tsi'),
+      onChanged: (v) {
+        if (_isValidTsi(v) && fieldComboRMatauang != null) {
+          clearErr('tsi');
+        }
       },
+      validator: (_) => err('tsi'),
     );
   }
 
@@ -445,17 +445,17 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     required MRekanGeneralCmpCrudState cmpState,
   }) {
     final authState = context.read<AuthenticationBloc>().state;
+    final pageContext = context;
+    final userType = authState is AuthenticationAuthenticated
+        ? authState.user.userType.trim().toUpperCase()
+        : "";
 
-    if (authState is! AuthenticationAuthenticated) return;
-
-    final user = authState.user;
-
-    if (user.userType != "C") {
+    if (authState is! AuthenticationAuthenticated || userType != "C") {
       showDialog(
-        context: context,
+        context: pageContext,
         barrierDismissible: true,
         barrierColor: Colors.black.withOpacity(0.6),
-        builder: (context) => RegisterClientPopUp(
+        builder: (_) => RegisterClientPopUp(
           header: 'Data Klien Belum Terdaftar!',
           description:
               'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
@@ -463,13 +463,15 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
           onPressed: () {
             _pendingAutoConfirm = true;
             Navigator.push(
-              context,
+              pageContext,
               MaterialPageRoute(
                 builder: (context) => RegisterClient(
                   requestFrom: 'regother_page',
                 ),
               ),
-            );
+            ).then((_) {
+              _pendingAutoConfirm = false;
+            });
           },
         ),
       );
@@ -589,15 +591,18 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   }
 
   void _executeSave() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
+    if (!validateRegotherForm()) return;
+    if (!_formKey.currentState!.validate()) return;
 
-      _saveRegother();
-    }
+    _formKey.currentState!.save();
+
+    _saveRegother();
   }
 
   void _executeSaveSilently() {
-    if (!_isFormFilledSilently()) return;
+    if (!validateRegotherForm()) return;
+    if (!_formKey.currentState!.validate()) return;
+
     _saveRegother();
   }
 
@@ -627,12 +632,47 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     required MRekanGeneralIdvCrudState idvState,
     required MRekanGeneralCmpCrudState cmpState,
   }) {
-    if (_formKey.currentState!.validate()) {
-      _showPengajuanDialog(
-        idvState: idvState,
-        cmpState: cmpState,
-      );
+    if (!validateRegotherForm()) return;
+    if (!_formKey.currentState!.validate()) return;
+
+    _showPengajuanDialog(
+      idvState: idvState,
+      cmpState: cmpState,
+    );
+  }
+
+  bool validateRegotherForm() {
+    final nextErrors = <String, String?>{};
+
+    if (fieldComboMCobApp1 == null) {
+      nextErrors['mcobId'] = kStringNullError;
     }
+
+    if (fieldComboRMatauang == null) {
+      nextErrors['tsi'] = kStringNullError;
+    } else if (fieldTsiController.text.trim().isEmpty) {
+      nextErrors['tsi'] = kStringNullError;
+    } else if (!_isValidTsi(fieldTsiController.text)) {
+      nextErrors['tsi'] = 'Nilai pertanggungan tidak valid';
+    }
+
+    if (fieldRemarkController.text.trim().isEmpty) {
+      nextErrors['remark'] = kStringNullError;
+    }
+
+    setState(() {
+      fieldErrors
+        ..clear()
+        ..addAll(nextErrors);
+    });
+
+    return nextErrors.isEmpty;
+  }
+
+  bool _isValidTsi(String value) {
+    final cleaned = value.replaceAll(',', '').trim();
+    if (cleaned.isEmpty) return false;
+    return double.tryParse(cleaned) != null;
   }
 
   bool _isFormFilledSilently() {
@@ -674,6 +714,13 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     }
     _executeSaveSilently();
   }
+
+  String? err(String key) => fieldErrors[key];
+
+  void clearErr(String key) {
+    if (!fieldErrors.containsKey(key)) return;
+    setState(() => fieldErrors.remove(key));
+  }
 }
 
 class AppCurrencyField extends StatelessWidget {
@@ -682,6 +729,8 @@ class AppCurrencyField extends StatelessWidget {
   final Function(ComboRMatauangModel?) onCurrencyChanged;
   final TextEditingController valueController;
   final FormFieldValidator<String>? validator;
+  final String? errorText;
+  final ValueChanged<String>? onChanged;
 
   const AppCurrencyField({
     super.key,
@@ -690,6 +739,8 @@ class AppCurrencyField extends StatelessWidget {
     required this.onCurrencyChanged,
     required this.valueController,
     this.validator,
+    this.errorText,
+    this.onChanged,
   });
 
   @override
@@ -706,7 +757,7 @@ class AppCurrencyField extends StatelessWidget {
                 color: formGrey,
                 borderRadius: BorderRadius.circular(cardBorderRadius),
                 border: Border.all(
-                  color: fieldState.hasError ? Colors.red : sGrey,
+                  color: errorText != null ? Colors.red : sGrey,
                 ),
               ),
               child: Row(
@@ -743,7 +794,10 @@ class AppCurrencyField extends StatelessWidget {
                           symbol: '',
                         ),
                       ],
-                      onChanged: fieldState.didChange,
+                      onChanged: (value) {
+                        fieldState.didChange(value);
+                        onChanged?.call(value);
+                      },
                       cursorColor: primaryLightColor,
                       style: bodyTextStyle(context),
                       decoration: const InputDecoration(
@@ -758,11 +812,11 @@ class AppCurrencyField extends StatelessWidget {
                 ],
               ),
             ),
-            if (fieldState.hasError)
+            if (errorText != null)
               Padding(
                 padding: const EdgeInsets.only(left: 10, top: 4),
                 child: Text(
-                  fieldState.errorText ?? '',
+                  errorText!,
                   style: bodyTextStyle(context).copyWith(
                     color: Colors.red,
                     fontSize: 12,

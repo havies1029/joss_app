@@ -12,11 +12,12 @@ import 'package:joss_app/models/combobox/comborkodepos_model.dart';
 
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../common/app_data.dart';
-import '../../../../../helper/phone_number_result.dart';
+import '../../../../../helper/international_phone_result.dart';
 import '../../../../../repositories/combobox/combomkota_repository.dart';
 import '../../../../../repositories/combobox/combompropinsi_repository.dart';
 import '../../../../../repositories/combobox/comborkodepos_repository.dart';
 import '../../../../../widgets/apptheme/dropdown2.dart';
+import '../../../../../widgets/apptheme/phone_number_field.dart';
 import '../../../../base/base_background_sidepage.dart';
 
 class MRekanContactCrudFormPage extends StatefulWidget {
@@ -38,6 +39,7 @@ class MRekanContactCrudFormPageFormState
   final fieldAlamat1Controller = TextEditingController();
   final fieldEmailController = TextEditingController();
   final fieldTelpController = TextEditingController();
+  int fieldTelpCountryCode = InternationalPhoneHelper.defaultCountryCode;
 
   ComboMKotaModel? fieldComboMKota;
   final comboMKotaKey = GlobalKey<DropdownSearchState<ComboMKotaModel>>();
@@ -130,14 +132,11 @@ class MRekanContactCrudFormPageFormState
                           final userTelp = (AppData.user.hp ?? '').trim();
 
                           if (contactTelp.isNotEmpty) {
-                            fieldTelpController.text =
-                                PhoneNumberHelper.clean(contactTelp);
+                            _setPhoneFieldFromRaw(contactTelp);
                           } else if (rekanTelp.isNotEmpty) {
-                            fieldTelpController.text =
-                                PhoneNumberHelper.clean(rekanTelp);
+                            _setPhoneFieldFromRaw(rekanTelp);
                           } else if (userTelp.isNotEmpty) {
-                            fieldTelpController.text =
-                                PhoneNumberHelper.clean(userTelp);
+                            _setPhoneFieldFromRaw(userTelp);
                           }
                         }
 
@@ -247,6 +246,17 @@ class MRekanContactCrudFormPageFormState
     setState(() {});
   }
 
+  void _setPhoneFieldFromRaw(String rawPhone) {
+    final digits = InternationalPhoneHelper.clean(rawPhone);
+    final detected = InternationalPhoneHelper.detectCountry(digits);
+    fieldTelpCountryCode =
+        detected?.dialCode ?? InternationalPhoneHelper.defaultCountryCode;
+    fieldTelpController.text = InternationalPhoneHelper.toNationalInput(
+      rawPhone,
+      countryCode: fieldTelpCountryCode,
+    );
+  }
+
   void loadData() {
     mRekanContactCrudBloc.add(MRekanContactCrudLihatEvent());
   }
@@ -276,7 +286,10 @@ class MRekanContactCrudFormPageFormState
       setErr('telp', kPhoneNumberNullError);
       ok = false;
     } else {
-      final res = PhoneNumberHelper.normalize(telp);
+      final res = InternationalPhoneHelper.normalize(
+        telp,
+        countryCode: fieldTelpCountryCode,
+      );
       if (!res.isValid) {
         setErr('telp', res.error ?? 'Nomor telepon tidak valid');
         ok = false;
@@ -323,15 +336,25 @@ class MRekanContactCrudFormPageFormState
       _ => 'Perusahaan',
     };
 
-    return appTextField(
+    return AppPhoneNumberField(
       label: 'No. Telp $jenisClientLabel',
       controller: fieldTelpController,
-      keyboardType: TextInputType.phone,
+      countryCode: fieldTelpCountryCode,
+      onCountryCodeChanged: (value) {
+        setState(() {
+          fieldTelpCountryCode = value;
+        });
+        clearErr('telp');
+      },
       errorText: err('telp'),
       validator: (_) => err('telp'),
       onChanged: (v) {
         final telp = v.trim();
-        if (telp.isNotEmpty && PhoneNumberHelper.normalize(telp).isValid) {
+        if (telp.isNotEmpty &&
+            InternationalPhoneHelper.normalize(
+              telp,
+              countryCode: fieldTelpCountryCode,
+            ).isValid) {
           clearErr('telp');
         }
       },
@@ -438,8 +461,9 @@ class MRekanContactCrudFormPageFormState
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 
-    final phoneRes = PhoneNumberHelper.normalize(
+    final phoneRes = InternationalPhoneHelper.normalize(
       fieldTelpController.text.trim(),
+      countryCode: fieldTelpCountryCode,
     );
 
     final telpNormalized = phoneRes.phone ?? "";

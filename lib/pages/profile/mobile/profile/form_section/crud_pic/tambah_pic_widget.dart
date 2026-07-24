@@ -1,6 +1,5 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/pages/profile/mobile/profile/form_section/rekan_pic_widget.dart';
@@ -12,11 +11,12 @@ import 'package:joss_app/models/gen_profile/mrekanpiccrud_model.dart';
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../../common/constants.dart';
-import '../../../../../../helper/indo_phone_result.dart';
+import '../../../../../../helper/international_phone_result.dart';
 import '../../../../../../models/combobox/combomjabatan_model.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
 import '../../../../../../repositories/combobox/combomjabatan_repository.dart';
 import '../../../../../../repositories/gen_profile/rekanpiccobcari_repository.dart';
+import '../../../../../../widgets/apptheme/phone_number_field.dart';
 import '../../../../../base/base_background_sidepage.dart';
 import 'list_pic_widget.dart';
 
@@ -46,6 +46,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
 
   final _comboKey = GlobalKey<DropdownSearchState<ComboMJabatanModel>>();
   ComboMJabatanModel? _jabatan;
+  int _hpCountryCode = InternationalPhoneHelper.defaultCountryCode;
 
   @override
   void initState() {
@@ -82,8 +83,11 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
       return;
     }
 
-    final phoneRes = IndoPhoneHelper.normalize(_hp.text.trim());
-    final hpNormalized = phoneRes.phone62 ?? "";
+    final phoneRes = InternationalPhoneHelper.normalize(
+      _hp.text.trim(),
+      countryCode: _hpCountryCode,
+    );
+    final hpNormalized = phoneRes.phone ?? "";
 
     final mjnsclientId = context.read<RegUserBloc>().state.record?.jnsClientId;
 
@@ -464,17 +468,15 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
   }
 
   Widget buildFiledTelp() {
-    return appTextField(
+    return AppPhoneNumberField(
       label: 'No. Telp',
       controller: _hp,
-      keyboardType: TextInputType.phone,
-      prefix: Text(
-        '+62 | ',
-        style: inputTextStyle(context, color: primaryLightColor),
-      ),
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[0-9+ ]')),
-      ],
+      countryCode: _hpCountryCode,
+      onCountryCodeChanged: (value) {
+        setState(() {
+          _hpCountryCode = value;
+        });
+      },
       validator: (v) {
         final telp = v?.trim() ?? "";
 
@@ -482,7 +484,10 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
           return kPhoneNumberNullError;
         }
 
-        final res = IndoPhoneHelper.normalize(telp);
+        final res = InternationalPhoneHelper.normalize(
+          telp,
+          countryCode: _hpCountryCode,
+        );
 
         if (!res.isValid) {
           return res.error ?? 'Nomor HP tidak valid';

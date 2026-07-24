@@ -93,6 +93,7 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
     _scrollController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -100,11 +101,9 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(
-              hPadding * 1.5,
-              hPadding,
-              hPadding * 1.5,
-              hPadding,
+            padding: EdgeInsets.symmetric(
+              horizontal: 0,
+              vertical: hPadding,
             ),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -112,7 +111,7 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
               child: Row(
                 children: List.generate(
                   chipItems.length,
-                      (index) => Padding(
+                  (index) => Padding(
                     padding: EdgeInsets.only(
                       right: index == chipItems.length - 1 ? 0 : 10,
                     ),
@@ -142,12 +141,12 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
                       key: tentangKey,
                       child: TentangCardWidget(),
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 40 * 2.5),
+
                     Container(
                       key: companyProfileKey,
                       child: CompanyProfileCard(),
                     ),
-                    const SizedBox(height: 40),
                     Container(
                       key: testimoniKey,
                       child: TestimoniPage1(),

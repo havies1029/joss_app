@@ -8,8 +8,9 @@ import 'package:joss_app/blocs/perbaruiklaimpar/klaimparklaimcrud_bloc.dart';
 import 'package:joss_app/models/combobox/combomjenisrugi_model.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:joss_app/models/combobox/combormatauang_model.dart';
-import '../../../helper/phone_number_result.dart';
+import '../../../helper/international_phone_result.dart';
 import '../../../widgets/apptheme/dropdown2.dart';
+import '../../../widgets/apptheme/phone_number_field.dart';
 import '../../../widgets/combobox/combormatauang_widget.dart';
 import '../../perbaruiklaimmv/mobile/klaimmvklaimcrud_form.dart';
 
@@ -55,6 +56,7 @@ class KlaimparklaimcrudFormPageFormState
   final fieldPicJabatanController = TextEditingController();
   final fieldPicNamaController = TextEditingController();
   final fieldPicTelpController = TextEditingController();
+  int fieldPicTelpCountryCode = InternationalPhoneHelper.defaultCountryCode;
 
   bool isPolisJps = false;
 
@@ -132,8 +134,12 @@ class KlaimparklaimcrudFormPageFormState
       setErr('form.picTelp', kPhoneNumberNullError);
       ok = false;
     } else {
-      if (!PhoneNumberHelper.isValid(telp)) {
-        setErr('form.picTelp', "Nomor telepon tidak valid");
+      final phoneRes = InternationalPhoneHelper.normalize(
+        telp,
+        countryCode: fieldPicTelpCountryCode,
+      );
+      if (!phoneRes.isValid) {
+        setErr('form.picTelp', phoneRes.error ?? "Nomor telepon tidak valid");
         ok = false;
       }
     }
@@ -199,8 +205,13 @@ class KlaimparklaimcrudFormPageFormState
       picEmail: fieldPicEmailController.text.trim(),
     ));
 
+    final phoneRes = InternationalPhoneHelper.normalize(
+      fieldPicTelpController.text.trim(),
+      countryCode: fieldPicTelpCountryCode,
+    );
+
     klaimparklaimcrudBloc.add(FieldPicTelpChangedEvent(
-      picTelp: fieldPicTelpController.text.trim(),
+      picTelp: phoneRes.phone ?? '',
     ));
 
     if (fieldComboMJenisrugi != null) {
@@ -322,13 +333,16 @@ class KlaimparklaimcrudFormPageFormState
             fieldPicJabatanController.text = state.record!.picJabatan;
             fieldPicNamaController.text = state.record!.picNama;
             fieldComboRMatauang = state.comboRMatauang;
-            fieldPicTelpController.text = state.record?.picTelp ?? '';
+            _setPicTelpFromRaw(state.record?.picTelp ?? '');
             isPolisJps = state.record?.isPolisJps ?? false;
             fieldCobNamaController.text = state.record!.cobNama;
             fieldKlaimAmountController.text =
                 NumberFormat("#,###").format(state.record!.klaimAmount);
           }
           fieldComboMJenisrugi = state.comboMJenisrugi;
+          if (mounted) {
+            setState(() {});
+          }
         }
       },
     );
@@ -539,10 +553,16 @@ class KlaimparklaimcrudFormPageFormState
   }
 
   Widget buildFieldPicTelp() {
-    return appTextField(
+    return AppPhoneNumberField(
       label: 'No Telepon PIC',
       controller: fieldPicTelpController,
-      keyboardType: TextInputType.phone,
+      countryCode: fieldPicTelpCountryCode,
+      onCountryCodeChanged: (value) {
+        setState(() {
+          fieldPicTelpCountryCode = value;
+        });
+        clearErr('form.picTelp');
+      },
       errorText: err('form.picTelp'),
       validator: (_) => err('form.picTelp'),
       onChanged: (value) {
@@ -551,17 +571,39 @@ class KlaimparklaimcrudFormPageFormState
         if (telp.isEmpty) {
           clearErr('form.picTelp');
         } else {
-          if (PhoneNumberHelper.isValid(telp)) {
+          final phoneRes = InternationalPhoneHelper.normalize(
+            telp,
+            countryCode: fieldPicTelpCountryCode,
+          );
+          if (phoneRes.isValid) {
             clearErr('form.picTelp');
           } else {
-            setErr('form.picTelp', "Nomor telepon tidak valid");
+            setErr('form.picTelp', phoneRes.error ?? "Nomor telepon tidak valid");
           }
         }
 
         klaimparklaimcrudBloc.add(
-          FieldPicTelpChangedEvent(picTelp: value),
+          FieldPicTelpChangedEvent(
+            picTelp: InternationalPhoneHelper.normalize(
+                  value,
+                  countryCode: fieldPicTelpCountryCode,
+                  required: false,
+                ).phone ??
+                '',
+          ),
         );
       },
+    );
+  }
+
+  void _setPicTelpFromRaw(String rawPhone) {
+    final digits = InternationalPhoneHelper.clean(rawPhone);
+    final detected = InternationalPhoneHelper.detectCountry(digits);
+    fieldPicTelpCountryCode =
+        detected?.dialCode ?? InternationalPhoneHelper.defaultCountryCode;
+    fieldPicTelpController.text = InternationalPhoneHelper.toNationalInput(
+      rawPhone,
+      countryCode: fieldPicTelpCountryCode,
     );
   }
 

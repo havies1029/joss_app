@@ -1,4 +1,6 @@
-﻿import 'package:firebase_core/firebase_core.dart';
+import 'dart:async';
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/services.dart';
@@ -41,6 +43,7 @@ import 'package:joss_app/pages/login/mobile/client/login_client_page.dart';
 import 'package:joss_app/pages/login/mobile/client/widget/otp_client_widget.dart';
 import 'package:joss_app/pages/login/mobile/user/widget/otp_user_widget.dart';
 import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
+import 'package:joss_app/pages/startpage/mobile/startpage.dart';
 
 // APIs
 import 'apis/payment/paymentdn_api.dart';
@@ -897,6 +900,7 @@ class _App extends StatefulWidget {
 class _AppState extends State<_App> {
   late bool _showOnboarding;
   final GlobalKey<NavigatorState> _navigatorKey = rootNavigatorKey;
+  String? _lastRegisterSuccessOverlayKey;
 
   @override
   void initState() {
@@ -914,6 +918,70 @@ class _AppState extends State<_App> {
     await _navigatorKey.currentState?.push(
       MaterialPageRoute(builder: (_) => page),
     );
+  }
+
+  bool _shouldShowRegisterSuccessOverlay(AuthenticationAuthenticated state) {
+    final regState = context.read<RegUserBloc>().state;
+    final authenticatedFrom = state.authenticatedFrom.trim();
+
+    if (!regState.isRegisterSuccess || authenticatedFrom.isEmpty) {
+      return false;
+    }
+
+    if (regState.requestFrom.trim() != authenticatedFrom) {
+      return false;
+    }
+
+    return singlePopPages.contains(authenticatedFrom);
+  }
+
+  Future<void> _showRegisterSuccessOverlay() async {
+    final overlayContext = _navigatorKey.currentContext;
+    if (overlayContext == null) return;
+
+    await showGeneralDialog<void>(
+      context: overlayContext,
+      barrierDismissible: true,
+      barrierLabel: 'Tutup',
+      barrierColor: Colors.black.withOpacity(0.6),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return const _RegisterSuccessOverlay();
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+        );
+
+        return FadeTransition(
+          opacity: curved,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.96, end: 1).animate(curved),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  void _showGeneralDataPopup(String? mjenisClient) {
+    final popupContext = _navigatorKey.currentContext;
+    if (popupContext == null) return;
+
+    if (mjenisClient == '10') {
+      showDialog(
+        context: popupContext,
+        useRootNavigator: true,
+        builder: (_) => const MRekanGeneralIdvPopUpPage(),
+      );
+    } else if (mjenisClient == '20') {
+      showDialog(
+        context: popupContext,
+        useRootNavigator: true,
+        builder: (_) => const MRekanGeneralCmpPopUpPage(),
+      );
+    }
   }
 
   @override
@@ -943,38 +1011,43 @@ class _AppState extends State<_App> {
           listenWhen: (_, curr) => curr is AuthenticationAuthenticated,
           listener: (_, state) {
             if (state is AuthenticationAuthenticated) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
+              WidgetsBinding.instance.addPostFrameCallback((_) async {
                 final nav = _navigatorKey.currentState;
                 final mjenisClient =
                     context.read<RegUserBloc>().state.record?.jnsClientId;
                 if (nav == null) return;
+                final shouldShowRegisterSuccess =
+                    _shouldShowRegisterSuccessOverlay(state);
+                final overlayKey =
+                    '${state.authenticatedFrom}:${state.user.token ?? state.user.id}';
+                final canShowRegisterSuccess = shouldShowRegisterSuccess &&
+                    _lastRegisterSuccessOverlayKey != overlayKey;
+
                 if (state.authenticatedFrom == 'daftarclient_page') {
                   while (nav.canPop()) {
                     nav.pop();
                   }
+                  if (canShowRegisterSuccess) {
+                    _lastRegisterSuccessOverlayKey = overlayKey;
+                    await _showRegisterSuccessOverlay();
+                  }
                   return;
                 }
                 if (singlePopPages.contains(state.authenticatedFrom)) {
-                  if (mjenisClient == '10') {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      showDialog(
-                        context: _navigatorKey.currentContext!,
-                        useRootNavigator: true,
-                        builder: (_) => const MRekanGeneralIdvPopUpPage(),
-                      );
-                    });
-                  } else if (mjenisClient == '20') {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      showDialog(
-                        context: _navigatorKey.currentContext!,
-                        useRootNavigator: true,
-                        builder: (_) => const MRekanGeneralCmpPopUpPage(),
-                      );
-                    });
+                  if (canShowRegisterSuccess) {
+                    _lastRegisterSuccessOverlayKey = overlayKey;
+                    await _showRegisterSuccessOverlay();
                   }
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _showGeneralDataPopup(mjenisClient);
+                  });
                 } else {
                   while (nav.canPop()) {
                     nav.pop();
+                  }
+                  if (canShowRegisterSuccess) {
+                    _lastRegisterSuccessOverlayKey = overlayKey;
+                    await _showRegisterSuccessOverlay();
                   }
                 }
               });
@@ -1022,6 +1095,10 @@ class _AppState extends State<_App> {
         },
         home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
+            if (_showOnboarding) {
+              return StartScreen(onCompleted: _onOnboardingCompleted);
+            }
+
             if (state is AuthenticationAuthenticated) {
               final user = state.user;
               final homeWidget = HomeTabWidget(
@@ -1127,6 +1204,99 @@ class _AppState extends State<_App> {
 
             return const LoadingIndicator();
           },
+        ),
+      ),
+    );
+  }
+}
+
+class _RegisterSuccessOverlay extends StatefulWidget {
+  const _RegisterSuccessOverlay();
+
+  @override
+  State<_RegisterSuccessOverlay> createState() =>
+      _RegisterSuccessOverlayState();
+}
+
+class _RegisterSuccessOverlayState extends State<_RegisterSuccessOverlay> {
+  Timer? _autoCloseTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _autoCloseTimer = Timer(const Duration(seconds: 3), _close);
+  }
+
+  @override
+  void dispose() {
+    _autoCloseTimer?.cancel();
+    super.dispose();
+  }
+
+  void _close() {
+    if (!mounted) return;
+    final navigator = Navigator.of(context, rootNavigator: true);
+    if (navigator.canPop()) {
+      navigator.pop();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
+          decoration: BoxDecoration(
+            color: formGrey,
+            borderRadius: BorderRadius.circular(cardBorderRadius),
+            border: Border.all(color: sGrey),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.35),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.check_circle_rounded,
+                color: successGreen,
+                size: 72,
+              ),
+              const SizedBox(height: vPadding),
+              Text(
+                'Pendaftaran Berhasil',
+                textAlign: TextAlign.center,
+                style: headingStyle(
+                  context,
+                  fontSize: getResponsiveFont(context, 22),
+                ),
+              ),
+              const SizedBox(height: hPadding),
+              Text(
+                'Akun berhasil dibuat, layanan siap digunakan.',
+                textAlign: TextAlign.center,
+                style: bodyTextStyle(
+                  context,
+                  fontSize: getResponsiveFont(context, 16),
+                ).copyWith(color: hintGrey),
+              ),
+              const SizedBox(height: vPadding),
+              AppButton.primary(
+                text: 'Kembali',
+                backgroundColor: primaryColor,
+                width: 220,
+                onPressed: _close,
+              ),
+            ],
+          ),
         ),
       ),
     );

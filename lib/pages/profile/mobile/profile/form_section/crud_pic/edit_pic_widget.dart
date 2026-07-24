@@ -1,6 +1,5 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/pages/profile/mobile/profile/form_section/rekan_pic_widget.dart';
@@ -11,12 +10,13 @@ import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../blocs/hakakses/hakaksescrud_bloc.dart';
 import '../../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../../common/constants.dart';
-import '../../../../../../helper/indo_phone_result.dart';
+import '../../../../../../helper/international_phone_result.dart';
 import '../../../../../../models/combobox/combomjabatan_model.dart';
 import '../../../../../../models/gen_profile/mrekanpiccrud_model.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
 import '../../../../../../repositories/combobox/combomjabatan_repository.dart';
 import '../../../../../../repositories/gen_profile/rekanpiccobcari_repository.dart';
+import '../../../../../../widgets/apptheme/phone_number_field.dart';
 import '../../../../../base/base_background_sidepage.dart';
 import 'list_pic_widget.dart';
 
@@ -57,6 +57,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
   final _comboKey = GlobalKey<DropdownSearchState<ComboMJabatanModel>>();
   ComboMJabatanModel? _jabatan;
+  int _hpCountryCode = InternationalPhoneHelper.defaultCountryCode;
 
   @override
   void initState() {
@@ -93,24 +94,25 @@ class _EditPicWidgetState extends State<EditPicWidget> {
   }
 
   String _toPhoneFieldValue(String raw) {
-    final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
-
-    if (digits.isEmpty) return '';
-
-    if (digits.startsWith('62')) {
-      return digits.substring(2);
-    }
-
-    if (digits.startsWith('0')) {
-      return digits.substring(1);
-    }
-
-    return digits;
+    return InternationalPhoneHelper.toNationalInput(
+      raw,
+      countryCode: _hpCountryCode,
+    );
   }
 
   String _toNormalizedPhone62(String raw) {
-    final res = IndoPhoneHelper.normalize(raw.trim());
-    return res.phone62 ?? '';
+    final res = InternationalPhoneHelper.normalize(
+      raw.trim(),
+      countryCode: _hpCountryCode,
+    );
+    return res.phone ?? '';
+  }
+
+  void _setHpCountryFromRaw(String raw) {
+    final digits = InternationalPhoneHelper.clean(raw);
+    final detected = InternationalPhoneHelper.detectCountry(digits);
+    _hpCountryCode =
+        detected?.dialCode ?? InternationalPhoneHelper.defaultCountryCode;
   }
 
   Future<void> _openCobPicker() async {
@@ -222,6 +224,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     _id.text = (record.mrekanpicId ?? '').trim();
     _nama.text = (record.picNama ?? '').trim();
     _email.text = (record.picEmail ?? '').trim();
+    _setHpCountryFromRaw((record.picHp ?? '').trim());
     _hp.text = _toPhoneFieldValue((record.picHp ?? '').trim());
     _jabatanDesc.text = (record.jabatanDesc ?? '').trim();
     _alamat.text = (record.alamat1 ?? '').trim();
@@ -735,17 +738,15 @@ class _EditPicWidgetState extends State<EditPicWidget> {
   }
 
   Widget buildFiledTelp() {
-    return appTextField(
+    return AppPhoneNumberField(
       label: 'No. Telp',
       controller: _hp,
-      keyboardType: TextInputType.phone,
-      prefix: Text(
-        '+62 | ',
-        style: inputTextStyle(context, color: primaryLightColor),
-      ),
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[0-9 ]')),
-      ],
+      countryCode: _hpCountryCode,
+      onCountryCodeChanged: (value) {
+        setState(() {
+          _hpCountryCode = value;
+        });
+      },
       validator: (v) {
         final telp = v?.trim() ?? '';
 
@@ -753,7 +754,10 @@ class _EditPicWidgetState extends State<EditPicWidget> {
           return kPhoneNumberNullError;
         }
 
-        final res = IndoPhoneHelper.normalize(telp);
+        final res = InternationalPhoneHelper.normalize(
+          telp,
+          countryCode: _hpCountryCode,
+        );
 
         if (!res.isValid) {
           return res.error ?? 'Nomor HP tidak valid';
