@@ -267,23 +267,30 @@ class HomeTabWidgetState extends State<HomeTabWidget> {
                   index: selectedIndex,
                   children: pages,
                 ),
-                DraggableChatButton(
-                  onTap: () {
-                    final authState = context.read<AuthenticationBloc>().state;
+
+                BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                  builder: (context, authState) {
                     final userType = authState is AuthenticationAuthenticated
                         ? authState.user.userType.trim()
                         : '';
 
-                    if (userType.isEmpty) return;
-
-                    if (ChatInitService.I.isInitialized) {
-                      Navigator.pushNamed(context, 'chat');
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Chat belum siap, coba lagi')),
-                      );
+                    if (userType.isEmpty) {
+                      return const SizedBox.shrink();
                     }
+
+                    return DraggableChatButton(
+                      onTap: () {
+                        if (ChatInitService.I.isInitialized) {
+                          Navigator.pushNamed(context, 'chat');
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Chat belum siap, coba lagi'),
+                            ),
+                          );
+                        }
+                      },
+                    );
                   },
                 ),
               ],
