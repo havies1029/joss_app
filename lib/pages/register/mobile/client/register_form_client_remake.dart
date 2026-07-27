@@ -4,7 +4,6 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/common/loading_indicator.dart';
 import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import 'package:joss_app/pages/login/mobile/client/new_login_client/new_login_client_page.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
@@ -73,26 +72,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     fieldKonfirmasiPasswordController.dispose();
     fieldCompanyNamaController.dispose();
     super.dispose();
-  }
-
-  void _showGlobalLoading() {
-    if (!mounted || _isDialogLoadingShown) return;
-
-    _isDialogLoadingShown = true;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: Colors.black54,
-      builder: (_) {
-        return const PopScope(
-          canPop: false,
-          child: Center(
-            child: LoadingIndicator(),
-          ),
-        );
-      },
-    );
   }
 
   void _hideGlobalLoading() {
@@ -648,11 +627,17 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
                   state.isSaved &&
                   state.isRegisterSuccess) {
                 _submitAttempt++;
+                _hideGlobalLoading();
                 if (mounted) {
                   setState(() {
                     isSubmitting = false;
                   });
                 }
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    successSnackBar('Registrasi berhasil.'),
+                  );
                 context
                     .read<RegUserOtpBloc>()
                     .add(const RegUserOtpClearEvent());

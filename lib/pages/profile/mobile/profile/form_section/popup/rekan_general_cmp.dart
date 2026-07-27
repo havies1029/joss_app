@@ -88,11 +88,9 @@ class MRekanGeneralCmpPopUpPageFormState
       debugPrint("navigator3x");
       navigator.pop();
       navigator.pop();
-      navigator.pop();
       regUserBloc.add(ClearRequestFromEvent());
     } else if (regUserBloc.state.requestFrom == 'regother_page') {
       debugPrint("navigator2x");
-      navigator.pop();
       navigator.pop();
       navigator.pop();
       regUserBloc.add(ClearRequestFromEvent());

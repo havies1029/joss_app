@@ -91,111 +91,124 @@ class RingkasanPageState extends State<RingkasanPage> {
       },
       child: Scaffold(
         backgroundColor: secondaryBlackColor,
-        body: Stack(
-          children: [
-            Column(
+        body: BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
+          builder: (context, state) {
+            if (_firstLoading || state.status != ListStatus.success) {
+              return const Center(child: LoadingIndicator());
+            }
+
+            if (state.items.isEmpty) {
+              return const Center(child: Text("Data kosong"));
+            }
+
+            return Stack(
               children: [
-                const SizedBox(height: 8),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: hPadding * 1.5,
-                    vertical: 10,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
-                        buildWhen: (previous, current) {
-                          return previous.status != current.status ||
-                              previous.items != current.items;
-                        },
-                        builder: (context, state) {
-                          final bool isEmpty =
-                              state.status != ListStatus.success ||
-                                  state.items.isEmpty;
+                Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: hPadding * 1.5,
+                        vertical: 10,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
+                            buildWhen: (previous, current) {
+                              return previous.status != current.status ||
+                                  previous.items != current.items;
+                            },
+                            builder: (context, state) {
+                              final bool isEmpty =
+                                  state.status != ListStatus.success ||
+                                      state.items.isEmpty;
 
-                          return PolisButton(
-                            assetPath: "assets/icons/unduh.svg",
-                            bgColor: const Color(0xFFA1A1AA),
-                            borderColor: const Color(0xFFBCBCC7),
-                            onTap: isEmpty
-                                ? null
-                                : () => _showExportDialog(context),
-                            iconSize: 16,
-                            height: 36,
-                            width: 36,
+                              return PolisButton(
+                                assetPath: "assets/icons/unduh.svg",
+                                bgColor: const Color(0xFFA1A1AA),
+                                borderColor: const Color(0xFFBCBCC7),
+                                onTap: isEmpty
+                                    ? null
+                                    : () => _showExportDialog(context),
+                                iconSize: 16,
+                                height: 36,
+                                width: 36,
+                              );
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
+                            buildWhen: (previous, current) {
+                              return previous.status != current.status ||
+                                  previous.items != current.items;
+                            },
+                            builder: (context, state) {
+                              final bool isEmpty =
+                                  state.status != ListStatus.success ||
+                                      state.items.isEmpty;
+
+                              return PolisButton(
+                                assetPath: "assets/icons/bagikan.svg",
+                                bgColor: const Color(0xFF295EFF),
+                                borderColor: const Color(0xFF5D86FF),
+                                onTap: isEmpty ? null : () => _onShare(context),
+                                iconSize: 16,
+                                height: 36,
+                                width: 36,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: hPadding),
+                    Expanded(
+                      child:
+                          BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
+                        builder: (context, state) {
+                          if (_firstLoading) {
+                            return const Center(child: LoadingIndicator());
+                          }
+
+                          if (state.status != ListStatus.success) {
+                            return const Center(child: LoadingIndicator());
+                          }
+
+                          if (state.items.isEmpty) {
+                            return const Center(child: Text("Data kosong"));
+                          }
+
+                          return RingkasanTablePage(
+                            items: state.items,
                           );
                         },
                       ),
-                      const SizedBox(width: 8),
-                      BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
-                        buildWhen: (previous, current) {
-                          return previous.status != current.status ||
-                              previous.items != current.items;
-                        },
-                        builder: (context, state) {
-                          final bool isEmpty =
-                              state.status != ListStatus.success ||
-                                  state.items.isEmpty;
-
-                          return PolisButton(
-                            assetPath: "assets/icons/bagikan.svg",
-                            bgColor: const Color(0xFF295EFF),
-                            borderColor: const Color(0xFF5D86FF),
-                            onTap: isEmpty ? null : () => _onShare(context),
-                            iconSize: 16,
-                            height: 36,
-                            width: 36,
-                          );
-                        },
+                    ),
+                    const SizedBox(height: hPadding),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: hPadding * 1.5,
                       ),
-                    ],
-                  ),
+                      child: buildInfoNote(context),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: hPadding),
-                Expanded(
-                  child: BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
-                    builder: (context, state) {
-                      if (_firstLoading) {
-                        return const Center(child: LoadingIndicator());
-                      }
 
-                      if (state.status != ListStatus.success) {
-                        return const Center(child: LoadingIndicator());
-                      }
-
-                      if (state.items.isEmpty) {
-                        return const Center(child: Text("Data kosong"));
-                      }
-
-                      return RingkasanTablePage(
-                        items: state.items,
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: hPadding),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: hPadding * 1.5,
-                  ),
-                  child: buildInfoNote(context),
-                ),
+                // ===== FLOATING BAYAR BUTTON =====
+                // BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
+                //   builder: (context, state) {
+                //     final hasSelection = state.selectedIds.isNotEmpty;
+                //
+                //     return BayarButton(
+                //       isEnabled: hasSelection,
+                //       onTap: hasSelection ? onViewListOutstandingPolis : null,
+                //     );
+                //   },
+                // ),
               ],
-            ),
-
-            // ===== FLOATING BAYAR BUTTON =====
-            // BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
-            //   builder: (context, state) {
-            //     final hasSelection = state.selectedIds.isNotEmpty;
-            //
-            //     return BayarButton(
-            //       isEnabled: hasSelection,
-            //       onTap: hasSelection ? onViewListOutstandingPolis : null,
-            //     );
-            //   },
-            // ),
-          ],
+            );
+          },
         ),
       ),
     );

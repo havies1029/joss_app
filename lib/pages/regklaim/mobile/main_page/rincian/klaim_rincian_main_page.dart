@@ -35,6 +35,8 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
   void initState() {
     super.initState();
     groupcobCariBloc = context.read<GroupcobCariBloc>();
+    context.read<MstatusrinciCariBloc>().add(RefreshMstatusrinciCariEvent());
+
     Future.delayed(const Duration(milliseconds: 500), () {
       if (!mounted) return;
       _refreshData();
@@ -84,12 +86,44 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
           },
         ),
       ],
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildHeader(context),
-          _buildContent(context),
-        ],
+      child: BlocBuilder<GroupcobCariBloc, GroupcobCariState>(
+        buildWhen: (previous, current) =>
+            current.status != previous.status ||
+            current.items != previous.items,
+        builder: (context, state) {
+          if (state.status == ListStatus.initial ||
+              state.status == ListStatus.loadingMore) {
+            return const Center(child: LoadingIndicator());
+          }
+
+          if (state.status == ListStatus.failure) {
+            return const Center(
+              child: Text(
+                'Gagal memuat data',
+                style: TextStyle(color: Colors.red),
+              ),
+            );
+          }
+
+          if (state.items.isEmpty) {
+            return const Center(
+              child: EmptyStatePage(
+                iconPath: 'assets/icons/belipolis_no_file.svg',
+                title: 'Tidak ada Rincian Klaim',
+                description:
+                    'Detail klaim akan muncul di sini ketika tersedia.',
+              ),
+            );
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildHeader(context),
+              _buildContent(context),
+            ],
+          );
+        },
       ),
     );
   }

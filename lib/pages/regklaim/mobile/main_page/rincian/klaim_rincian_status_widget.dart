@@ -20,7 +20,10 @@ class _KlaimRincianStatusWidgetState extends State<KlaimRincianStatusWidget> {
     super.initState();
 
     mstatusrinciCariBloc = context.read<MstatusrinciCariBloc>();
-    mstatusrinciCariBloc.add(RefreshMstatusrinciCariEvent());
+    if (mstatusrinciCariBloc.state.status == ListStatus.initial &&
+        mstatusrinciCariBloc.state.items.isEmpty) {
+      mstatusrinciCariBloc.add(RefreshMstatusrinciCariEvent());
+    }
   }
 
   @override
@@ -63,8 +66,8 @@ class _KlaimRincianStatusWidgetState extends State<KlaimRincianStatusWidget> {
                             isSelected: isSelected,
                             onTap: () {
                               context.read<MstatusrinciCariBloc>().add(
-                                SelectedIdChanged(id),
-                              );
+                                    SelectedIdChanged(id),
+                                  );
                             },
                           ),
                         );

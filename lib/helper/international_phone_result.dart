@@ -50,7 +50,8 @@ class InternationalPhoneHelper {
   static const int defaultCountryCode = 62;
 
   static const List<PhoneCountryCode> countries = [
-    PhoneCountryCode(dialCode: 1, isoCode: 'US', name: 'United States / Canada'),
+    PhoneCountryCode(
+        dialCode: 1, isoCode: 'US', name: 'United States / Canada'),
     PhoneCountryCode(dialCode: 7, isoCode: 'RU', name: 'Russia / Kazakhstan'),
     PhoneCountryCode(dialCode: 20, isoCode: 'EG', name: 'Egypt'),
     PhoneCountryCode(dialCode: 27, isoCode: 'ZA', name: 'South Africa'),
@@ -117,17 +118,20 @@ class InternationalPhoneHelper {
     PhoneCountryCode(dialCode: 233, isoCode: 'GH', name: 'Ghana'),
     PhoneCountryCode(dialCode: 234, isoCode: 'NG', name: 'Nigeria'),
     PhoneCountryCode(dialCode: 235, isoCode: 'TD', name: 'Chad'),
-    PhoneCountryCode(dialCode: 236, isoCode: 'CF', name: 'Central African Republic'),
+    PhoneCountryCode(
+        dialCode: 236, isoCode: 'CF', name: 'Central African Republic'),
     PhoneCountryCode(dialCode: 237, isoCode: 'CM', name: 'Cameroon'),
     PhoneCountryCode(dialCode: 238, isoCode: 'CV', name: 'Cape Verde'),
-    PhoneCountryCode(dialCode: 239, isoCode: 'ST', name: 'Sao Tome and Principe'),
+    PhoneCountryCode(
+        dialCode: 239, isoCode: 'ST', name: 'Sao Tome and Principe'),
     PhoneCountryCode(dialCode: 240, isoCode: 'GQ', name: 'Equatorial Guinea'),
     PhoneCountryCode(dialCode: 241, isoCode: 'GA', name: 'Gabon'),
     PhoneCountryCode(dialCode: 242, isoCode: 'CG', name: 'Congo'),
     PhoneCountryCode(dialCode: 243, isoCode: 'CD', name: 'Congo DR'),
     PhoneCountryCode(dialCode: 244, isoCode: 'AO', name: 'Angola'),
     PhoneCountryCode(dialCode: 245, isoCode: 'GW', name: 'Guinea Bissau'),
-    PhoneCountryCode(dialCode: 246, isoCode: 'IO', name: 'British Indian Ocean Territory'),
+    PhoneCountryCode(
+        dialCode: 246, isoCode: 'IO', name: 'British Indian Ocean Territory'),
     PhoneCountryCode(dialCode: 248, isoCode: 'SC', name: 'Seychelles'),
     PhoneCountryCode(dialCode: 249, isoCode: 'SD', name: 'Sudan'),
     PhoneCountryCode(dialCode: 250, isoCode: 'RW', name: 'Rwanda'),
@@ -180,7 +184,8 @@ class InternationalPhoneHelper {
     PhoneCountryCode(dialCode: 383, isoCode: 'XK', name: 'Kosovo'),
     PhoneCountryCode(dialCode: 385, isoCode: 'HR', name: 'Croatia'),
     PhoneCountryCode(dialCode: 386, isoCode: 'SI', name: 'Slovenia'),
-    PhoneCountryCode(dialCode: 387, isoCode: 'BA', name: 'Bosnia and Herzegovina'),
+    PhoneCountryCode(
+        dialCode: 387, isoCode: 'BA', name: 'Bosnia and Herzegovina'),
     PhoneCountryCode(dialCode: 389, isoCode: 'MK', name: 'North Macedonia'),
     PhoneCountryCode(dialCode: 420, isoCode: 'CZ', name: 'Czech Republic'),
     PhoneCountryCode(dialCode: 421, isoCode: 'SK', name: 'Slovakia'),
@@ -193,9 +198,11 @@ class InternationalPhoneHelper {
     PhoneCountryCode(dialCode: 505, isoCode: 'NI', name: 'Nicaragua'),
     PhoneCountryCode(dialCode: 506, isoCode: 'CR', name: 'Costa Rica'),
     PhoneCountryCode(dialCode: 507, isoCode: 'PA', name: 'Panama'),
-    PhoneCountryCode(dialCode: 508, isoCode: 'PM', name: 'Saint Pierre and Miquelon'),
+    PhoneCountryCode(
+        dialCode: 508, isoCode: 'PM', name: 'Saint Pierre and Miquelon'),
     PhoneCountryCode(dialCode: 509, isoCode: 'HT', name: 'Haiti'),
-    PhoneCountryCode(dialCode: 590, isoCode: 'GP', name: 'Guadeloupe / Saint Martin'),
+    PhoneCountryCode(
+        dialCode: 590, isoCode: 'GP', name: 'Guadeloupe / Saint Martin'),
     PhoneCountryCode(dialCode: 591, isoCode: 'BO', name: 'Bolivia'),
     PhoneCountryCode(dialCode: 592, isoCode: 'GY', name: 'Guyana'),
     PhoneCountryCode(dialCode: 593, isoCode: 'EC', name: 'Ecuador'),
@@ -204,9 +211,11 @@ class InternationalPhoneHelper {
     PhoneCountryCode(dialCode: 596, isoCode: 'MQ', name: 'Martinique'),
     PhoneCountryCode(dialCode: 597, isoCode: 'SR', name: 'Suriname'),
     PhoneCountryCode(dialCode: 598, isoCode: 'UY', name: 'Uruguay'),
-    PhoneCountryCode(dialCode: 599, isoCode: 'CW', name: 'Curacao / Caribbean Netherlands'),
+    PhoneCountryCode(
+        dialCode: 599, isoCode: 'CW', name: 'Curacao / Caribbean Netherlands'),
     PhoneCountryCode(dialCode: 670, isoCode: 'TL', name: 'Timor Leste'),
-    PhoneCountryCode(dialCode: 672, isoCode: 'NF', name: 'Norfolk Island / Antarctica'),
+    PhoneCountryCode(
+        dialCode: 672, isoCode: 'NF', name: 'Norfolk Island / Antarctica'),
     PhoneCountryCode(dialCode: 673, isoCode: 'BN', name: 'Brunei'),
     PhoneCountryCode(dialCode: 674, isoCode: 'NR', name: 'Nauru'),
     PhoneCountryCode(dialCode: 675, isoCode: 'PG', name: 'Papua New Guinea'),
@@ -243,7 +252,8 @@ class InternationalPhoneHelper {
     PhoneCountryCode(dialCode: 967, isoCode: 'YE', name: 'Yemen'),
     PhoneCountryCode(dialCode: 968, isoCode: 'OM', name: 'Oman'),
     PhoneCountryCode(dialCode: 970, isoCode: 'PS', name: 'Palestine'),
-    PhoneCountryCode(dialCode: 971, isoCode: 'AE', name: 'United Arab Emirates'),
+    PhoneCountryCode(
+        dialCode: 971, isoCode: 'AE', name: 'United Arab Emirates'),
     PhoneCountryCode(dialCode: 972, isoCode: 'IL', name: 'Israel'),
     PhoneCountryCode(dialCode: 973, isoCode: 'BH', name: 'Bahrain'),
     PhoneCountryCode(dialCode: 974, isoCode: 'QA', name: 'Qatar'),
@@ -311,14 +321,17 @@ class InternationalPhoneHelper {
       return InternationalPhoneResult.fail('Kode negara tidak ditemukan');
     }
 
-    final bool explicitInternational = raw.startsWith('+') || raw.startsWith('00');
+    final bool explicitInternational =
+        raw.startsWith('+') || raw.startsWith('00');
     PhoneCountryCode country = selectedCountry;
     String phone;
     String nationalNumber;
 
     if (explicitInternational) {
       final internationalDigits =
-          raw.startsWith('00') && digits.startsWith('00') ? digits.substring(2) : digits;
+          raw.startsWith('00') && digits.startsWith('00')
+              ? digits.substring(2)
+              : digits;
       final detected = detectCountry(internationalDigits);
 
       if (detected == null) {
@@ -327,8 +340,10 @@ class InternationalPhoneHelper {
 
       country = detected;
       phone = internationalDigits;
-      nationalNumber = internationalDigits.substring(country.dialCodeText.length);
-    } else if (digits.startsWith(selectedCountry.dialCodeText)) {
+      nationalNumber =
+          internationalDigits.substring(country.dialCodeText.length);
+    } else if (selectedCountry.dialCode == defaultCountryCode &&
+        digits.startsWith(selectedCountry.dialCodeText)) {
       phone = digits;
       nationalNumber = digits.substring(selectedCountry.dialCodeText.length);
     } else if (digits.startsWith('0')) {

@@ -62,7 +62,8 @@ class AppPhoneNumberField extends StatelessWidget {
       decoration: InputDecoration(
         alignLabelWithHint: true,
         labelText: label,
-        labelStyle: isEnabled ? inputTextStyle(context) : bodyTextStyle(context),
+        labelStyle:
+            isEnabled ? inputTextStyle(context) : bodyTextStyle(context),
         hintText: hint ?? 'Masukkan $label...',
         hintStyle: inputTextStyle(context, color: sGrey),
         filled: true,
@@ -91,8 +92,9 @@ class AppPhoneNumberField extends StatelessWidget {
           color: Colors.red,
           fontSize: 12,
         ),
-        errorText:
-            errorText != null && errorText!.trim().isNotEmpty ? errorText : null,
+        errorText: errorText != null && errorText!.trim().isNotEmpty
+            ? errorText
+            : null,
         helperText: helperText,
         helperStyle: helperStyle,
       ),

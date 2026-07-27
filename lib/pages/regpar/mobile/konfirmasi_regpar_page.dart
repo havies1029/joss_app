@@ -936,7 +936,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                         });
                       },
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Checkbox(
                             value: isAgreementChecked,
@@ -959,14 +959,11 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                           ),
                           const SizedBox(width: 6),
                           Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 12),
-                              child: Text(
-                                'Saya telah membaca dan menyetujui penawaran yang diberikan.',
-                                style: bodyTextStyle(context).copyWith(
-                                  color: primaryLightColor,
-                                  fontSize: 16,
-                                ),
+                            child: Text(
+                              'Saya telah membaca dan menyetujui penawaran yang diberikan.',
+                              style: bodyTextStyle(context).copyWith(
+                                color: primaryLightColor,
+                                fontSize: 16,
                               ),
                             ),
                           ),

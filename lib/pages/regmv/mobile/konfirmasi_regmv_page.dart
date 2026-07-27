@@ -855,7 +855,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                         });
                       },
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Checkbox(
                             value: isAgreementChecked,
@@ -878,14 +878,11 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                           ),
                           const SizedBox(width: 6),
                           Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 12),
-                              child: Text(
-                                'Saya telah membaca dan menyetujui penawaran yang diberikan.',
-                                style: bodyTextStyle(context).copyWith(
-                                  color: primaryLightColor,
-                                  fontSize: 16,
-                                ),
+                            child: Text(
+                              'Saya telah membaca dan menyetujui penawaran yang diberikan.',
+                              style: bodyTextStyle(context).copyWith(
+                                color: primaryLightColor,
+                                fontSize: 16,
                               ),
                             ),
                           ),

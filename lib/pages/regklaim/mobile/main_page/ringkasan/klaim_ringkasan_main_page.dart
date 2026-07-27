@@ -24,139 +24,161 @@ class KlaimRingkasanMainPage extends StatefulWidget {
   State<KlaimRingkasanMainPage> createState() => _KlaimRingkasanMainPageState();
 }
 
-  class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
-    final TextEditingController _searchController = TextEditingController();
+class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
+  final TextEditingController _searchController = TextEditingController();
 
-    @override
-    void initState() {
-      super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        refreshData();
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      refreshData();
+    });
+  }
 
-    @override
-    void dispose() {
-      _searchController.dispose();
-      super.dispose();
-    }
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
-    @override
-    Widget build(BuildContext context) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildHeader(context),
-          Expanded(child: _buildBody(context)),
-        ],
-      );
-    }
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<KlaimringkasCariBloc, KlaimringkasCariState>(
+      buildWhen: (previous, current) =>
+          previous.status != current.status || previous.items != current.items,
+      builder: (context, state) {
+        if (state.status == ListStatus.initial ||
+            state.status == ListStatus.loadingMore) {
+          return const Center(child: LoadingIndicator());
+        }
 
-    Widget _buildHeader(BuildContext context) {
-      return Container(
-        color: secondaryBlackColor,
-        padding: EdgeInsets.symmetric(
-          horizontal: hPadding * 1.5,
-          vertical: hPadding,
-        ),
-        child: Column(
+        if (state.status == ListStatus.failure) {
+          return const Center(child: Text('Failed to fetch data'));
+        }
+
+        if (state.items.isEmpty) {
+          return const Center(
+            child: EmptyStatePage(
+              iconPath: 'assets/icons/belipolis_no_file.svg',
+              title: 'Tidak ada Klaim',
+              description:
+                  'Klaim yang Anda ajukan akan muncul di sini ketika tersedia.',
+            ),
+          );
+        }
+
+        return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                PolisButton(
-                  assetPath: "assets/icons/unduh.svg",
-                  bgColor: bGrey,
-                  borderColor: bdGrey,
-                  onTap: () => _showExportDialog(context),
-                  iconSize: 16,
-                  height: 36,
-                  width: 36,
-                ),
-                const SizedBox(width: 8),
-                PolisButton(
-                  assetPath: "assets/icons/bagikan.svg",
-                  bgColor: bBlue,
-                  borderColor: bdBlue,
-                  onTap: () => _onShare(context),
-                  iconSize: 16,
-                  height: 36,
-                  width: 36,
-                ),
-              ],
-            ),
-            const SizedBox(height: hPadding),
-            const KlaimRingkasanStatusWidget(),
+            _buildHeader(context),
+            Expanded(child: _buildBody(context)),
           ],
-        ),
-      );
-    }
+        );
+      },
+    );
+  }
 
-    Widget _buildBody(BuildContext context) {
-      final statusId = context.select<MstatusringkasCariBloc, String>(
-            (b) => b.state.selectedStatusId,
-      );
-
-      return BlocBuilder<KlaimringkasCariBloc, KlaimringkasCariState>(
-        buildWhen: (previous, current) =>
-        previous.status != current.status ||
-            previous.items != current.items,
-        builder: (context, s) {
-          if (s.status == ListStatus.initial ||
-              s.status == ListStatus.loadingMore) {
-            return const Center(child: LoadingIndicator());
-          }
-
-          if (s.status == ListStatus.failure) {
-            return const Center(child: Text('Failed to fetch data'));
-          }
-
-          if (s.status == ListStatus.success && s.items.isEmpty) {
-            return const Center(
-              child: EmptyStatePage(
-                iconPath: 'assets/icons/belipolis_no_file.svg',
-                title: 'Tidak ada Klaim',
-                description: 'Klaim yang Anda ajukan akan muncul di sini ketika tersedia.',
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      color: secondaryBlackColor,
+      padding: EdgeInsets.symmetric(
+        horizontal: hPadding * 1.5,
+        vertical: hPadding,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              PolisButton(
+                assetPath: "assets/icons/unduh.svg",
+                bgColor: bGrey,
+                borderColor: bdGrey,
+                onTap: () => _showExportDialog(context),
+                iconSize: 16,
+                height: 36,
+                width: 36,
               ),
-            );
-          }
+              const SizedBox(width: 8),
+              PolisButton(
+                assetPath: "assets/icons/bagikan.svg",
+                bgColor: bBlue,
+                borderColor: bdBlue,
+                onTap: () => _onShare(context),
+                iconSize: 16,
+                height: 36,
+                width: 36,
+              ),
+            ],
+          ),
+          const SizedBox(height: hPadding),
+          const KlaimRingkasanStatusWidget(),
+        ],
+      ),
+    );
+  }
 
-          return KlaimRingkasanTableWidget();
-        },
-      );
-    }
+  Widget _buildBody(BuildContext context) {
+    return BlocBuilder<KlaimringkasCariBloc, KlaimringkasCariState>(
+      buildWhen: (previous, current) =>
+          previous.status != current.status || previous.items != current.items,
+      builder: (context, s) {
+        if (s.status == ListStatus.initial ||
+            s.status == ListStatus.loadingMore) {
+          return const Center(child: LoadingIndicator());
+        }
+
+        if (s.status == ListStatus.failure) {
+          return const Center(child: Text('Failed to fetch data'));
+        }
+
+        if (s.status == ListStatus.success && s.items.isEmpty) {
+          return const Center(
+            child: EmptyStatePage(
+              iconPath: 'assets/icons/belipolis_no_file.svg',
+              title: 'Tidak ada Klaim',
+              description:
+                  'Klaim yang Anda ajukan akan muncul di sini ketika tersedia.',
+            ),
+          );
+        }
+
+        return KlaimRingkasanTableWidget();
+      },
+    );
+  }
 
   void refreshData() {
     final statusId =
         context.read<MstatusringkasCariBloc>().state.selectedStatusId;
 
     context.read<KlaimringkasCariBloc>().add(
-      RefreshKlaimringkasCariEvent(
-        selectedStatusId: statusId,
-      ),
-    );
+          RefreshKlaimringkasCariEvent(
+            selectedStatusId: statusId,
+          ),
+        );
   }
 
-    List<Map<String, dynamic>> _exportRows() {
-      final st = context.read<KlaimringkasCariBloc>().state;
+  List<Map<String, dynamic>> _exportRows() {
+    final st = context.read<KlaimringkasCariBloc>().state;
 
-      return st.items
-          .map((d) => {
-        "No": d.nourut,
-        "COB": d.cobNama,
-        "Qty Klaim": d.klaimQty,
-        "Mata Uang": d.currNama,
-        "Nilai Klaim": _formatCurrencyValue(d.klaimAmount),
-      })
-          .toList();
-    }
+    return st.items
+        .map((d) => {
+              "No": d.nourut,
+              "COB": d.cobNama,
+              "Qty Klaim": d.klaimQty,
+              "Mata Uang": d.currNama,
+              "Nilai Klaim": _formatCurrencyValue(d.klaimAmount),
+            })
+        .toList();
+  }
 
-    String _formatCurrencyValue(num? value) {
-      return NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
-    }
+  String _formatCurrencyValue(num? value) {
+    return NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
+  }
 
   CategoryType _exportCategory() => CategoryType.klaim;
 
@@ -194,20 +216,20 @@ class KlaimRingkasanMainPage extends StatefulWidget {
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) =>
           FadeTransition(
-            opacity: animation,
-            child: ScaleTransition(
-              scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-              child: child,
-            ),
-          ),
+        opacity: animation,
+        child: ScaleTransition(
+          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+          child: child,
+        ),
+      ),
     );
   }
 
   Future<void> _exportData(
-      BuildContext context,
-      ExportFormat format,
-      List<Map<String, dynamic>> rows,
-      ) async {
+    BuildContext context,
+    ExportFormat format,
+    List<Map<String, dynamic>> rows,
+  ) async {
     final ext = (format == ExportFormat.excel) ? "xlsx" : "pdf";
     final exportFormat = (format == ExportFormat.excel) ? "excel" : "pdf";
     final fileName =

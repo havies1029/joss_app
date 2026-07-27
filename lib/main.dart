@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -111,7 +109,6 @@ import 'package:joss_app/repositories/simulpar/simulparcrud_repository.dart';
 
 import 'package:joss_app/repositories/gen_compro/reqcompro_repository.dart';
 import 'package:joss_app/repositories/gen_invite/invite_repository.dart';
-import 'package:joss_app/repositories/quopdf/quopdf_repository.dart';
 
 // Blocs / Cubits
 import 'package:joss_app/blocs/authentication/authentication_bloc.dart';
@@ -900,9 +897,7 @@ class _App extends StatefulWidget {
 class _AppState extends State<_App> {
   late bool _showOnboarding;
   final GlobalKey<NavigatorState> _navigatorKey = rootNavigatorKey;
-  late AuthenticationBloc _authenticationBloc;
   late RegUserBloc _regUserBloc;
-  String? _lastRegisterSuccessOverlayKey;
 
   @override
   void initState() {
@@ -913,7 +908,6 @@ class _AppState extends State<_App> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authenticationBloc = context.read<AuthenticationBloc>();
     _regUserBloc = context.read<RegUserBloc>();
   }
 
@@ -926,61 +920,6 @@ class _AppState extends State<_App> {
   Future<void> _showPopup(Widget page) async {
     await _navigatorKey.currentState?.push(
       MaterialPageRoute(builder: (_) => page),
-    );
-  }
-
-  bool _shouldShowRegisterSuccessOverlay(AuthenticationAuthenticated state) {
-    final regState = _regUserBloc.state;
-    final authenticatedFrom = state.authenticatedFrom.trim();
-
-    if (!regState.isRegisterSuccess || authenticatedFrom.isEmpty) {
-      return false;
-    }
-
-    if (regState.requestFrom.trim() != authenticatedFrom) {
-      return false;
-    }
-
-    return singlePopPages.contains(authenticatedFrom);
-  }
-
-  bool _isStillAuthenticated(AuthenticationAuthenticated expected) {
-    if (!mounted) return false;
-
-    final current = _authenticationBloc.state;
-    if (current is! AuthenticationAuthenticated) return false;
-
-    return current.user.id == expected.user.id &&
-        current.authenticatedFrom == expected.authenticatedFrom;
-  }
-
-  Future<void> _showRegisterSuccessOverlay() async {
-    final overlayContext = _navigatorKey.currentContext;
-    if (overlayContext == null) return;
-
-    await showGeneralDialog<void>(
-      context: overlayContext,
-      barrierDismissible: true,
-      barrierLabel: 'Tutup',
-      barrierColor: Colors.black.withOpacity(0.6),
-      transitionDuration: const Duration(milliseconds: 220),
-      pageBuilder: (dialogContext, animation, secondaryAnimation) {
-        return const _RegisterSuccessOverlay();
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-        );
-
-        return FadeTransition(
-          opacity: curved,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.96, end: 1).animate(curved),
-            child: child,
-          ),
-        );
-      },
     );
   }
 
@@ -1030,49 +969,26 @@ class _AppState extends State<_App> {
           listenWhen: (_, curr) => curr is AuthenticationAuthenticated,
           listener: (_, state) {
             if (state is AuthenticationAuthenticated) {
-              WidgetsBinding.instance.addPostFrameCallback((_) async {
-                if (!_isStillAuthenticated(state)) return;
-
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted) return;
                 final nav = _navigatorKey.currentState;
                 if (nav == null) return;
 
                 final mjenisClient = _regUserBloc.state.record?.jnsClientId;
-                final shouldShowRegisterSuccess =
-                    _shouldShowRegisterSuccessOverlay(state);
-                final overlayKey =
-                    '${state.authenticatedFrom}:${state.user.token ?? state.user.id}';
-                final canShowRegisterSuccess = shouldShowRegisterSuccess &&
-                    _lastRegisterSuccessOverlayKey != overlayKey;
-
                 if (state.authenticatedFrom == 'daftarclient_page') {
                   while (nav.canPop()) {
                     nav.pop();
                   }
-                  if (canShowRegisterSuccess) {
-                    _lastRegisterSuccessOverlayKey = overlayKey;
-                    await _showRegisterSuccessOverlay();
-                    if (!_isStillAuthenticated(state)) return;
-                  }
                   return;
                 }
                 if (singlePopPages.contains(state.authenticatedFrom)) {
-                  if (canShowRegisterSuccess) {
-                    _lastRegisterSuccessOverlayKey = overlayKey;
-                    await _showRegisterSuccessOverlay();
-                    if (!_isStillAuthenticated(state)) return;
-                  }
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (!_isStillAuthenticated(state)) return;
+                    if (!mounted) return;
                     _showGeneralDataPopup(mjenisClient);
                   });
                 } else {
                   while (nav.canPop()) {
                     nav.pop();
-                  }
-                  if (canShowRegisterSuccess) {
-                    _lastRegisterSuccessOverlayKey = overlayKey;
-                    await _showRegisterSuccessOverlay();
-                    if (!_isStillAuthenticated(state)) return;
                   }
                 }
               });
@@ -1210,130 +1126,11 @@ class _AppState extends State<_App> {
             }
 
             if (state is AuthenticationPhonePinVerified) {
-              final requestFrom = context.read<RegUserBloc>().state.requestFrom;
-
-              if (requestFrom == "calmv_page " ||
-                  requestFrom == "calpar_page") {
-                debugPrint("Log out user");
-                context.read<AuthenticationBloc>().add(LoggedOut());
-              } else {
-                while (_navigatorKey.currentState?.canPop() ?? false) {
-                  _navigatorKey.currentState?.pop();
-                }
-                context.read<AuthenticationBloc>().add(LoggedOut());
-              }
-
               return const LoadingIndicator();
             }
 
             return const LoadingIndicator();
           },
-        ),
-      ),
-    );
-  }
-}
-
-class _RegisterSuccessOverlay extends StatefulWidget {
-  const _RegisterSuccessOverlay();
-
-  @override
-  State<_RegisterSuccessOverlay> createState() =>
-      _RegisterSuccessOverlayState();
-}
-
-class _RegisterSuccessOverlayState extends State<_RegisterSuccessOverlay> {
-  Timer? _autoCloseTimer;
-  Route<dynamic>? _route;
-
-  @override
-  void initState() {
-    super.initState();
-    _autoCloseTimer = Timer(const Duration(seconds: 3), _close);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _route = ModalRoute.of(context);
-  }
-
-  @override
-  void dispose() {
-    _autoCloseTimer?.cancel();
-    super.dispose();
-  }
-
-  void _close() {
-    if (!mounted) return;
-
-    if (_route?.isCurrent != true) return;
-
-    final navigator = rootNavigatorKey.currentState;
-    if (navigator == null || !navigator.mounted || !navigator.canPop()) return;
-
-    _autoCloseTimer?.cancel();
-    _autoCloseTimer = null;
-
-    navigator.pop();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          width: double.infinity,
-          margin: const EdgeInsets.symmetric(horizontal: 24),
-          padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
-          decoration: BoxDecoration(
-            color: formGrey,
-            borderRadius: BorderRadius.circular(cardBorderRadius),
-            border: Border.all(color: sGrey),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.35),
-                blurRadius: 24,
-                offset: const Offset(0, 12),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.check_circle_rounded,
-                color: successGreen,
-                size: 72,
-              ),
-              const SizedBox(height: vPadding),
-              Text(
-                'Pendaftaran Berhasil',
-                textAlign: TextAlign.center,
-                style: headingStyle(
-                  context,
-                  fontSize: getResponsiveFont(context, 22),
-                ),
-              ),
-              const SizedBox(height: hPadding),
-              Text(
-                'Akun berhasil dibuat, layanan siap digunakan.',
-                textAlign: TextAlign.center,
-                style: bodyTextStyle(
-                  context,
-                  fontSize: getResponsiveFont(context, 16),
-                ).copyWith(color: hintGrey),
-              ),
-              const SizedBox(height: vPadding),
-              AppButton.primary(
-                text: 'Kembali',
-                backgroundColor: primaryColor,
-                width: 220,
-                onPressed: _close,
-              ),
-            ],
-          ),
         ),
       ),
     );

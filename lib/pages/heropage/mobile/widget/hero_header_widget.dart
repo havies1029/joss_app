@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -5,7 +7,7 @@ import 'package:joss_app/common/constants.dart';
 
 import '../../../../blocs/profile/profile_download_foto_bloc.dart';
 
-class HeroHeaderWidget extends StatelessWidget {
+class HeroHeaderWidget extends StatefulWidget {
   final String userName;
   final String? userImage;
   final String userType;
@@ -18,6 +20,37 @@ class HeroHeaderWidget extends StatelessWidget {
   });
 
   @override
+  State<HeroHeaderWidget> createState() => _HeroHeaderWidgetState();
+}
+
+class _HeroHeaderWidgetState extends State<HeroHeaderWidget>
+    with WidgetsBindingObserver {
+  late String _greeting;
+  Timer? _greetingTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _greeting = _getGreeting();
+    _scheduleGreetingRefresh();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _greetingTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refreshGreeting();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: hPadding + 6),
@@ -26,9 +59,10 @@ class HeroHeaderWidget extends StatelessWidget {
           SizedBox(
             width: 46,
             height: 46,
-            child: BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
+            child:
+                BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
               buildWhen: (prev, curr) =>
-              curr is ProfileDownloadFotoLoaded ||
+                  curr is ProfileDownloadFotoLoaded ||
                   curr is ProfileDownloadFotoLoading ||
                   prev.runtimeType != curr.runtimeType,
               builder: (context, state) {
@@ -42,15 +76,15 @@ class HeroHeaderWidget extends StatelessWidget {
                     ClipOval(
                       child: hasBytes
                           ? Image.memory(
-                        state.imageBytes,
-                        fit: BoxFit.cover,
-                        width: 46,
-                        height: 46,
-                        gaplessPlayback: true,
-                        filterQuality: FilterQuality.medium,
-                        errorBuilder: (_, __, ___) => _avatarFallback(),
-                      )
-                          : _buildFromString(userImage),
+                              state.imageBytes,
+                              fit: BoxFit.cover,
+                              width: 46,
+                              height: 46,
+                              gaplessPlayback: true,
+                              filterQuality: FilterQuality.medium,
+                              errorBuilder: (_, __, ___) => _avatarFallback(),
+                            )
+                          : _buildFromString(widget.userImage),
                     ),
                     if (isLoading)
                       SizedBox(
@@ -58,7 +92,8 @@ class HeroHeaderWidget extends StatelessWidget {
                         height: 46,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(primaryColor),
                           backgroundColor: Colors.transparent,
                         ),
                       ),
@@ -68,33 +103,33 @@ class HeroHeaderWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
-          userType != 'C'
+          widget.userType != 'C'
               ? Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Halo, ${_getGreeting()}',
-                  style: headingStyle(context, fontSize: 22),
-                ),
-              ],
-            ),
-          )
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Halo, $_greeting',
+                        style: headingStyle(context, fontSize: 22),
+                      ),
+                    ],
+                  ),
+                )
               : Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Halo, $userName',
-                  style: headingStyle(context, fontSize: 22),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Halo, ${widget.userName}',
+                        style: headingStyle(context, fontSize: 22),
+                      ),
+                      Text(
+                        _greeting,
+                        style: bodyTextStyle(context),
+                      ),
+                    ],
+                  ),
                 ),
-                Text(
-                  _getGreeting(),
-                  style: bodyTextStyle(context),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -117,11 +152,54 @@ class HeroHeaderWidget extends StatelessWidget {
   }
 
   Widget _avatarFallback() => SvgPicture.asset(
-    'assets/icons/place_holder_2.svg',
-    width: 46,
-    height: 46,
-    fit: BoxFit.contain,
-  );
+        'assets/icons/place_holder_2.svg',
+        width: 46,
+        height: 46,
+        fit: BoxFit.contain,
+      );
+
+  void _refreshGreeting() {
+    final nextGreeting = _getGreeting();
+
+    if (mounted && nextGreeting != _greeting) {
+      setState(() {
+        _greeting = nextGreeting;
+      });
+    }
+
+    _scheduleGreetingRefresh();
+  }
+
+  void _scheduleGreetingRefresh() {
+    _greetingTimer?.cancel();
+    _greetingTimer = Timer(_durationUntilNextGreeting(), _refreshGreeting);
+  }
+
+  Duration _durationUntilNextGreeting() {
+    final now = DateTime.now();
+    final next = _nextGreetingBoundary(now);
+    final duration = next.difference(now);
+
+    return duration.isNegative ? const Duration(minutes: 1) : duration;
+  }
+
+  DateTime _nextGreetingBoundary(DateTime now) {
+    final boundaries = <DateTime>[
+      DateTime(now.year, now.month, now.day, 4),
+      DateTime(now.year, now.month, now.day, 11),
+      DateTime(now.year, now.month, now.day, 15),
+      DateTime(now.year, now.month, now.day, 18),
+    ];
+
+    for (final boundary in boundaries) {
+      if (boundary.isAfter(now)) {
+        return boundary;
+      }
+    }
+
+    final tomorrow = now.add(const Duration(days: 1));
+    return DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 4);
+  }
 
   String _getGreeting() {
     final hour = DateTime.now().hour;

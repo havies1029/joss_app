@@ -350,7 +350,9 @@ class _SettingsPageState extends State<SettingsPage> {
                           nama: displayName,
                           email: profileEmail ?? authUser.email,
                           telepon: profileTelepon ?? authUser.hp,
-                          subtitle: userNama,
+                          subtitle: currentMjenisClient == '10'
+                              ? 'Klien JPS'
+                              : userNama,
                         );
                       },
                     );

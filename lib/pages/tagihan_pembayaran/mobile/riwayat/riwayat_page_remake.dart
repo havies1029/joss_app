@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/payment/historybayarcari_bloc.dart';
 // import 'package:joss_app/pages/payment/mobile/riwayat/riwayat_table_page_remake.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
@@ -73,7 +72,6 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
               );
               onViewPaymentMethods(state.curr, state.totalBayar);
             } else if (state.paymentStatus == "30") {
-
               ScaffoldMessenger.of(context).showSnackBar(
                 infoSnackBar('Silakan lakukan pembayaran.'),
               );
@@ -86,7 +84,6 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                   ),
                 ),
               );
-
             } else if (state.paymentStatus == "40") {
               if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
                 _isCardWebViewOpen = false;
@@ -120,7 +117,9 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                   ),
                 );
 
-                context.read<DnRekap2invBloc>().add(InitializeDnRekap2invEvent());
+                context
+                    .read<DnRekap2invBloc>()
+                    .add(InitializeDnRekap2invEvent());
                 refreshData();
                 return;
               }
@@ -134,14 +133,13 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                 successSnackBar('Pembayaran berhasil dibatalkan.'),
               );
 
-
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (_) => PaymentSuccess(
                     display: "Pengajuan Tidak Dilanjutkan",
                     description:
-                    "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
+                        "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
                     displayButton: "Kembali",
                     assetPath: "assets/icons/Logo_Gagal1.svg",
                     onButtonPressed: () {
@@ -149,7 +147,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                         MaterialPageRoute(
                           builder: (_) => const TransaksiPage(),
                         ),
-                            (route) => route.isFirst,
+                        (route) => route.isFirst,
                       );
                     },
                   ),
@@ -185,7 +183,8 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
           },
           listener: (context, state) async {
             if (state.hasFailure) {
-              String message = 'Proses pembayaran kartu gagal. Silakan coba lagi.';
+              String message =
+                  'Proses pembayaran kartu gagal. Silakan coba lagi.';
 
               final errorMessage = state.message.trim();
 
@@ -193,12 +192,12 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                 '"card_number" must be a credit card',
               )) {
                 message =
-                'Maaf, nomor kartu yang dimasukkan tidak dikenali sebagai kartu kredit.';
+                    'Maaf, nomor kartu yang dimasukkan tidak dikenali sebagai kartu kredit.';
               } else if (errorMessage.contains(
                 'card_details.card_number must match pattern',
               )) {
                 message =
-                'Maaf, nomor kartu harus terdiri dari 14 sampai 19 digit angka.';
+                    'Maaf, nomor kartu harus terdiri dari 14 sampai 19 digit angka.';
               }
 
               ScaffoldMessenger.of(context).showSnackBar(
@@ -213,18 +212,18 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
             final redirectUrl = state.record!.redirectUrl.trim();
 
             if (redirectUrl.isEmpty) {
-            //   ScaffoldMessenger.of(context).showSnackBar(
-            //     errorSnackBar('Redirect URL pembayaran tidak ditemukan.'),
-            //   );
+              //   ScaffoldMessenger.of(context).showSnackBar(
+              //     errorSnackBar('Redirect URL pembayaran tidak ditemukan.'),
+              //   );
               return;
             }
 
             context.read<InvbayarvaFormBloc>().add(
-              CreditCardPaymentCheckingStarted(
-                invoiceId: state.record!.invoiceId,
-                interval: const Duration(seconds: 5),
-              ),
-            );
+                  CreditCardPaymentCheckingStarted(
+                    invoiceId: state.record!.invoiceId,
+                    interval: const Duration(seconds: 5),
+                  ),
+                );
 
             _isCardWebViewOpen = true;
 
@@ -241,36 +240,72 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
 
             _isCardWebViewOpen = false;
           },
-
         ),
       ],
       child: Scaffold(
         resizeToAvoidBottomInset: true,
-        body: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: hPadding * 1.5,
-            vertical: 10,
-          ),
-          color: secondaryBlackColor,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListPageFilterBarUIWidget(
-                searchController: _searchController,
-                onSearch: (value) {
-                  refreshData();
-                },
-               hintText: "No Pembayaran",
+        body: BlocBuilder<HistorybayarCariBloc, HistorybayarCariState>(
+          builder: (context, state) {
+            if (state.status != ListStatus.success) {
+              return Container(
+                color: secondaryBlackColor,
+                child: const Center(child: LoadingIndicator()),
+              );
+            }
+
+            if (state.items.isEmpty) {
+              return Container(
+                color: secondaryBlackColor,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      padding: const EdgeInsets.only(bottom: 24),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: const Center(
+                          child: EmptyStatePage(
+                            iconPath: 'assets/icons/belipolis_no_file.svg',
+                            title: 'Tidak ada Riwayat Pembayaran',
+                            description:
+                                'Riwayat pembayaran yang telah dilakukan akan muncul di sini',
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            }
+
+            return Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: hPadding * 1.5,
+                vertical: 10,
               ),
-              const SizedBox(height: 10),
-
-              _buildFilterBarParent(),
-              const SizedBox(height: 10),
-
-              buildList(),
-            ],
-          ),
+              color: secondaryBlackColor,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListPageFilterBarUIWidget(
+                    searchController: _searchController,
+                    onSearch: (value) {
+                      refreshData();
+                    },
+                    hintText: "No Pembayaran",
+                  ),
+                  const SizedBox(height: 10),
+                  _buildFilterBarParent(),
+                  const SizedBox(height: 10),
+                  buildList(),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
@@ -307,7 +342,8 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
             return LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
                   padding: const EdgeInsets.only(bottom: 24),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
@@ -318,7 +354,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                         iconPath: 'assets/icons/belipolis_no_file.svg',
                         title: 'Tidak ada Riwayat Pembayaran',
                         description:
-                        'Riwayat pembayaran yang telah dilakukan akan muncul di sini',
+                            'Riwayat pembayaran yang telah dilakukan akan muncul di sini',
                       ),
                     ),
                   ),
@@ -362,6 +398,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
         return STATUS_SELESAI;
     }
   }
+
   Widget _buildFilterBarParent() {
     void apply(RiwayatFilter f) {
       if (_filter == f) return;

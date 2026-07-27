@@ -13,14 +13,12 @@ import '../../../../helper/expert_helper.dart';
 import '../../../../helper/mobile_expert_helper.dart';
 import '../../../../helper/share_position_origin_helper.dart';
 import '../../../../widgets/apptheme/empty_state_page.dart';
-import '../../../../widgets/apptheme/hubungi_cs.dart';
 import '../../../../widgets/apptheme/polis_button.dart';
 import '../../../../widgets/apptheme/popup_widget.dart';
 import '../../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../../widgets/listpage_filter_bar_ui.dart';
 import '../../../heropage/mobile/widget/transaksi_page.dart';
 import '../../fab_pembayaran.dart';
-import '../bayar_button.dart';
 import '../payment_page/payment_method/payment_method_page.dart';
 import '../payment_page/payment_process/payment_process.dart';
 import '../payment_page/payment_success/payment_success.dart';
@@ -232,7 +230,8 @@ class _RincianPageState extends State<RincianPage> {
           },
           listener: (BuildContext context, InvoiceStatusCardState state) async {
             if (state.hasFailure) {
-              String message = 'Proses pembayaran kartu gagal. Silakan coba lagi.';
+              String message =
+                  'Proses pembayaran kartu gagal. Silakan coba lagi.';
 
               final errorMessage = state.message.trim();
 
@@ -240,12 +239,12 @@ class _RincianPageState extends State<RincianPage> {
                 '"card_number" must be a credit card',
               )) {
                 message =
-                'Maaf, nomor kartu yang dimasukkan tidak dikenali sebagai kartu kredit.';
+                    'Maaf, nomor kartu yang dimasukkan tidak dikenali sebagai kartu kredit.';
               } else if (errorMessage.contains(
                 'card_details.card_number must match pattern',
               )) {
                 message =
-                'Maaf, nomor kartu harus terdiri dari 14 sampai 19 digit angka.';
+                    'Maaf, nomor kartu harus terdiri dari 14 sampai 19 digit angka.';
               }
 
               ScaffoldMessenger.of(context).showSnackBar(
@@ -293,259 +292,279 @@ class _RincianPageState extends State<RincianPage> {
       child: Scaffold(
         backgroundColor: secondaryBlackColor,
         resizeToAvoidBottomInset: true,
-        body: Stack(
-          children: [
-            Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: hPadding * 1.5,
-                    vertical: 10,
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ListPageFilterBarUIWidget(
-                          searchController: _searchController,
-                          onSearch: (value) {
-                            dn2invBloc.add(
-                              GetRincianSOACustomerEvent(
-                                searchText: value,
-                              ),
-                            );
-                          },
-                          hintText: "No Polis",
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
-                        buildWhen: (previous, current) {
-                          return previous.rincianSOA.headers !=
-                              current.rincianSOA.headers;
-                        },
-                        builder: (context, state) {
-                          final bool isEmpty = state.rincianSOA.headers.isEmpty;
+        body: BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
+          builder: (context, state) {
+            final bool isWaitingForResult =
+                !state.isProcessed && !state.hasFailure;
 
-                          return PolisButton(
-                            assetPath: "assets/icons/unduh.svg",
-                            bgColor: const Color(0xFFA1A1AA),
-                            borderColor: const Color(0xFFBCBCC7),
-                            onTap: isEmpty
-                                ? null
-                                : () => _showExportDialog(context),
-                            iconSize: 16,
-                            height: 36,
-                            width: 36,
-                          );
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
-                        buildWhen: (previous, current) {
-                          return previous.rincianSOA.headers !=
-                              current.rincianSOA.headers;
-                        },
-                        builder: (context, state) {
-                          final bool isEmpty = state.rincianSOA.headers.isEmpty;
+            if (_firstLoading || state.isProcessing || isWaitingForResult) {
+              return const Center(
+                child: LoadingIndicator(),
+              );
+            }
 
-                          return PolisButton(
-                            assetPath: "assets/icons/bagikan.svg",
-                            bgColor: const Color(0xFF295EFF),
-                            borderColor: const Color(0xFF5D86FF),
-                            onTap: isEmpty ? null : () => _onShare(context),
-                            iconSize: 16,
-                            height: 36,
-                            width: 36,
-                          );
-                        },
-                      ),
-                    ],
+            if (state.rincianSOA.headers.isEmpty) {
+              return const Center(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.only(bottom: 24),
+                  child: EmptyStatePage(
+                    iconPath: 'assets/icons/belipolis_no_file.svg',
+                    title: 'Tidak ada Rincian Tagihan',
+                    description:
+                        'Detail tagihan pembayaran akan muncul di sini ketika tersedia.',
                   ),
                 ),
-                const SizedBox(height: hPadding),
-                Expanded(
-                  child: BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
-                    builder: (context, state) {
-                      if (_firstLoading) {
-                        return const Center(
-                          child: LoadingIndicator(),
-                        );
-                      }
+              );
+            }
 
-                      final bool isEmpty = state.rincianSOA.headers.isEmpty;
+            return Stack(
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: hPadding * 1.5,
+                        vertical: 10,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ListPageFilterBarUIWidget(
+                              searchController: _searchController,
+                              onSearch: (value) {
+                                dn2invBloc.add(
+                                  GetRincianSOACustomerEvent(
+                                    searchText: value,
+                                  ),
+                                );
+                              },
+                              hintText: "No Polis",
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
+                            buildWhen: (previous, current) {
+                              return previous.rincianSOA.headers !=
+                                  current.rincianSOA.headers;
+                            },
+                            builder: (context, state) {
+                              final bool isEmpty =
+                                  state.rincianSOA.headers.isEmpty;
 
-                      if (state.isProcessing) {
-                        return const Center(
-                          child: LoadingIndicator(),
-                        );
-                      }
+                              return PolisButton(
+                                assetPath: "assets/icons/unduh.svg",
+                                bgColor: const Color(0xFFA1A1AA),
+                                borderColor: const Color(0xFFBCBCC7),
+                                onTap: isEmpty
+                                    ? null
+                                    : () => _showExportDialog(context),
+                                iconSize: 16,
+                                height: 36,
+                                width: 36,
+                              );
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
+                            buildWhen: (previous, current) {
+                              return previous.rincianSOA.headers !=
+                                  current.rincianSOA.headers;
+                            },
+                            builder: (context, state) {
+                              final bool isEmpty =
+                                  state.rincianSOA.headers.isEmpty;
 
-                      if (isEmpty) {
-                        return const Center(
-                          child: SingleChildScrollView(
-                            padding: EdgeInsets.only(bottom: 24),
-                            child: EmptyStatePage(
-                              iconPath: 'assets/icons/belipolis_no_file.svg',
-                              title: 'Tidak ada Rincian Tagihan',
+                              return PolisButton(
+                                assetPath: "assets/icons/bagikan.svg",
+                                bgColor: const Color(0xFF295EFF),
+                                borderColor: const Color(0xFF5D86FF),
+                                onTap: isEmpty ? null : () => _onShare(context),
+                                iconSize: 16,
+                                height: 36,
+                                width: 36,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: hPadding),
+                    Expanded(
+                      child: BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
+                        builder: (context, state) {
+                          final bool isEmpty = state.rincianSOA.headers.isEmpty;
+
+                          if (isEmpty) {
+                            return const Center(
+                              child: SingleChildScrollView(
+                                padding: EdgeInsets.only(bottom: 24),
+                                child: EmptyStatePage(
+                                  iconPath:
+                                      'assets/icons/belipolis_no_file.svg',
+                                  title: 'Tidak ada Rincian Tagihan',
+                                  description:
+                                      'Detail tagihan pembayaran akan muncul di sini ketika tersedia.',
+                                ),
+                              ),
+                            );
+                          }
+
+                          return SingleChildScrollView(
+                            keyboardDismissBehavior:
+                                ScrollViewKeyboardDismissBehavior.onDrag,
+                            child: Column(
+                              children: [
+                                RincianTablePage(
+                                  headers: state.rincianSOA.headers,
+                                  selectedIds: state.selectedIds,
+                                  onSelect: (dn1Id) {
+                                    dn2invBloc.add(SelectDetailEvent(dn1Id));
+                                  },
+                                  onUnselect: (dn1Id) {
+                                    dn2invBloc.add(UnselectDetailEvent(dn1Id));
+                                  },
+                                ),
+                                RincianGrandTotalTableWidget(
+                                  grandTotals: state.rincianSOA.grandtotal,
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
+                  builder: (context, state) {
+                    final bool isEmpty = state.rincianSOA.headers.isEmpty;
+
+                    if (isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+
+                    return FabPembayaran(
+                      isEnabled: state.selectedIds.isNotEmpty,
+                      onBayarTap: () {
+                        final selectedCurrSet = getSelectedCurrSet(state);
+
+                        debugPrint("SELECTED CURR SET : $selectedCurrSet");
+
+                        final isAllIdr = selectedCurrSet.length == 1 &&
+                            selectedCurrSet.contains('IDR');
+
+                        if (!isAllIdr) {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            barrierColor: Colors.black.withOpacity(0.6),
+                            builder: (dialogContext) => RegisterClientPopUp(
+                              showIcon: false,
+                              showHeaderIcon: false,
+                              header: 'Pembayaran Mata Uang Asing',
                               description:
-                                  'Detail tagihan pembayaran akan muncul di sini ketika tersedia.',
+                                  'Untuk pembayaran selain IDR atau Rupiah belum bisa dilakukan. Segera hubungi bagian keuangan kami.',
+                              buttonText: 'Hubungi',
+                              onPressed: () async {
+                                final layananState =
+                                    context.read<Mlayanan1CariBloc>().state;
+
+                                if (layananState.items.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content:
+                                          Text("Data layanan tidak ditemukan"),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                final layanan1 = layananState.items.first;
+
+                                if (layanan1.mLayanan2.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Detail layanan kosong"),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                final layanan = layanan1.mLayanan2.first;
+                                final link = layanan.linkLayanan;
+
+                                if (link.trim().isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content:
+                                          Text("Link layanan tidak tersedia"),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                await openLinkLayanan(link);
+                              },
+                            ),
+                          );
+
+                          return;
+                        }
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => RincianKonfirmasiDetailPage(
+                              selectedDnIds: List.from(state.selectedIds),
                             ),
                           ),
                         );
-                      }
+                      },
+                      onHubungiKeuTap: () async {
+                        final layananState =
+                            context.read<Mlayanan1CariBloc>().state;
 
-                      return SingleChildScrollView(
-                        keyboardDismissBehavior:
-                            ScrollViewKeyboardDismissBehavior.onDrag,
-                        child: Column(
-                          children: [
-                            RincianTablePage(
-                              headers: state.rincianSOA.headers,
-                              selectedIds: state.selectedIds,
-                              onSelect: (dn1Id) {
-                                dn2invBloc.add(SelectDetailEvent(dn1Id));
-                              },
-                              onUnselect: (dn1Id) {
-                                dn2invBloc.add(UnselectDetailEvent(dn1Id));
-                              },
+                        if (layananState.items.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Data layanan tidak ditemukan"),
                             ),
-                            RincianGrandTotalTableWidget(
-                              grandTotals: state.rincianSOA.grandtotal,
+                          );
+                          return;
+                        }
+
+                        final layanan1 = layananState.items.first;
+
+                        if (layanan1.mLayanan2.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Detail layanan kosong"),
                             ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-            BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
-              builder: (context, state) {
-                final bool isEmpty = state.rincianSOA.headers.isEmpty;
+                          );
+                          return;
+                        }
 
-                if (isEmpty) {
-                  return const SizedBox.shrink();
-                }
+                        final layanan = layanan1.mLayanan2.first;
 
-                return FabPembayaran(
-                  isEnabled: state.selectedIds.isNotEmpty,
-                  onBayarTap: () {
-                    final selectedCurrSet = getSelectedCurrSet(state);
+                        final link = layanan.linkLayanan;
 
-                    debugPrint("SELECTED CURR SET : $selectedCurrSet");
+                        if (link.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Link layanan tidak tersedia"),
+                            ),
+                          );
+                          return;
+                        }
 
-                    final isAllIdr = selectedCurrSet.length == 1 &&
-                        selectedCurrSet.contains('IDR');
-
-                    if (!isAllIdr) {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: true,
-                        barrierColor: Colors.black.withOpacity(0.6),
-                        builder: (dialogContext) => RegisterClientPopUp(
-                          showIcon: false,
-                          showHeaderIcon: false,
-                          header: 'Pembayaran Mata Uang Asing',
-                          description:
-                              'Untuk pembayaran selain IDR atau Rupiah belum bisa dilakukan. Segera hubungi bagian keuangan kami.',
-                          buttonText: 'Hubungi',
-                          onPressed: () async {
-                            final layananState =
-                                context.read<Mlayanan1CariBloc>().state;
-
-                            if (layananState.items.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Data layanan tidak ditemukan"),
-                                ),
-                              );
-                              return;
-                            }
-
-                            final layanan1 = layananState.items.first;
-
-                            if (layanan1.mLayanan2.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Detail layanan kosong"),
-                                ),
-                              );
-                              return;
-                            }
-
-                            final layanan = layanan1.mLayanan2.first;
-                            final link = layanan.linkLayanan;
-
-                            if (link.trim().isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Link layanan tidak tersedia"),
-                                ),
-                              );
-                              return;
-                            }
-
-                            await openLinkLayanan(link);
-                          },
-                        ),
-                      );
-
-                      return;
-                    }
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => RincianKonfirmasiDetailPage(
-                          selectedDnIds: List.from(state.selectedIds),
-                        ),
-                      ),
+                        await openLinkLayanan(link);
+                      },
                     );
                   },
-                  onHubungiKeuTap: () async {
-                    final layananState =
-                        context.read<Mlayanan1CariBloc>().state;
-
-                    if (layananState.items.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Data layanan tidak ditemukan"),
-                        ),
-                      );
-                      return;
-                    }
-
-                    final layanan1 = layananState.items.first;
-
-                    if (layanan1.mLayanan2.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Detail layanan kosong"),
-                        ),
-                      );
-                      return;
-                    }
-
-                    final layanan = layanan1.mLayanan2.first;
-
-                    final link = layanan.linkLayanan;
-
-                    if (link.trim().isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Link layanan tidak tersedia"),
-                        ),
-                      );
-                      return;
-                    }
-
-                    await openLinkLayanan(link);
-                  },
-                );
-              },
-            ),
-          ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
