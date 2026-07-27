@@ -19,14 +19,10 @@ class LiterasiPage extends StatefulWidget {
 class _LiterasiPageState extends State<LiterasiPage> {
   int selectedTab = 0;
 
-  final List<Map<String, dynamic>> tabItems = [
-    {'label': 'Tentang', 'page': const TentangJPSPage()},
-    {
-      'label': 'Artikel',
-      'page': const ArtikelPage(constraints: BoxConstraints()),
-    },
-    // {'label': 'Testimoni', 'page': const TestimoniPage()},
-    {'label': 'Rating', 'page': const TestimoniPage2()},
+  static const List<String> tabItems = [
+    'Tentang',
+    'Artikel',
+    'Rating',
   ];
 
   void _ensureArtikelLoaded() {
@@ -53,6 +49,19 @@ class _LiterasiPageState extends State<LiterasiPage> {
       _ensureArtikelLoaded();
     }
     setState(() => selectedTab = index);
+  }
+
+  Widget _buildSelectedPage() {
+    switch (selectedTab) {
+      case 0:
+        return const TentangJPSPage();
+      case 1:
+        return const ArtikelPage();
+      case 2:
+        return const TestimoniPage2();
+      default:
+        return const SizedBox.shrink();
+    }
   }
 
   @override
@@ -100,7 +109,7 @@ class _LiterasiPageState extends State<LiterasiPage> {
                                     : null,
                           ),
                           child: Text(
-                            tabItems[i]['label'],
+                            tabItems[i],
                             style: bodyTextStyle(context).copyWith(
                               color: isActive ? primaryColor : unselectedColor,
                             ),
@@ -115,9 +124,8 @@ class _LiterasiPageState extends State<LiterasiPage> {
             ),
             // Body content
             Expanded(
-              child: IndexedStack(
-                index: selectedTab,
-                children: tabItems.map((e) => e['page'] as Widget).toList(),
+              child: SizedBox.expand(
+                child: _buildSelectedPage(),
               ),
             ),
           ],

@@ -232,9 +232,14 @@ class _SettingsPageState extends State<SettingsPage> {
         return;
       }
 
-      context.read<AuthenticationBloc>().add(LoggedOut());
+      FocusManager.instance.primaryFocus?.unfocus();
       context.read<ProfileDownloadFotoBloc>().add(ClearSecureImage());
       ChatInitService.I.dispose();
+
+      await WidgetsBinding.instance.endOfFrame;
+      if (!context.mounted) return;
+
+      context.read<AuthenticationBloc>().add(LoggedOut());
     }
   }
 

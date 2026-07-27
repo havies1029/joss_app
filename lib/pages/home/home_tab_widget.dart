@@ -39,11 +39,18 @@ class HomeTabWidget extends StatefulWidget {
 class HomeTabWidgetState extends State<HomeTabWidget> {
   late int selectedIndex;
   late final List<Widget> pages;
+  late MRekanContactCrudBloc _mRekanContactCrudBloc;
 
   void goToHeroPage() {
     setState(() {
       selectedIndex = 0;
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _mRekanContactCrudBloc = context.read<MRekanContactCrudBloc>();
   }
 
   @override
@@ -206,9 +213,14 @@ class HomeTabWidgetState extends State<HomeTabWidget> {
         return;
       }
 
-      context.read<AuthenticationBloc>().add(LoggedOut());
+      FocusManager.instance.primaryFocus?.unfocus();
       context.read<ProfileDownloadFotoBloc>().add(ClearSecureImage());
       ChatInitService.I.dispose();
+
+      await WidgetsBinding.instance.endOfFrame;
+      if (!context.mounted) return;
+
+      context.read<AuthenticationBloc>().add(LoggedOut());
     }
   }
 
@@ -241,11 +253,13 @@ class HomeTabWidgetState extends State<HomeTabWidget> {
                   curr.isLoaded &&
                   prev.record?.mrekan1Id != curr.record?.mrekan1Id,
               listener: (context, state) {
+                if (!mounted) return;
+
                 final mrekan1Id = state.record?.mrekan1Id;
                 if (mrekan1Id != null && mrekan1Id.isNotEmpty) {
-                  context.read<MRekanContactCrudBloc>().add(
-                        MRekanContactCrudLihatEvent(),
-                      );
+                  _mRekanContactCrudBloc.add(
+                    MRekanContactCrudLihatEvent(),
+                  );
                 }
               },
             ),

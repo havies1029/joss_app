@@ -1996,17 +1996,14 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       ok = false;
     }
 
-    // No Polisi (required, length 3..9 setelah spasi dihapus)
+    // No Polisi (required, format: B 1234 CD)
     final platRaw = fieldPlatNoController.text.trim();
     if (platRaw.isEmpty) {
       setErr('form3.platNo', kStringNullError);
       ok = false;
-    } else {
-      final cleaned = platRaw.replaceAll(' ', '');
-      if (cleaned.length < 3 || cleaned.length > 9) {
-        setErr('form3.platNo', "Format plat nomor tidak valid");
-        ok = false;
-      }
+    } else if (!_isValidPlatNomor(platRaw)) {
+      setErr('form3.platNo', "Format No Plat tidak valid");
+      ok = false;
     }
 
     // No Rangka (required, min 5)
@@ -2074,6 +2071,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     }
 
     return ok;
+  }
+
+  bool _isValidPlatNomor(String value) {
+    return RegExp(r'^[A-Z]{1,2} [0-9]{1,4} [A-Z]{1,3}$')
+        .hasMatch(value.trim().toUpperCase());
   }
 
   bool validateForm7() {
@@ -2522,11 +2524,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         errorText: err('form3.platNo'),
         validator: (_) => err('form3.platNo'),
         onChanged: (v) {
-          final t = v.trim();
-          if (t.isEmpty) return;
-
-          final cleaned = t.replaceAll(' ', '');
-          if (cleaned.length >= 3 && cleaned.length <= 9) {
+          if (_isValidPlatNomor(v)) {
             clearErr('form3.platNo');
           }
         },
@@ -2876,7 +2874,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     return selectedYearform3.trim().isNotEmpty &&
         harga > 0 &&
         fieldComboMWilayah != null &&
-        fieldPlatNoController.text.replaceAll(' ', '').trim().length >= 3 &&
+        _isValidPlatNomor(fieldPlatNoController.text) &&
         fieldRangkaNoController.text.trim().length >= 5 &&
         fieldMesinNoController.text.trim().length >= 5 &&
         fieldComboMMvmerk != null &&

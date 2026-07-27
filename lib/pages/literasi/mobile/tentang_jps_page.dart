@@ -29,16 +29,16 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
     "Testimoni",
   ];
 
-  void scrollToSection(GlobalKey key) {
+  Future<void> scrollToSection(GlobalKey key) async {
     final context = key.currentContext;
-    if (context != null) {
-      Scrollable.ensureVisible(
-        context,
-        duration: const Duration(milliseconds: 450),
-        curve: Curves.easeInOutCubic,
-        alignment: 0.05,
-      );
-    }
+    if (!mounted || context == null) return;
+
+    await Scrollable.ensureVisible(
+      context,
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeInOutCubic,
+      alignment: 0.05,
+    );
   }
 
   Widget buildChip(String label, int index) {

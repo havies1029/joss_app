@@ -332,6 +332,30 @@ class _AppButtonState extends State<AppButton>
     }
   }
 
+  double _getInlineIconSize() {
+    final fontSize = _getTextStyle().fontSize ?? 18;
+    return fontSize * 0.9;
+  }
+
+  Widget _buildInlineIcon([Widget? fallback]) {
+    final icon = widget.icon ?? fallback ?? const Icon(Icons.add);
+    final iconSize = _getInlineIconSize();
+
+    return SizedBox.square(
+      dimension: iconSize,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: IconTheme.merge(
+          data: IconThemeData(
+            size: iconSize,
+            color: _getTextStyle().color,
+          ),
+          child: icon,
+        ),
+      ),
+    );
+  }
+
   Widget _buildButtonChild() {
     if (widget.isLoading) {
       return FittedBox(
@@ -366,7 +390,7 @@ class _AppButtonState extends State<AppButton>
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            widget.icon ?? const Icon(Icons.add),
+            _buildInlineIcon(),
             SizedBox(width: widget.iconTextSpacing),
             Text(
               widget.text ?? '',
@@ -384,7 +408,7 @@ class _AppButtonState extends State<AppButton>
               style: _getTextStyle(),
             ),
             SizedBox(width: widget.iconTextSpacing),
-            widget.icon ?? const Icon(Icons.add),
+            _buildInlineIcon(),
           ],
         );
 
@@ -392,7 +416,7 @@ class _AppButtonState extends State<AppButton>
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            widget.icon ?? const Icon(Icons.add),
+            _buildInlineIcon(),
             SizedBox(height: widget.iconTextSpacing),
             Text(
               widget.text ?? '',
@@ -410,7 +434,7 @@ class _AppButtonState extends State<AppButton>
               style: _getTextStyle(),
             ),
             SizedBox(height: widget.iconTextSpacing),
-            widget.icon ?? const Icon(Icons.add),
+            _buildInlineIcon(),
           ],
         );
 
@@ -422,7 +446,7 @@ class _AppButtonState extends State<AppButton>
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              widget.icon!,
+              _buildInlineIcon(),
               SizedBox(width: widget.iconTextSpacing),
               Text(
                 widget.text!,

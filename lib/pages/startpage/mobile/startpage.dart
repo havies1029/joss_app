@@ -174,7 +174,7 @@ class _StartScreenState extends State<StartScreen> {
               SizedBox(width: getProportionateScreenWidth(5)),
               Icon(
                 Icons.arrow_forward_ios,
-                size: getProportionateScreenWidth(14),
+                size: getResponsiveFont(context, 14),
                 color: primaryLightColor,
               ),
             ],
@@ -276,13 +276,16 @@ class _StartScreenState extends State<StartScreen> {
 
   Widget _buildBottomButton() {
     bool isLastPage = _currentIndex == _onboardingData.length - 1;
+    final bottomPadding = pIsAndroid && isMobile(context)
+        ? getProportionateScreenHeight(vPadding)
+        : 0.0;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
         getProportionateScreenWidth(hPadding * 1.5),
         getProportionateScreenHeight(10),
         getProportionateScreenWidth(hPadding * 1.5),
-        0,
+        bottomPadding,
       ),
       child: AnimatedSwitcher(
         duration: defaultDuration,
@@ -293,7 +296,7 @@ class _StartScreenState extends State<StartScreen> {
           text: 'Selanjutnya',
           icon: Icon(
             Icons.arrow_forward_ios,
-            size: getProportionateScreenWidth(14),
+            size: getResponsiveFont(context, 14),
             color: Colors.white,
           ),
           onPressed: _nextPage,

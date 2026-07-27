@@ -900,12 +900,21 @@ class _App extends StatefulWidget {
 class _AppState extends State<_App> {
   late bool _showOnboarding;
   final GlobalKey<NavigatorState> _navigatorKey = rootNavigatorKey;
+  late AuthenticationBloc _authenticationBloc;
+  late RegUserBloc _regUserBloc;
   String? _lastRegisterSuccessOverlayKey;
 
   @override
   void initState() {
     super.initState();
     _showOnboarding = !widget.seenOnboarding;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _authenticationBloc = context.read<AuthenticationBloc>();
+    _regUserBloc = context.read<RegUserBloc>();
   }
 
   void _onOnboardingCompleted() {
@@ -921,7 +930,7 @@ class _AppState extends State<_App> {
   }
 
   bool _shouldShowRegisterSuccessOverlay(AuthenticationAuthenticated state) {
-    final regState = context.read<RegUserBloc>().state;
+    final regState = _regUserBloc.state;
     final authenticatedFrom = state.authenticatedFrom.trim();
 
     if (!regState.isRegisterSuccess || authenticatedFrom.isEmpty) {
@@ -933,6 +942,16 @@ class _AppState extends State<_App> {
     }
 
     return singlePopPages.contains(authenticatedFrom);
+  }
+
+  bool _isStillAuthenticated(AuthenticationAuthenticated expected) {
+    if (!mounted) return false;
+
+    final current = _authenticationBloc.state;
+    if (current is! AuthenticationAuthenticated) return false;
+
+    return current.user.id == expected.user.id &&
+        current.authenticatedFrom == expected.authenticatedFrom;
   }
 
   Future<void> _showRegisterSuccessOverlay() async {
@@ -1012,10 +1031,12 @@ class _AppState extends State<_App> {
           listener: (_, state) {
             if (state is AuthenticationAuthenticated) {
               WidgetsBinding.instance.addPostFrameCallback((_) async {
+                if (!_isStillAuthenticated(state)) return;
+
                 final nav = _navigatorKey.currentState;
-                final mjenisClient =
-                    context.read<RegUserBloc>().state.record?.jnsClientId;
                 if (nav == null) return;
+
+                final mjenisClient = _regUserBloc.state.record?.jnsClientId;
                 final shouldShowRegisterSuccess =
                     _shouldShowRegisterSuccessOverlay(state);
                 final overlayKey =
@@ -1030,6 +1051,7 @@ class _AppState extends State<_App> {
                   if (canShowRegisterSuccess) {
                     _lastRegisterSuccessOverlayKey = overlayKey;
                     await _showRegisterSuccessOverlay();
+                    if (!_isStillAuthenticated(state)) return;
                   }
                   return;
                 }
@@ -1037,8 +1059,10 @@ class _AppState extends State<_App> {
                   if (canShowRegisterSuccess) {
                     _lastRegisterSuccessOverlayKey = overlayKey;
                     await _showRegisterSuccessOverlay();
+                    if (!_isStillAuthenticated(state)) return;
                   }
                   WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (!_isStillAuthenticated(state)) return;
                     _showGeneralDataPopup(mjenisClient);
                   });
                 } else {
@@ -1048,6 +1072,7 @@ class _AppState extends State<_App> {
                   if (canShowRegisterSuccess) {
                     _lastRegisterSuccessOverlayKey = overlayKey;
                     await _showRegisterSuccessOverlay();
+                    if (!_isStillAuthenticated(state)) return;
                   }
                 }
               });
@@ -1176,7 +1201,6 @@ class _AppState extends State<_App> {
               context.read<LoginBloc>().add(
                   LoginReset()); // balikin kondisi state bloc ke konidsi semula
               return HomeTabWidget(
-                key: homeTabKey,
                 userRepository: widget.userRepository,
               );
             }
@@ -1220,11 +1244,18 @@ class _RegisterSuccessOverlay extends StatefulWidget {
 
 class _RegisterSuccessOverlayState extends State<_RegisterSuccessOverlay> {
   Timer? _autoCloseTimer;
+  Route<dynamic>? _route;
 
   @override
   void initState() {
     super.initState();
     _autoCloseTimer = Timer(const Duration(seconds: 3), _close);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _route = ModalRoute.of(context);
   }
 
   @override
@@ -1235,10 +1266,16 @@ class _RegisterSuccessOverlayState extends State<_RegisterSuccessOverlay> {
 
   void _close() {
     if (!mounted) return;
-    final navigator = Navigator.of(context, rootNavigator: true);
-    if (navigator.canPop()) {
-      navigator.pop();
-    }
+
+    if (_route?.isCurrent != true) return;
+
+    final navigator = rootNavigatorKey.currentState;
+    if (navigator == null || !navigator.mounted || !navigator.canPop()) return;
+
+    _autoCloseTimer?.cancel();
+    _autoCloseTimer = null;
+
+    navigator.pop();
   }
 
   @override

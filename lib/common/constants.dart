@@ -35,6 +35,7 @@ const List<String> scopes = <String>[
 ];
 
 bool get pIsMobile => !kIsWeb && (Platform.isIOS || Platform.isAndroid);
+bool get pIsAndroid => !kIsWeb && Platform.isAndroid;
 bool get pIsWeb => kIsWeb;
 
 bool isMobile(BuildContext ctx) => MediaQuery.of(ctx).size.width < 650;

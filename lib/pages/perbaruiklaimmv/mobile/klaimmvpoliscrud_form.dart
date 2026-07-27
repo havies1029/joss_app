@@ -123,6 +123,9 @@ class KlaimmvpoliscrudFormPageFormState
     if (noPlat.isEmpty) {
       setErr('form.noPlat', 'No Plat tidak boleh kosong');
       ok = false;
+    } else if (!_isValidPlatNomor(noPlat)) {
+      setErr('form.noPlat', 'Format No Plat tidak valid');
+      ok = false;
     }
 
     final noChasis = fieldNoChasisController.text.trim();
@@ -168,6 +171,11 @@ class KlaimmvpoliscrudFormPageFormState
     }
 
     return ok;
+  }
+
+  bool _isValidPlatNomor(String value) {
+    return RegExp(r'^[A-Z]{1,2} [0-9]{1,4} [A-Z]{1,3}$')
+        .hasMatch(value.trim().toUpperCase());
   }
 
   void loadData() {
@@ -384,7 +392,7 @@ class KlaimmvpoliscrudFormPageFormState
       errorText: err('form.noPlat'),
       validator: (_) => err('form.noPlat'),
       onChanged: (value) {
-        if (value.trim().isNotEmpty) {
+        if (_isValidPlatNomor(value)) {
           clearErr('form.noPlat');
         }
         klaimmvpoliscrudBloc.add(FieldNoPlatChangedEvent(noPlat: value));
