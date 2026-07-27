@@ -11,11 +11,15 @@ class AppStarted extends AuthenticationEvent {}
 
 class LoggedIn extends AuthenticationEvent {
   final User user;
+  final String authenticatedFrom;
 
-  const LoggedIn({required this.user});
+  const LoggedIn({
+    required this.user,
+    this.authenticatedFrom = 'login_client',
+  });
 
   @override
-  List<Object> get props => [user];
+  List<Object> get props => [user, authenticatedFrom];
 }
 
 class LoggedOut extends AuthenticationEvent {}
@@ -24,7 +28,8 @@ class RequireLoginClient extends AuthenticationEvent {
   final String requiredFrom;
   final String errorMsg;
 
-  const RequireLoginClient({required this.requiredFrom, required this.errorMsg});
+  const RequireLoginClient(
+      {required this.requiredFrom, required this.errorMsg});
 
   @override
   List<Object> get props => [requiredFrom, errorMsg];
@@ -66,7 +71,8 @@ class UserAuthenticated extends AuthenticationEvent {
   final User user;
   final String authenticatedFrom;
 
-  const UserAuthenticated({required this.user, required this.authenticatedFrom});
+  const UserAuthenticated(
+      {required this.user, required this.authenticatedFrom});
 
   @override
   List<Object> get props => [user, authenticatedFrom];

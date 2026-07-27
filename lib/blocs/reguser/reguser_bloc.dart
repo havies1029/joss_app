@@ -26,6 +26,7 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     on<SetIsEmailEvent>(_onSetIsEmail);
     on<ResendOtpEvent>(onResendOtp);
     on<ClearRequestFromEvent>(_onClearRequestFrom);
+    on<SetRequestFromEvent>(_onSetRequestFrom);
   }
 
   @override
@@ -57,6 +58,13 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
 
   void _onSetIsEmail(SetIsEmailEvent event, Emitter<RegUserState> emit) {
     emit(state.copyWith(isEmail: event.isEmail));
+  }
+
+  void _onSetRequestFrom(
+    SetRequestFromEvent event,
+    Emitter<RegUserState> emit,
+  ) {
+    emit(state.copyWith(requestFrom: event.requestFrom));
   }
 
   bool _isClientLoginTokenInfo(List<String> info) {

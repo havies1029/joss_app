@@ -26,7 +26,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   void _clearEmailVerificationState() {
-    emailVerificationBloc.add(const FieldEmailVerificationChangedEvent(email: ''));
+    emailVerificationBloc
+        .add(const FieldEmailVerificationChangedEvent(email: ''));
   }
 
   Future<void> _onLoginButtonPressed(
@@ -54,11 +55,19 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
       _clearEmailVerificationState();
 
-      authenticationBloc.add(LoggedIn(user: user));
+      final authenticatedFrom = event.requestFrom.trim().isEmpty
+          ? 'login_client'
+          : event.requestFrom.trim();
+
+      authenticationBloc.add(
+        LoggedIn(
+          user: user,
+          authenticatedFrom: authenticatedFrom,
+        ),
+      );
       emit(LoginPostAuthenticate());
     } catch (error) {
       emit(LoginFailure(error: "username atau password salah"));
     }
   }
-
 }

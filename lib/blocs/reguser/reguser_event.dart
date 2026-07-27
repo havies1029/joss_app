@@ -72,3 +72,12 @@ class ResendOtpEvent extends RegUserEvents {
 class ClearRequestFromEvent extends RegUserEvents {
   const ClearRequestFromEvent();
 }
+
+class SetRequestFromEvent extends RegUserEvents {
+  final String requestFrom;
+
+  const SetRequestFromEvent(this.requestFrom);
+
+  @override
+  List<Object> get props => [requestFrom];
+}

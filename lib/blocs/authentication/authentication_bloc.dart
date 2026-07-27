@@ -95,7 +95,7 @@ class AuthenticationBloc
       LoggedIn event, Emitter<AuthenticationState> emit) async {
     emit(AuthenticationLoading());
     emit(AuthenticationAuthenticated(
-        user: event.user, authenticatedFrom: "login_client"));
+        user: event.user, authenticatedFrom: event.authenticatedFrom));
   }
 
   Future<void> _onLoggedOut(

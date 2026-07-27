@@ -898,6 +898,7 @@ class _AppState extends State<_App> {
   late bool _showOnboarding;
   final GlobalKey<NavigatorState> _navigatorKey = rootNavigatorKey;
   late RegUserBloc _regUserBloc;
+  String _pendingFlowRequestFrom = '';
 
   @override
   void initState() {
@@ -921,6 +922,53 @@ class _AppState extends State<_App> {
     await _navigatorKey.currentState?.push(
       MaterialPageRoute(builder: (_) => page),
     );
+  }
+
+  bool _isContinuationFlow(String authenticatedFrom) {
+    return authenticatedFrom.isNotEmpty &&
+        authenticatedFrom != 'daftarclient_page' &&
+        singlePopPages.contains(authenticatedFrom);
+  }
+
+  void _markPendingContinuationFlow(String requestFrom) {
+    if (!_isContinuationFlow(requestFrom)) return;
+
+    _pendingFlowRequestFrom = requestFrom;
+    if (_regUserBloc.state.requestFrom != requestFrom) {
+      _regUserBloc.add(SetRequestFromEvent(requestFrom));
+    }
+  }
+
+  void _popPendingContinuationRoute() {
+    final requestFrom = _pendingFlowRequestFrom;
+    final nav = _navigatorKey.currentState;
+    if (nav != null && nav.canPop()) {
+      nav.pop();
+    }
+    _pendingFlowRequestFrom = '';
+
+    if (requestFrom != 'calpar_page' && requestFrom != 'calmv_page') {
+      _regUserBloc.add(const ClearRequestFromEvent());
+    }
+  }
+
+  void _handlePendingGeneralDataLoaded({
+    required String mjenisClient,
+    required bool isDataComplete,
+  }) {
+    if (_pendingFlowRequestFrom.isEmpty) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _pendingFlowRequestFrom.isEmpty) return;
+
+      if (isDataComplete) {
+        _popPendingContinuationRoute();
+        return;
+      }
+
+      _showGeneralDataPopup(mjenisClient);
+      _pendingFlowRequestFrom = '';
+    });
   }
 
   void _showGeneralDataPopup(String? mjenisClient) {
@@ -974,7 +1022,6 @@ class _AppState extends State<_App> {
                 final nav = _navigatorKey.currentState;
                 if (nav == null) return;
 
-                final mjenisClient = _regUserBloc.state.record?.jnsClientId;
                 if (state.authenticatedFrom == 'daftarclient_page') {
                   while (nav.canPop()) {
                     nav.pop();
@@ -982,10 +1029,7 @@ class _AppState extends State<_App> {
                   return;
                 }
                 if (singlePopPages.contains(state.authenticatedFrom)) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (!mounted) return;
-                    _showGeneralDataPopup(mjenisClient);
-                  });
+                  _markPendingContinuationFlow(state.authenticatedFrom);
                 } else {
                   while (nav.canPop()) {
                     nav.pop();
@@ -993,6 +1037,26 @@ class _AppState extends State<_App> {
                 }
               });
             }
+          },
+        ),
+        BlocListener<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
+          listenWhen: (previous, current) =>
+              previous.isLoaded != current.isLoaded && current.isLoaded,
+          listener: (_, state) {
+            _handlePendingGeneralDataLoaded(
+              mjenisClient: '10',
+              isDataComplete: state.isDataComplete,
+            );
+          },
+        ),
+        BlocListener<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
+          listenWhen: (previous, current) =>
+              previous.isLoaded != current.isLoaded && current.isLoaded,
+          listener: (_, state) {
+            _handlePendingGeneralDataLoaded(
+              mjenisClient: '20',
+              isDataComplete: state.isDataComplete,
+            );
           },
         ),
       ],
