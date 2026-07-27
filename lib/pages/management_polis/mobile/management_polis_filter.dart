@@ -51,7 +51,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _bootstrapped = true;
-      refreshData();
+      context.read<CobManPolBloc>().add(RefreshCobManPolEvent());
+      context.read<StatusAsetCariBloc>().add(RefreshStatusAsetCariEvent());
     });
   }
 
@@ -115,35 +116,147 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       children: [
         MultiBlocListener(
           listeners: [
-            BlocListener<StatusAsetCariBloc, StatusAsetCariState>(
-              listenWhen: (prev, curr) =>
-                  prev.selectedStatusId != curr.selectedStatusId,
-              listener: (context, state) {
-                if (!_bootstrapped) return;
-                refreshData(); // ini akan memanggil LoadingFlowStart
-              },
-            ),
             BlocListener<CobManPolBloc, CobManPolState>(
               listenWhen: (prev, curr) =>
+                  prev.status != curr.status ||
+                  prev.items != curr.items ||
                   prev.selectedCOBId != curr.selectedCOBId,
               listener: (context, state) {
+                if (state.status == ListStatus.success &&
+                    state.selectedCOBId.isEmpty &&
+                    state.items.isNotEmpty) {
+                  context
+                      .read<CobManPolBloc>()
+                      .add(SelectCobButton(state.items.first.mCobApp1Id));
+                  return;
+                }
+
                 if (!_bootstrapped) return;
                 if (state.selectedCOBId.isNotEmpty) refreshData();
               },
             ),
+            BlocListener<StatusAsetCariBloc, StatusAsetCariState>(
+              listenWhen: (prev, curr) =>
+                  prev.status != curr.status ||
+                  prev.items != curr.items ||
+                  prev.selectedStatusId != curr.selectedStatusId,
+              listener: (context, state) {
+                if (state.status == ListStatus.success &&
+                    state.selectedStatusId.isEmpty &&
+                    state.items.isNotEmpty) {
+                  final allowedIds = {"10001", "10002", "10003", "10004"};
+                  final selected = state.items.firstWhere(
+                    (item) => allowedIds.contains(item.mstatusasetId),
+                    orElse: () => state.items.first,
+                  );
+
+                  context
+                      .read<StatusAsetCariBloc>()
+                      .add(SelectStatusAsetButton(selected.mstatusasetId));
+                  return;
+                }
+
+                if (!_bootstrapped) return;
+                refreshData();
+              },
+            ),
           ],
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildHeader(context),
-              BlocBuilder<CobManPolBloc, CobManPolState>(
-                builder: (context, state) => _buildBodyByCob(context, state),
-              ),
-            ],
-          ),
+          child: Builder(builder: _buildContent),
         ),
       ],
     );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    final cobState = context.watch<CobManPolBloc>().state;
+    final statusState = context.watch<StatusAsetCariBloc>().state;
+    final flowState = context.watch<LoadingFlowBloc>().state;
+    final cobId = cobState.selectedCOBId;
+    final statusId = statusState.selectedStatusId;
+    final targetStatus = _targetStatus(context, cobId);
+    final targetEmpty = _targetIsEmpty(context, cobId);
+
+    final isMasterLoading =
+        _isListLoading(cobState.status) || _isListLoading(statusState.status);
+    final isSelectionWaiting = cobState.status == ListStatus.success &&
+        statusState.status == ListStatus.success &&
+        (cobId.trim().isEmpty || statusId.trim().isEmpty);
+    final isTargetLoading = _isListLoading(targetStatus);
+    final isFlowLoading = flowState.status == LoadingFlowStatus.loading;
+
+    if (isMasterLoading ||
+        isSelectionWaiting ||
+        isTargetLoading ||
+        isFlowLoading) {
+      return _fullState(const LoadingIndicator());
+    }
+
+    if (cobState.status == ListStatus.failure ||
+        statusState.status == ListStatus.failure ||
+        targetStatus == ListStatus.failure) {
+      return _fullState(const Text('Failed to fetch data'));
+    }
+
+    if (targetStatus == ListStatus.success && targetEmpty) {
+      return _fullState(EmptyStateWidget(statusId: statusId));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildHeader(context),
+        _buildBodyByCob(context, cobState),
+      ],
+    );
+  }
+
+  bool _isListLoading(ListStatus status) {
+    return status == ListStatus.initial || status == ListStatus.loadingMore;
+  }
+
+  Widget _fullState(Widget child) {
+    return Container(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height * 0.55,
+      color: secondaryBlackColor,
+      child: Center(child: child),
+    );
+  }
+
+  ListStatus _targetStatus(BuildContext context, String cobId) {
+    switch (cobId) {
+      case "10001":
+        return context.watch<AsetRingkasanCariBloc>().state.status;
+      case "10002":
+        return context.watch<AsetParCariBloc>().state.status;
+      case "10003":
+        return context.watch<AsetMvCariBloc>().state.status;
+      case "10004":
+        return context.watch<AsethullCariBloc>().state.status;
+      case "10005":
+        return context.watch<AsetHealthCariBloc>().state.status;
+      default:
+        if (cobId.trim().isEmpty) return ListStatus.initial;
+        return context.watch<AsetothersCariBloc>().state.status;
+    }
+  }
+
+  bool _targetIsEmpty(BuildContext context, String cobId) {
+    switch (cobId) {
+      case "10001":
+        return context.watch<AsetRingkasanCariBloc>().state.items.isEmpty;
+      case "10002":
+        return context.watch<AsetParCariBloc>().state.items.isEmpty;
+      case "10003":
+        return context.watch<AsetMvCariBloc>().state.items.isEmpty;
+      case "10004":
+        return context.watch<AsethullCariBloc>().state.items.isEmpty;
+      case "10005":
+        return context.watch<AsetHealthCariBloc>().state.items.isEmpty;
+      default:
+        if (cobId.trim().isEmpty) return true;
+        return context.watch<AsetothersCariBloc>().state.items.isEmpty;
+    }
   }
 
   Widget _buildHeader(BuildContext context) {
@@ -590,69 +703,27 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
             timeoutMs: 15000,
           ),
         );
-
-    if (cleanCobId == "10001") {
-      context.read<AsetRingkasanCariBloc>().add(
-            RefreshAsetRingkasanCariEvent(
-                statusId: statusId, searchText: searchText),
-          );
-      return;
-    }
-
-    if (cleanCobId == "10002") {
-      context.read<AsetParCariBloc>().add(
-            RefreshAsetParCariEvent(statusId: statusId, searchText: searchText),
-          );
-      return;
-    }
-
-    if (cleanCobId == "10003") {
-      context.read<AsetMvCariBloc>().add(
-            RefreshAsetMvCariEvent(statusId: statusId, searchText: searchText),
-          );
-      return;
-    }
-
-    if (cleanCobId == "10004") {
-      context.read<AsethullCariBloc>().add(
-            RefreshAsethullCariEvent(
-                statusId: statusId, searchText: searchText),
-          );
-      return;
-    }
-
-    if (cleanCobId == "10005") {
-      context.read<AsetHealthCariBloc>().add(
-            RefreshAsetHealthCariEvent(
-                statusId: statusId, searchText: searchText),
-          );
-      return;
-    }
-
-    context.read<AsetothersCariBloc>().add(
-          RefreshAsetothersCariEvent(
-            statusId: statusId,
-            searchText: searchText,
-            cobId: cleanCobId,
-          ),
-        );
   }
 
   bool hasSelected(BuildContext context) {
     final cobId = _cobId();
 
-    if (cobId == "10002")
+    if (cobId == "10002") {
       return context
           .select((AsetParCariBloc b) => b.state.selectedIds.isNotEmpty);
-    if (cobId == "10003")
+    }
+    if (cobId == "10003") {
       return context
           .select((AsetMvCariBloc b) => b.state.selectedIds.isNotEmpty);
-    if (cobId == "10004")
+    }
+    if (cobId == "10004") {
       return context
           .select((AsethullCariBloc b) => b.state.selectedIds.isNotEmpty);
-    if (cobId == "10005")
+    }
+    if (cobId == "10005") {
       return context
           .select((AsetHealthCariBloc b) => b.state.selectedIds.isNotEmpty);
+    }
 
     // ringkasan 10001 (kalau nanti kamu punya selectedIds di ringkasan, tinggal tambah)
     // default => others
@@ -772,7 +843,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                 "No": d.nomor,
                 // "No Polis": d.polisNo,
                 "Nilai Pertanggungan": d.jmlObject,
-                "Status": d.status ?? "-",
+                "Status": d.status,
               })
           .toList();
     }
@@ -988,5 +1059,4 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       }
     }
   }
-
 }

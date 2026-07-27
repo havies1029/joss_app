@@ -48,6 +48,7 @@ AppBar MobileTopNavigationBar({
                       : isTablet(context)
                           ? 140
                           : 120,
+                  fit: BoxFit.contain,
                 ),
                 Expanded(child: SizedBox()),
                 BlocBuilder<AuthenticationBloc, AuthenticationState>(

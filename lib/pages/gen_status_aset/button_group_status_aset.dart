@@ -10,14 +10,19 @@ class ButtonGroupStatusAsetWidget extends StatefulWidget {
   const ButtonGroupStatusAsetWidget({super.key});
 
   @override
-  State<ButtonGroupStatusAsetWidget> createState() => _ButtonGroupStatusAsetWidgetState();
+  State<ButtonGroupStatusAsetWidget> createState() =>
+      _ButtonGroupStatusAsetWidgetState();
 }
 
-class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidget> {
+class _ButtonGroupStatusAsetWidgetState
+    extends State<ButtonGroupStatusAsetWidget> {
   @override
   void initState() {
     super.initState();
-    context.read<StatusAsetCariBloc>().add(RefreshStatusAsetCariEvent());
+    final state = context.read<StatusAsetCariBloc>().state;
+    if (state.status == ListStatus.initial && state.items.isEmpty) {
+      context.read<StatusAsetCariBloc>().add(RefreshStatusAsetCariEvent());
+    }
   }
 
   @override
@@ -35,7 +40,8 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
         }
 
         if (state.status == ListStatus.failure) {
-          return const Text("Gagal memuat data", style: TextStyle(color: Colors.red));
+          return const Text("Gagal memuat data",
+              style: TextStyle(color: Colors.red));
         }
 
         if (state.status == ListStatus.success) {
@@ -46,8 +52,8 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
               context.read<StatusAsetCariBloc>().add(
-                SelectStatusAsetButton(state.items.first.mstatusasetId),
-              );
+                    SelectStatusAsetButton(state.items.first.mstatusasetId),
+                  );
             });
           }
 
@@ -83,13 +89,16 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
                 final isSelected = state.selectedStatusId == id;
 
                 return Padding(
-                  padding: EdgeInsets.only(right: i < items.length - 1 ? 10 : 0),
+                  padding:
+                      EdgeInsets.only(right: i < items.length - 1 ? 10 : 0),
                   child: StatusChip(
                     statusId: id,
                     label: statusNama(id),
                     isSelected: isSelected,
                     onTap: () {
-                      context.read<StatusAsetCariBloc>().add(SelectStatusAsetButton(id));
+                      context
+                          .read<StatusAsetCariBloc>()
+                          .add(SelectStatusAsetButton(id));
                     },
                   ),
                 );

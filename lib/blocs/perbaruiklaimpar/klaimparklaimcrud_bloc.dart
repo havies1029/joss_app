@@ -312,7 +312,6 @@ class KlaimparklaimcrudBloc
         _hasText(record.picNama) &&
         _hasText(record.picJabatan) &&
         _hasText(record.picEmail) &&
-        _hasText(record.picTelp) &&
         _hasValue(record.currId) &&
         record.klaimAmount > 0;
   }

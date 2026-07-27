@@ -88,7 +88,7 @@ class KlaimparklaimcrudModel {
         'picEmail': picEmail,
         'picJabatan': picJabatan,
         'picNama': picNama,
-        'picTelp': picTelp,
+        'picTelp': picTelp.trim().isEmpty ? null : picTelp,
         'mjenisrugiId': mjenisrugiId,
         'comboMJenisrugi': comboMJenisrugi?.toJson(),
         'cobId': cobId,

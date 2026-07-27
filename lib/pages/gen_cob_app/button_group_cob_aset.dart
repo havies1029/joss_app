@@ -3,18 +3,23 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/gen_cob_app/cobmanpol_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/common/loading_indicator.dart';
+
 class ButtonGroupCobAsetWidget extends StatefulWidget {
   const ButtonGroupCobAsetWidget({super.key});
 
   @override
-  State<ButtonGroupCobAsetWidget> createState() => _ButtonGroupCobAsetWidgetState();
+  State<ButtonGroupCobAsetWidget> createState() =>
+      _ButtonGroupCobAsetWidgetState();
 }
 
 class _ButtonGroupCobAsetWidgetState extends State<ButtonGroupCobAsetWidget> {
   @override
   void initState() {
     super.initState();
-    context.read<CobManPolBloc>().add(RefreshCobManPolEvent());
+    final state = context.read<CobManPolBloc>().state;
+    if (state.status == ListStatus.initial && state.items.isEmpty) {
+      context.read<CobManPolBloc>().add(RefreshCobManPolEvent());
+    }
   }
 
   @override
@@ -36,7 +41,8 @@ class _ButtonGroupCobAsetWidgetState extends State<ButtonGroupCobAsetWidget> {
         }
 
         if (state.status == ListStatus.failure) {
-          return const Text("Gagal memuat data", style: TextStyle(color: Colors.red));
+          return const Text("Gagal memuat data",
+              style: TextStyle(color: Colors.red));
         }
 
         if (state.status == ListStatus.success) {
@@ -83,7 +89,9 @@ class _ButtonGroupCobAsetWidgetState extends State<ButtonGroupCobAsetWidget> {
                   vertical: 5,
                 ),
                 onSelected: (_) {
-                  context.read<CobManPolBloc>().add(SelectCobButton(cob.mCobApp1Id));
+                  context
+                      .read<CobManPolBloc>()
+                      .add(SelectCobButton(cob.mCobApp1Id));
                 },
               ),
             );

@@ -59,6 +59,7 @@ class KlaimparklaimcrudFormPageFormState
   int fieldPicTelpCountryCode = InternationalPhoneHelper.defaultCountryCode;
 
   bool isPolisJps = false;
+  String? _hydratedRecordKey;
 
   final fieldCobNamaController = TextEditingController();
 
@@ -129,14 +130,11 @@ class KlaimparklaimcrudFormPageFormState
     }
 
     final telp = fieldPicTelpController.text.trim();
-
-    if (telp.isEmpty) {
-      setErr('form.picTelp', kPhoneNumberNullError);
-      ok = false;
-    } else {
+    if (telp.isNotEmpty) {
       final phoneRes = InternationalPhoneHelper.normalize(
         telp,
         countryCode: fieldPicTelpCountryCode,
+        required: false,
       );
       if (!phoneRes.isValid) {
         setErr('form.picTelp', phoneRes.error ?? "Nomor telepon tidak valid");
@@ -208,6 +206,7 @@ class KlaimparklaimcrudFormPageFormState
     final phoneRes = InternationalPhoneHelper.normalize(
       fieldPicTelpController.text.trim(),
       countryCode: fieldPicTelpCountryCode,
+      required: false,
     );
 
     klaimparklaimcrudBloc.add(FieldPicTelpChangedEvent(
@@ -323,21 +322,13 @@ class KlaimparklaimcrudFormPageFormState
       listener: (context, state) {
         if (state.isLoaded) {
           if (state.record != null) {
-            fieldDolController.text = _dateToText(state.record!.dol);
-            fieldKeteranganController.text = state.record!.keterangan;
-            fieldLaporAsuransiController.text =
-                _dateToText(state.record!.laporAsuransi);
-            fieldLaporJpsController.text = _dateToText(state.record!.laporJps);
-            fieldPenyebabController.text = state.record!.penyebab;
-            fieldPicEmailController.text = state.record!.picEmail;
-            fieldPicJabatanController.text = state.record!.picJabatan;
-            fieldPicNamaController.text = state.record!.picNama;
-            fieldComboRMatauang = state.comboRMatauang;
-            _setPicTelpFromRaw(state.record?.picTelp ?? '');
-            isPolisJps = state.record?.isPolisJps ?? false;
-            fieldCobNamaController.text = state.record!.cobNama;
-            fieldKlaimAmountController.text =
-                NumberFormat("#,###").format(state.record!.klaimAmount);
+            final recordKey = state.record!.klaim1Id.isNotEmpty
+                ? state.record!.klaim1Id
+                : widget.recordId;
+            if (_hydratedRecordKey != recordKey) {
+              _hydrateFieldsFromRecord(state);
+              _hydratedRecordKey = recordKey;
+            }
           }
           fieldComboMJenisrugi = state.comboMJenisrugi;
           if (mounted) {
@@ -574,11 +565,13 @@ class KlaimparklaimcrudFormPageFormState
           final phoneRes = InternationalPhoneHelper.normalize(
             telp,
             countryCode: fieldPicTelpCountryCode,
+            required: false,
           );
           if (phoneRes.isValid) {
             clearErr('form.picTelp');
-          } else {
-            setErr('form.picTelp', phoneRes.error ?? "Nomor telepon tidak valid");
+          } else if (err('form.picTelp') != null) {
+            setErr(
+                'form.picTelp', phoneRes.error ?? "Nomor telepon tidak valid");
           }
         }
 
@@ -598,13 +591,35 @@ class KlaimparklaimcrudFormPageFormState
 
   void _setPicTelpFromRaw(String rawPhone) {
     final digits = InternationalPhoneHelper.clean(rawPhone);
+    if (digits.isEmpty) {
+      fieldPicTelpController.clear();
+      return;
+    }
+
     final detected = InternationalPhoneHelper.detectCountry(digits);
-    fieldPicTelpCountryCode =
-        detected?.dialCode ?? InternationalPhoneHelper.defaultCountryCode;
+    fieldPicTelpCountryCode = detected?.dialCode ?? fieldPicTelpCountryCode;
     fieldPicTelpController.text = InternationalPhoneHelper.toNationalInput(
       rawPhone,
       countryCode: fieldPicTelpCountryCode,
     );
+  }
+
+  void _hydrateFieldsFromRecord(KlaimparklaimcrudState state) {
+    final record = state.record!;
+    fieldDolController.text = _dateToText(record.dol);
+    fieldKeteranganController.text = record.keterangan;
+    fieldLaporAsuransiController.text = _dateToText(record.laporAsuransi);
+    fieldLaporJpsController.text = _dateToText(record.laporJps);
+    fieldPenyebabController.text = record.penyebab;
+    fieldPicEmailController.text = record.picEmail;
+    fieldPicJabatanController.text = record.picJabatan;
+    fieldPicNamaController.text = record.picNama;
+    fieldComboRMatauang = state.comboRMatauang;
+    _setPicTelpFromRaw(record.picTelp);
+    isPolisJps = record.isPolisJps;
+    fieldCobNamaController.text = record.cobNama;
+    fieldKlaimAmountController.text =
+        NumberFormat("#,###").format(record.klaimAmount);
   }
 
   Widget buildFieldCurrId() {
