@@ -97,7 +97,7 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
 
     if (state.status != ListStatus.success || state.klaimRasio.cobs.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Tidak ada data untuk diexport"));
+          .showSnackBar(errorSnackBar("Maaf data tidak tersedia"));
       return;
     }
 
@@ -125,7 +125,7 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
                 if (allDetails.isEmpty) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                      infoSnackBar("Tidak ada data untuk diekspor"));
+                      errorSnackBar("Maaf data tidak tersedia"));
                   return;
                 }
 
@@ -218,7 +218,7 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
     if (state.status != ListStatus.success ||
         state.klaimRasio.cobs.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        infoSnackBar("Tidak ada data untuk dibagikan"),
+        errorSnackBar("Maaf data tidak tersedia"),
       );
       return;
     }
@@ -228,7 +228,7 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
 
     if (allDetails.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        infoSnackBar("Tidak ada data untuk dibagikan"),
+        errorSnackBar("Maaf data tidak tersedia"),
       );
       return;
     }

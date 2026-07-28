@@ -26,6 +26,7 @@ class KlaimRingkasanMainPage extends StatefulWidget {
 
 class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
   final TextEditingController _searchController = TextEditingController();
+  bool _hasShownContent = false;
 
   @override
   void initState() {
@@ -49,25 +50,18 @@ class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
       buildWhen: (previous, current) =>
           previous.status != current.status || previous.items != current.items,
       builder: (context, state) {
-        if (state.status == ListStatus.initial ||
-            state.status == ListStatus.loadingMore) {
+        final isLoading = state.status == ListStatus.initial ||
+            state.status == ListStatus.loadingMore;
+
+        if (!_hasShownContent && isLoading) {
           return const Center(child: LoadingIndicator());
         }
 
-        if (state.status == ListStatus.failure) {
+        if (!_hasShownContent && state.status == ListStatus.failure) {
           return const Center(child: Text('Failed to fetch data'));
         }
 
-        if (state.items.isEmpty) {
-          return const Center(
-            child: EmptyStatePage(
-              iconPath: 'assets/icons/belipolis_no_file.svg',
-              title: 'Tidak ada Klaim',
-              description:
-                  'Klaim yang Anda ajukan akan muncul di sini ketika tersedia.',
-            ),
-          );
-        }
+        _hasShownContent = true;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -186,7 +180,7 @@ class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
     final rows = _exportRows();
     if (rows.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Tidak ada data untuk diekspor"));
+          .showSnackBar(errorSnackBar("Maaf data tidak tersedia"));
       return;
     }
 
@@ -266,7 +260,7 @@ class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
 
     if (rows.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Tidak ada data untuk dibagikan"));
+          .showSnackBar(errorSnackBar("Maaf data tidak tersedia"));
       return;
     }
 

@@ -28,6 +28,7 @@ class RingkasanPageState extends State<RingkasanPage> {
   late DnrekapcobCariBloc dnrekapcobCariBloc;
 
   bool _firstLoading = true;
+  bool _hasShownContent = false;
 
   @override
   void initState() {
@@ -93,12 +94,15 @@ class RingkasanPageState extends State<RingkasanPage> {
         backgroundColor: secondaryBlackColor,
         body: BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
           builder: (context, state) {
-            if (_firstLoading || state.status != ListStatus.success) {
+            final isLoading =
+                _firstLoading || state.status != ListStatus.success;
+
+            if (!_hasShownContent && isLoading) {
               return const Center(child: LoadingIndicator());
             }
 
-            if (state.items.isEmpty) {
-              return const Center(child: Text("Data kosong"));
+            if (!isLoading) {
+              _hasShownContent = true;
             }
 
             return Stack(
@@ -120,17 +124,11 @@ class RingkasanPageState extends State<RingkasanPage> {
                                   previous.items != current.items;
                             },
                             builder: (context, state) {
-                              final bool isEmpty =
-                                  state.status != ListStatus.success ||
-                                      state.items.isEmpty;
-
                               return PolisButton(
                                 assetPath: "assets/icons/unduh.svg",
                                 bgColor: const Color(0xFFA1A1AA),
                                 borderColor: const Color(0xFFBCBCC7),
-                                onTap: isEmpty
-                                    ? null
-                                    : () => _showExportDialog(context),
+                                onTap: () => _showExportDialog(context),
                                 iconSize: 16,
                                 height: 36,
                                 width: 36,
@@ -144,15 +142,11 @@ class RingkasanPageState extends State<RingkasanPage> {
                                   previous.items != current.items;
                             },
                             builder: (context, state) {
-                              final bool isEmpty =
-                                  state.status != ListStatus.success ||
-                                      state.items.isEmpty;
-
                               return PolisButton(
                                 assetPath: "assets/icons/bagikan.svg",
                                 bgColor: const Color(0xFF295EFF),
                                 borderColor: const Color(0xFF5D86FF),
-                                onTap: isEmpty ? null : () => _onShare(context),
+                                onTap: () => _onShare(context),
                                 iconSize: 16,
                                 height: 36,
                                 width: 36,
@@ -250,7 +244,7 @@ class RingkasanPageState extends State<RingkasanPage> {
 
     if (state.items.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        infoSnackBar("Tidak ada data untuk diunduh"),
+        errorSnackBar("Maaf data tidak tersedia"),
       );
       return;
     }
@@ -278,7 +272,7 @@ class RingkasanPageState extends State<RingkasanPage> {
                 if (allItems.isEmpty) {
                   Navigator.pop(dialogContext);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    errorSnackBar("Tidak ada data untuk diunduh"),
+                    errorSnackBar("Maaf data tidak tersedia"),
                   );
                   return;
                 }
@@ -360,7 +354,7 @@ class RingkasanPageState extends State<RingkasanPage> {
 
     if (state.items.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Tidak ada data untuk dibagikan"));
+          .showSnackBar(errorSnackBar("Maaf data tidak tersedia"));
       return;
     }
 

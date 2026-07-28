@@ -53,7 +53,7 @@ class MRekanGeneralCmpCrudFormPageFormState
     super.initState();
     mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
 
-    // mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudResetStatusEvent());
+    mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudResetStatusEvent());
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadData();
@@ -163,7 +163,9 @@ class MRekanGeneralCmpCrudFormPageFormState
                               .add(MRekan1CrudReloadEvent());
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                            successSnackBar("Data berhasil disimpan!"),
+                            successSnackBar(
+                              "Informasi klien berhasil disimpan!",
+                            ),
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(

@@ -30,6 +30,7 @@ class KlaimRincianMainPage extends StatefulWidget {
 class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
   late GroupcobCariBloc groupcobCariBloc;
   final TextEditingController _searchController = TextEditingController();
+  bool _hasShownContent = false;
 
   @override
   void initState() {
@@ -91,12 +92,14 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
             current.status != previous.status ||
             current.items != previous.items,
         builder: (context, state) {
-          if (state.status == ListStatus.initial ||
-              state.status == ListStatus.loadingMore) {
+          final isLoading = state.status == ListStatus.initial ||
+              state.status == ListStatus.loadingMore;
+
+          if (!_hasShownContent && isLoading) {
             return const Center(child: LoadingIndicator());
           }
 
-          if (state.status == ListStatus.failure) {
+          if (!_hasShownContent && state.status == ListStatus.failure) {
             return const Center(
               child: Text(
                 'Gagal memuat data',
@@ -105,16 +108,7 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
             );
           }
 
-          if (state.items.isEmpty) {
-            return const Center(
-              child: EmptyStatePage(
-                iconPath: 'assets/icons/belipolis_no_file.svg',
-                title: 'Tidak ada Rincian Klaim',
-                description:
-                    'Detail klaim akan muncul di sini ketika tersedia.',
-              ),
-            );
-          }
+          _hasShownContent = true;
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -249,6 +243,12 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
   void _showExportDialog(BuildContext context) {
     final data = _getExportRows();
 
+    if (data.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(errorSnackBar("Maaf data tidak tersedia"));
+      return;
+    }
+
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -343,7 +343,7 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
 
     if (data.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Tidak ada data untuk dibagikan"));
+          .showSnackBar(errorSnackBar("Maaf data tidak tersedia"));
       return;
     }
 

@@ -38,6 +38,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
 
   bool _isCardWebViewOpen = false;
   bool _hasHandledPaymentCancel = false;
+  bool _hasShownContent = false;
 
   @override
   void initState() {
@@ -246,39 +247,17 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
         resizeToAvoidBottomInset: true,
         body: BlocBuilder<HistorybayarCariBloc, HistorybayarCariState>(
           builder: (context, state) {
-            if (state.status != ListStatus.success) {
+            final isLoading = state.status != ListStatus.success;
+
+            if (!_hasShownContent && isLoading) {
               return Container(
                 color: secondaryBlackColor,
                 child: const Center(child: LoadingIndicator()),
               );
             }
 
-            if (state.items.isEmpty) {
-              return Container(
-                color: secondaryBlackColor,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      keyboardDismissBehavior:
-                          ScrollViewKeyboardDismissBehavior.onDrag,
-                      padding: const EdgeInsets.only(bottom: 24),
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight,
-                        ),
-                        child: const Center(
-                          child: EmptyStatePage(
-                            iconPath: 'assets/icons/belipolis_no_file.svg',
-                            title: 'Tidak ada Riwayat Pembayaran',
-                            description:
-                                'Riwayat pembayaran yang telah dilakukan akan muncul di sini',
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              );
+            if (!isLoading) {
+              _hasShownContent = true;
             }
 
             return Container(

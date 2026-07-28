@@ -206,8 +206,14 @@ class MRekanGeneralCmpPopUpPageFormState
                               if (!state.isSaved) return;
 
                               if (!state.hasFailure) {
+                                context
+                                    .read<MRekan1CrudBloc>()
+                                    .add(MRekan1CrudReloadEvent());
+
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  successSnackBar("Data berhasil disimpan!"),
+                                  successSnackBar(
+                                    "Informasi klien berhasil disimpan!",
+                                  ),
                                 );
 
                                 mRekanGeneralCmpCrudBloc.add(

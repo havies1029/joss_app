@@ -46,6 +46,7 @@ class _RincianPageState extends State<RincianPage> {
   bool _firstLoading = true;
   bool _isCardWebViewOpen = false;
   bool _hasHandledPaymentCancel = false;
+  bool _hasShownContent = false;
 
   Set<String> getSelectedCurrSet(DnRekap2invState state) {
     return state.rincianSOA.headers
@@ -296,25 +297,17 @@ class _RincianPageState extends State<RincianPage> {
           builder: (context, state) {
             final bool isWaitingForResult =
                 !state.isProcessed && !state.hasFailure;
+            final bool isLoading =
+                _firstLoading || state.isProcessing || isWaitingForResult;
 
-            if (_firstLoading || state.isProcessing || isWaitingForResult) {
+            if (!_hasShownContent && isLoading) {
               return const Center(
                 child: LoadingIndicator(),
               );
             }
 
-            if (state.rincianSOA.headers.isEmpty) {
-              return const Center(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.only(bottom: 24),
-                  child: EmptyStatePage(
-                    iconPath: 'assets/icons/belipolis_no_file.svg',
-                    title: 'Tidak ada Rincian Tagihan',
-                    description:
-                        'Detail tagihan pembayaran akan muncul di sini ketika tersedia.',
-                  ),
-                ),
-              );
+            if (!isLoading) {
+              _hasShownContent = true;
             }
 
             return Stack(
@@ -348,16 +341,11 @@ class _RincianPageState extends State<RincianPage> {
                                   current.rincianSOA.headers;
                             },
                             builder: (context, state) {
-                              final bool isEmpty =
-                                  state.rincianSOA.headers.isEmpty;
-
                               return PolisButton(
                                 assetPath: "assets/icons/unduh.svg",
                                 bgColor: const Color(0xFFA1A1AA),
                                 borderColor: const Color(0xFFBCBCC7),
-                                onTap: isEmpty
-                                    ? null
-                                    : () => _showExportDialog(context),
+                                onTap: () => _showExportDialog(context),
                                 iconSize: 16,
                                 height: 36,
                                 width: 36,
@@ -371,14 +359,11 @@ class _RincianPageState extends State<RincianPage> {
                                   current.rincianSOA.headers;
                             },
                             builder: (context, state) {
-                              final bool isEmpty =
-                                  state.rincianSOA.headers.isEmpty;
-
                               return PolisButton(
                                 assetPath: "assets/icons/bagikan.svg",
                                 bgColor: const Color(0xFF295EFF),
                                 borderColor: const Color(0xFF5D86FF),
-                                onTap: isEmpty ? null : () => _onShare(context),
+                                onTap: () => _onShare(context),
                                 iconSize: 16,
                                 height: 36,
                                 width: 36,
@@ -392,6 +377,12 @@ class _RincianPageState extends State<RincianPage> {
                     Expanded(
                       child: BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
                         builder: (context, state) {
+                          final bool isWaitingForResult =
+                              !state.isProcessed && !state.hasFailure;
+                          if (state.isProcessing || isWaitingForResult) {
+                            return const Center(child: LoadingIndicator());
+                          }
+
                           final bool isEmpty = state.rincianSOA.headers.isEmpty;
 
                           if (isEmpty) {
@@ -577,7 +568,7 @@ class _RincianPageState extends State<RincianPage> {
 
     if (allDetails.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Tidak ada data untuk diunduh"));
+          .showSnackBar(errorSnackBar("Maaf data tidak tersedia"));
       return;
     }
 
@@ -603,7 +594,7 @@ class _RincianPageState extends State<RincianPage> {
                 if (selectedDetails.isEmpty) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                      errorSnackBar("Tidak ada data untuk diunduh"));
+                      errorSnackBar("Maaf data tidak tersedia"));
                   return;
                 }
 
@@ -728,7 +719,7 @@ class _RincianPageState extends State<RincianPage> {
 
     if (allDetails.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Tidak ada data untuk dibagikan"));
+          .showSnackBar(errorSnackBar("Maaf data tidak tersedia"));
       return;
     }
 
@@ -740,7 +731,7 @@ class _RincianPageState extends State<RincianPage> {
 
     if (selectedDetails.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(errorSnackBar("Tidak ada data untuk dibagikan"));
+          .showSnackBar(errorSnackBar("Maaf data tidak tersedia"));
       return;
     }
 

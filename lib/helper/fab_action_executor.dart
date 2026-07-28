@@ -25,6 +25,12 @@ class FabActionExecutor {
     ScaffoldMessenger.of(context).showSnackBar(infoSnackBar(message));
   }
 
+  void _emptyDataSnack(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      errorSnackBar("Maaf data tidak tersedia"),
+    );
+  }
+
   bool? _boolFlag(Object item, String field) {
     try {
       final dyn = item as dynamic;
@@ -195,6 +201,12 @@ class FabActionExecutor {
       }
     }
 
+    if (_isDownloadAction(actionType) &&
+        !_hasDownloadFileId(selectedItem, actionType)) {
+      _emptyDataSnack(context);
+      return;
+    }
+
     final allowed = policy.isActionAllowed(
       cobId: cobId,
       statusId: statusId,
@@ -333,9 +345,47 @@ class FabActionExecutor {
     ).then((_) => onComplete?.call());
   }
 
+  bool _isDownloadAction(ActionType actionType) {
+    return actionType == ActionType.unduhPolis ||
+        actionType == ActionType.lihatPolis ||
+        actionType == ActionType.lihatPolisPar ||
+        actionType == ActionType.lihatPolisEq;
+  }
+
+  String _readStringField(dynamic item, String field) {
+    try {
+      final raw = switch (field) {
+        'filePolisId' => item.filePolisId,
+        'filePolisParId' => item.filePolisParId,
+        'filePolisEqId' => item.filePolisEqId,
+        _ => null,
+      };
+      return (raw ?? "").toString();
+    } catch (_) {
+      if (item is Map) return (item[field] ?? "").toString();
+      return "";
+    }
+  }
+
+  bool _hasDownloadFileId(
+    dynamic item,
+    ActionType actionType,
+  ) {
+    return switch (actionType) {
+      ActionType.lihatPolisPar =>
+        _readStringField(item, 'filePolisParId').isNotEmpty,
+      ActionType.lihatPolisEq =>
+        _readStringField(item, 'filePolisEqId').isNotEmpty,
+      _ => _readStringField(item, 'filePolisId').isNotEmpty,
+    };
+  }
+
   void _downloadGeneric(BuildContext c, String cobId, dynamic item) {
-    final polisFileId = (item.filePolisId ?? "").toString();
-    if (polisFileId.isEmpty) return;
+    final polisFileId = _readStringField(item, 'filePolisId');
+    if (polisFileId.isEmpty) {
+      _emptyDataSnack(c);
+      return;
+    }
 
     final bloc = c.read<SppaDownloadPolisBloc>();
 
@@ -351,8 +401,11 @@ class FabActionExecutor {
 
   void _downloadPar(BuildContext c, dynamic item) {
     // ignore: avoid_dynamic_calls
-    final id = (item.filePolisParId ?? "").toString();
-    if (id.isEmpty) return;
+    final id = _readStringField(item, 'filePolisParId');
+    if (id.isEmpty) {
+      _emptyDataSnack(c);
+      return;
+    }
 
     c.read<SppaDownloadPolisBloc>().add(
       DownloadFileEvent(ePolisId: id, cob: 'PAR'),
@@ -361,8 +414,11 @@ class FabActionExecutor {
 
   void _downloadEq(BuildContext c, dynamic item) {
     // ignore: avoid_dynamic_calls
-    final id = (item.filePolisEqId ?? "").toString();
-    if (id.isEmpty) return;
+    final id = _readStringField(item, 'filePolisEqId');
+    if (id.isEmpty) {
+      _emptyDataSnack(c);
+      return;
+    }
 
     c.read<SppaDownloadPolisBloc>().add(
       DownloadFileEvent(ePolisId: id, cob: 'EQ'),

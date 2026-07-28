@@ -208,7 +208,11 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
     final isDisabled = !action.isEnabled;
     final canTriggerGuardWhenDisabled = isDisabled &&
         (action.type == ActionType.perpanjangan ||
-            action.type == ActionType.aktifkanKembali);
+            action.type == ActionType.aktifkanKembali ||
+            action.type == ActionType.unduhPolis ||
+            action.type == ActionType.lihatPolis ||
+            action.type == ActionType.lihatPolisPar ||
+            action.type == ActionType.lihatPolisEq);
     return Opacity(
       opacity: isDisabled ? 0.55 : 1,
       child: Row(

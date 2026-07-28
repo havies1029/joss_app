@@ -42,6 +42,7 @@ class ManagementPolisFilter extends StatefulWidget {
 class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
   final TextEditingController _searchController = TextEditingController();
   bool _bootstrapped = false;
+  bool _hasShownFilterContent = false;
 
   String _cobId() => context.read<CobManPolBloc>().state.selectedCOBId;
 
@@ -183,29 +184,60 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         (cobId.trim().isEmpty || statusId.trim().isEmpty);
     final isTargetLoading = _isListLoading(targetStatus);
     final isFlowLoading = flowState.status == LoadingFlowStatus.loading;
+    final shouldBlockInitialTarget = !_hasShownFilterContent;
 
-    if (isMasterLoading ||
-        isSelectionWaiting ||
-        isTargetLoading ||
-        isFlowLoading) {
+    if (isMasterLoading || isSelectionWaiting) {
       return _fullState(const LoadingIndicator());
     }
 
+    if (shouldBlockInitialTarget && (isTargetLoading || isFlowLoading)) {
+      return _fullState(const LoadingIndicator());
+    }
+
+    if (isFlowLoading) {
+      return _contentState(
+        context,
+        cobState,
+        body: const SizedBox(
+          height: 400,
+          child: Center(child: LoadingIndicator()),
+        ),
+      );
+    }
+
     if (cobState.status == ListStatus.failure ||
-        statusState.status == ListStatus.failure ||
-        targetStatus == ListStatus.failure) {
+        statusState.status == ListStatus.failure) {
       return _fullState(const Text('Failed to fetch data'));
     }
 
-    if (targetStatus == ListStatus.success && targetEmpty) {
+    if (targetStatus == ListStatus.failure) {
+      if (shouldBlockInitialTarget) {
+        return _fullState(const Text('Failed to fetch data'));
+      }
+      return _contentState(context, cobState);
+    }
+
+    if (targetStatus == ListStatus.success &&
+        targetEmpty &&
+        shouldBlockInitialTarget) {
       return _fullState(EmptyStateWidget(statusId: statusId));
     }
+
+    return _contentState(context, cobState);
+  }
+
+  Widget _contentState(
+    BuildContext context,
+    CobManPolState cobState, {
+    Widget? body,
+  }) {
+    _hasShownFilterContent = true;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildHeader(context),
-        _buildBodyByCob(context, cobState),
+        body ?? _buildBodyByCob(context, cobState),
       ],
     );
   }
@@ -907,7 +939,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
 
     if (rows.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Tidak ada data untuk diekspor"));
+          .showSnackBar(errorSnackBar("Maaf data tidak tersedia"));
       return;
     }
 
@@ -1013,7 +1045,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
 
     if (rows.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Tidak ada data untuk diekspor"));
+          .showSnackBar(errorSnackBar("Maaf data tidak tersedia"));
       return;
     }
 

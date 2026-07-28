@@ -21,18 +21,23 @@ class ClientSection extends StatefulWidget {
 class _ClientSectionState extends State<ClientSection> {
   static const Duration _autoSlideInterval = Duration(seconds: 3);
   static const Duration _slideDuration = Duration(milliseconds: 600);
+  static const int _loopStartPage = 60000;
 
   late final PageController _pageController;
 
   Timer? _autoSlideTimer;
-  int _currentPage = 0;
+  int _currentVirtualPage = _loopStartPage;
   int _lastAutoSlideLength = 0;
+  int _positionedLength = 0;
 
   @override
   void initState() {
     super.initState();
 
-    _pageController = PageController(viewportFraction: 0.24);
+    _pageController = PageController(
+      initialPage: _loopStartPage,
+      viewportFraction: 0.24,
+    );
 
     context.read<GallerymemberCariBloc>().add(
       RefreshGallerymemberCariEvent(),
@@ -52,9 +57,13 @@ class _ClientSectionState extends State<ClientSection> {
 
   void _ensureAutoSlide(int length) {
     if (length <= 1) {
+      _positionedLength = 0;
+      _currentVirtualPage = 0;
       _stopAutoSlide();
       return;
     }
+
+    _ensureLoopPosition(length);
 
     if (_autoSlideTimer != null && _lastAutoSlideLength == length) return;
 
@@ -64,7 +73,7 @@ class _ClientSectionState extends State<ClientSection> {
     _autoSlideTimer = Timer.periodic(_autoSlideInterval, (_) {
       if (!mounted || !_pageController.hasClients) return;
 
-      final nextPage = (_currentPage + 1) % length;
+      final nextPage = _currentVirtualPage + 1;
 
       _pageController.animateToPage(
         nextPage,
@@ -78,6 +87,26 @@ class _ClientSectionState extends State<ClientSection> {
     _autoSlideTimer?.cancel();
     _autoSlideTimer = null;
     _lastAutoSlideLength = 0;
+  }
+
+  int _initialLoopPage(int length) {
+    return _loopStartPage - (_loopStartPage % length);
+  }
+
+  void _ensureLoopPosition(int length) {
+    if (_positionedLength == length) return;
+
+    _positionedLength = length;
+    _currentVirtualPage = _initialLoopPage(length);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_pageController.hasClients) return;
+      _pageController.jumpToPage(_currentVirtualPage);
+    });
+  }
+
+  int _itemIndex(int virtualIndex, int length) {
+    return virtualIndex % length;
   }
 
   @override
@@ -155,22 +184,33 @@ class _ClientSectionState extends State<ClientSection> {
 
         _ensureAutoSlide(items.length);
 
+        if (items.length == 1) {
+          return SizedBox(
+            height: isMobile ? 60 : 80,
+            child: Center(
+              child: _ClientLogoPageItem(
+                imageUrl: items.first.image1Url,
+                isMobile: isMobile,
+              ),
+            ),
+          );
+        }
+
         return SizedBox(
           height: isMobile ? 60 : 80,
           child: PageView.builder(
-            key: const PageStorageKey('client_logo_carousel'),
+            key: PageStorageKey('client_logo_carousel_${items.length}'),
             controller: _pageController,
             physics: const BouncingScrollPhysics(),
-            itemCount: items.length,
             onPageChanged: (index) {
-              if (_currentPage == index) return;
+              if (_currentVirtualPage == index) return;
 
               setState(() {
-                _currentPage = index;
+                _currentVirtualPage = index;
               });
             },
             itemBuilder: (context, index) {
-              final item = items[index];
+              final item = items[_itemIndex(index, items.length)];
 
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2),

@@ -158,7 +158,9 @@ class MRekanGeneralIdvCrudFormPageFormState
                               .add(MRekan1CrudReloadEvent());
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                            successSnackBar("Data berhasil disimpan!"),
+                            successSnackBar(
+                              "Informasi klien berhasil disimpan!",
+                            ),
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(

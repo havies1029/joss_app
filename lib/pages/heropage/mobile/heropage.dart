@@ -88,10 +88,8 @@ class _HeroPageState extends State<HeroPage> {
 
                                 final displayName = !recordReady
                                     ? ''
-                                    : mjenisClient == '20'
-                                        ? (rekanNama.isNotEmpty
-                                            ? rekanNama
-                                            : "Klien Baru")
+                                    : rekanNama.isNotEmpty
+                                        ? rekanNama
                                         : (userNama.isNotEmpty
                                             ? userNama
                                             : "Klien Baru");

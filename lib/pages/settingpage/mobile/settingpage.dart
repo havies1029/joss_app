@@ -338,10 +338,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             : '';
                         final displayName = !recordReady
                             ? ''
-                            : currentMjenisClient == '20'
-                                ? (rekanNama.isNotEmpty
-                                    ? rekanNama
-                                    : 'Klien Baru')
+                            : rekanNama.isNotEmpty
+                                ? rekanNama
                                 : (userNama.isNotEmpty
                                     ? userNama
                                     : 'Klien Baru');
