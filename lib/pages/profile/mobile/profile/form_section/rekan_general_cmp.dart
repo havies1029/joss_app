@@ -13,6 +13,7 @@ import 'package:joss_app/models/combobox/combombidang_model.dart';
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../common/loading_indicator.dart';
 import '../../../../../helper/image_uploader.dart';
 import '../../../../../repositories/combobox/combombentukcst_repository.dart';
 import '../../../../../repositories/combobox/combombidang_repository.dart';
@@ -47,6 +48,7 @@ class MRekanGeneralCmpCrudFormPageFormState
   final fieldIdKlienController = TextEditingController();
 
   bool _isFirstLoad = true;
+  bool _isLoadingInitialData = true;
   bool _isTapLocked = false;
   @override
   void initState() {
@@ -56,6 +58,7 @@ class MRekanGeneralCmpCrudFormPageFormState
     mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudResetStatusEvent());
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       loadData();
     });
   }
@@ -80,22 +83,13 @@ class MRekanGeneralCmpCrudFormPageFormState
             width: double.infinity,
             height: constraints.maxHeight,
             color: secondaryBlackColor,
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
-                ),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                  child: BlocConsumer<MRekanGeneralCmpCrudBloc,
-                      MRekanGeneralCmpCrudState>(
-                    listenWhen: (prev, curr) =>
-                        prev.isLoaded != curr.isLoaded ||
-                        prev.isSaved != curr.isSaved,
-                    listener: (context, state) {
-                      if (state.isLoaded && _isFirstLoad) {
+            child: BlocConsumer<MRekanGeneralCmpCrudBloc,
+                MRekanGeneralCmpCrudState>(
+              listenWhen: (prev, curr) =>
+                  prev.isLoaded != curr.isLoaded ||
+                  prev.isSaved != curr.isSaved,
+              listener: (context, state) {
+                if (state.isLoaded && _isFirstLoad) {
                         final rec = state.record;
 
                         final formName = (rec?.rekanNama ?? '').trim();
@@ -146,40 +140,57 @@ class MRekanGeneralCmpCrudFormPageFormState
                         fieldComboMBidang ??=
                             rec?.comboMBidang ?? state.comboMBidang;
 
-                        setState(() {});
-                        _isFirstLoad = false;
-                      }
+                  if (mounted) {
+                    setState(() {
+                      _isFirstLoad = false;
+                      _isLoadingInitialData = false;
+                    });
+                  }
+                }
 
-                      if (state.isSaved) {
-                        if (mounted) {
-                          setState(() {
-                            isSaving = false;
-                          });
-                        }
+                if (state.isSaved) {
+                  if (mounted) {
+                    setState(() {
+                      isSaving = false;
+                    });
+                  }
 
-                        if (!state.hasFailure) {
-                          context
-                              .read<MRekan1CrudBloc>()
-                              .add(MRekan1CrudReloadEvent());
+                  if (!state.hasFailure) {
+                    context
+                        .read<MRekan1CrudBloc>()
+                        .add(MRekan1CrudReloadEvent());
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            successSnackBar(
-                              "Informasi klien berhasil disimpan!",
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            errorSnackBar("Data gagal disimpan!"),
-                          );
-                        }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      successSnackBar(
+                        "Informasi klien berhasil disimpan!",
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      errorSnackBar("Data gagal disimpan!"),
+                    );
+                  }
 
-                        context
-                            .read<MRekanGeneralCmpCrudBloc>()
-                            .add(MRekanGeneralCmpCrudResetStatusEvent());
-                      }
-                    },
-                    builder: (context, state) {
-                      return Form(
+                  context
+                      .read<MRekanGeneralCmpCrudBloc>()
+                      .add(MRekanGeneralCmpCrudResetStatusEvent());
+                }
+              },
+              builder: (context, state) {
+                if (_isLoadingInitialData) {
+                  return const LoadingIndicator();
+                }
+
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 20),
+                      child: Form(
                         key: _formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -341,11 +352,11 @@ class MRekanGeneralCmpCrudFormPageFormState
                             )
                           ],
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           );
         },
@@ -361,6 +372,12 @@ class MRekanGeneralCmpCrudFormPageFormState
       );
 
   void loadData() {
+    if (mounted) {
+      setState(() {
+        _isLoadingInitialData = true;
+      });
+    }
+
     mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
 
     // context.read<ProfileDownloadFotoBloc>()

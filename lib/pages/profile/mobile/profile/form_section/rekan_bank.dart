@@ -9,6 +9,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../common/loading_indicator.dart';
 import '../../../../../repositories/combobox/combombank_repository.dart';
 import '../../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../base/base_background_sidepage.dart';
@@ -43,6 +44,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 
   String? existingMrekanBankId;
   bool _isFirstLoad = true;
+  bool _isLoadingInitialData = true;
   bool isSaving = false;
 
   @override
@@ -54,11 +56,18 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
     mRekanBankCrudBloc.add(MRekanBankCrudResetStatusEvent());
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       loadData();
     });
   }
 
   void loadData() {
+    if (mounted) {
+      setState(() {
+        _isLoadingInitialData = true;
+      });
+    }
+
     final mrekan1Id = context.read<MRekan1CrudBloc>().state.record?.mrekan1Id;
     fieldMrekan1IdController.text = mrekan1Id ?? '';
 
@@ -83,48 +92,55 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                   decoration: const BoxDecoration(
                     color: secondaryBlackColor,
                   ),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 15,
-                      vertical: 20,
-                    ),
-                    child:
-                        BlocListener<MRekanBankCrudBloc, MRekanBankCrudState>(
-                      listenWhen: (prev, curr) =>
-                          prev.isLoaded != curr.isLoaded ||
-                          prev.isSaved != curr.isSaved,
-                      listener: (context, state) {
-                        if (state.isLoaded &&
-                            _isFirstLoad &&
-                            state.record != null) {
+                  child: BlocListener<MRekanBankCrudBloc, MRekanBankCrudState>(
+                    listenWhen: (prev, curr) =>
+                        prev.isLoaded != curr.isLoaded ||
+                        prev.isSaved != curr.isSaved,
+                    listener: (context, state) {
+                      if (state.isLoaded && _isFirstLoad) {
+                        if (state.record != null) {
                           _injectPayload(state.record!);
-                          _isFirstLoad = false;
                         }
 
-                        if (state.isSaved) {
-                          if (mounted) {
-                            setState(() {
-                              isSaving = false;
-                            });
-                          }
-
-                          if (!state.hasFailure) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              successSnackBar("Data berhasil disimpan!"),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              errorSnackBar("Gagal menyimpan data!"),
-                            );
-                          }
-
-                          context
-                              .read<MRekanBankCrudBloc>()
-                              .add(MRekanBankCrudResetStatusEvent());
+                        if (mounted) {
+                          setState(() {
+                            _isFirstLoad = false;
+                            _isLoadingInitialData = false;
+                          });
                         }
-                      },
-                      child: _buildFormContent(context),
-                    ),
+                      }
+
+                      if (state.isSaved) {
+                        if (mounted) {
+                          setState(() {
+                            isSaving = false;
+                          });
+                        }
+
+                        if (!state.hasFailure) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            successSnackBar("Data berhasil disimpan!"),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            errorSnackBar("Gagal menyimpan data!"),
+                          );
+                        }
+
+                        context
+                            .read<MRekanBankCrudBloc>()
+                            .add(MRekanBankCrudResetStatusEvent());
+                      }
+                    },
+                    child: _isLoadingInitialData
+                        ? const LoadingIndicator()
+                        : SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 20,
+                            ),
+                            child: _buildFormContent(context),
+                          ),
                   ),
                 ),
               ),
@@ -186,19 +202,17 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
   }
 
   void _injectPayload(MRekanBankCrudModel record) {
-    setState(() {
-      fieldMrekan1IdController.text = record.mrekan1Id;
-      fieldRekNamaController.text = record.rekNama;
-      fieldRekNoController.text = record.rekNo;
+    fieldMrekan1IdController.text = record.mrekan1Id;
+    fieldRekNamaController.text = record.rekNama;
+    fieldRekNoController.text = record.rekNo;
 
-      if (record.comboMBank != null) {
-        fieldComboMBank = record.comboMBank;
-      }
+    if (record.comboMBank != null) {
+      fieldComboMBank = record.comboMBank;
+    }
 
-      if (record.mrekanbankId.isNotEmpty) {
-        existingMrekanBankId = record.mrekanbankId;
-      }
-    });
+    if (record.mrekanbankId.isNotEmpty) {
+      existingMrekanBankId = record.mrekanbankId;
+    }
   }
 
   Widget buildFieldNamaBank() {

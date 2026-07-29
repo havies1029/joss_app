@@ -12,6 +12,7 @@ import 'package:joss_app/models/combobox/comborkodepos_model.dart';
 
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../common/app_data.dart';
+import '../../../../../common/loading_indicator.dart';
 import '../../../../../helper/international_phone_result.dart';
 import '../../../../../repositories/combobox/combomkota_repository.dart';
 import '../../../../../repositories/combobox/combompropinsi_repository.dart';
@@ -50,6 +51,7 @@ class MRekanContactCrudFormPageFormState
   final comboRKodeposKey = GlobalKey<DropdownSearchState<ComboRKodeposModel>>();
 
   bool _isFirstLoad = true;
+  bool _isLoadingInitialData = true;
 
   @override
   void initState() {
@@ -59,6 +61,7 @@ class MRekanContactCrudFormPageFormState
     mRekanContactCrudBloc.add(MRekanContactCrudResetStatusEvent());
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       loadData();
     });
   }
@@ -81,100 +84,112 @@ class MRekanContactCrudFormPageFormState
             width: double.infinity,
             height: constraints.maxHeight,
             color: secondaryBlackColor,
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 20,
-                  ),
-                  child: BlocListener<MRekanContactCrudBloc,
-                      MRekanContactCrudState>(
-                    listenWhen: (prev, curr) =>
-                        prev.isLoaded != curr.isLoaded ||
-                        prev.isSaved != curr.isSaved,
-                    listener: (context, state) {
-                      if (state.isLoaded &&
-                          state.record != null &&
-                          _isFirstLoad) {
-                        final contact = state.record!;
-
-                        if (fieldAlamat1Controller.text.trim().isEmpty) {
-                          final alamat = contact.alamat1.trim();
-                          if (alamat.isNotEmpty) {
-                            fieldAlamat1Controller.text = alamat;
-                          }
-                        }
-
-                        final contactEmail = contact.email.trim();
-                        final contactTelp = contact.telp.trim();
-
-                        final rekan =
-                            context.read<MRekan1CrudBloc>().state.record;
-                        final rekanEmail = (rekan?.email ?? '').trim();
-                        final rekanTelp = (rekan?.telepon ?? '').trim();
-
-                        if (fieldEmailController.text.trim().isEmpty) {
-                          final userEmail = (AppData.user.email ?? '').trim();
-
-                          if (contactEmail.isNotEmpty) {
-                            fieldEmailController.text = contactEmail;
-                          } else if (rekanEmail.isNotEmpty) {
-                            fieldEmailController.text = rekanEmail;
-                          } else if (userEmail.isNotEmpty) {
-                            fieldEmailController.text = userEmail;
-                          }
-                        }
-
-                        if (fieldTelpController.text.trim().isEmpty) {
-                          final userTelp = (AppData.user.hp ?? '').trim();
-
-                          if (contactTelp.isNotEmpty) {
-                            _setPhoneFieldFromRaw(contactTelp);
-                          } else if (rekanTelp.isNotEmpty) {
-                            _setPhoneFieldFromRaw(rekanTelp);
-                          } else if (userTelp.isNotEmpty) {
-                            _setPhoneFieldFromRaw(userTelp);
-                          }
-                        }
-
-                        _injectPayload(contact);
-                        _isFirstLoad = false;
-                      }
-
-                      if (state.isSaved) {
-                        if (mounted) {
-                          setState(() {
-                            isSaving = false;
-                          });
-                        }
-
-                        if (!state.hasFailure) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            successSnackBar("Data berhasil disimpan!"),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            errorSnackBar("Data gagal disimpan!"),
-                          );
-                        }
-
-                        context
-                            .read<MRekanContactCrudBloc>()
-                            .add(MRekanContactCrudResetStatusEvent());
-                      }
-                    },
-                    child: _buildFormContent(context),
-                  ),
-                ),
-              ),
+            child: BlocListener<MRekanContactCrudBloc, MRekanContactCrudState>(
+              listenWhen: (prev, curr) =>
+                  prev.isLoaded != curr.isLoaded ||
+                  prev.isSaved != curr.isSaved,
+              listener: _handleCrudState,
+              child: _isLoadingInitialData
+                  ? const LoadingIndicator()
+                  : SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints:
+                            BoxConstraints(minHeight: constraints.maxHeight),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 20,
+                          ),
+                          child: _buildFormContent(context),
+                        ),
+                      ),
+                    ),
             ),
           );
         },
       ),
     );
+  }
+
+  void _handleCrudState(
+    BuildContext context,
+    MRekanContactCrudState state,
+  ) {
+    if (state.isLoaded && _isFirstLoad) {
+      if (state.record != null) {
+        final contact = state.record!;
+
+        if (fieldAlamat1Controller.text.trim().isEmpty) {
+          final alamat = contact.alamat1.trim();
+          if (alamat.isNotEmpty) {
+            fieldAlamat1Controller.text = alamat;
+          }
+        }
+
+        final contactEmail = contact.email.trim();
+        final contactTelp = contact.telp.trim();
+
+        final rekan = context.read<MRekan1CrudBloc>().state.record;
+        final rekanEmail = (rekan?.email ?? '').trim();
+        final rekanTelp = (rekan?.telepon ?? '').trim();
+
+        if (fieldEmailController.text.trim().isEmpty) {
+          final userEmail = (AppData.user.email ?? '').trim();
+
+          if (contactEmail.isNotEmpty) {
+            fieldEmailController.text = contactEmail;
+          } else if (rekanEmail.isNotEmpty) {
+            fieldEmailController.text = rekanEmail;
+          } else if (userEmail.isNotEmpty) {
+            fieldEmailController.text = userEmail;
+          }
+        }
+
+        if (fieldTelpController.text.trim().isEmpty) {
+          final userTelp = (AppData.user.hp ?? '').trim();
+
+          if (contactTelp.isNotEmpty) {
+            _setPhoneFieldFromRaw(contactTelp);
+          } else if (rekanTelp.isNotEmpty) {
+            _setPhoneFieldFromRaw(rekanTelp);
+          } else if (userTelp.isNotEmpty) {
+            _setPhoneFieldFromRaw(userTelp);
+          }
+        }
+
+        _injectPayload(contact);
+      }
+
+      if (mounted) {
+        setState(() {
+          _isFirstLoad = false;
+          _isLoadingInitialData = false;
+        });
+      }
+    }
+
+    if (state.isSaved) {
+      if (mounted) {
+        setState(() {
+          isSaving = false;
+        });
+      }
+
+      if (!state.hasFailure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          successSnackBar("Data berhasil disimpan!"),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar("Data gagal disimpan!"),
+        );
+      }
+
+      context
+          .read<MRekanContactCrudBloc>()
+          .add(MRekanContactCrudResetStatusEvent());
+    }
   }
 
   Widget _buildFormContent(BuildContext context) {
@@ -242,8 +257,6 @@ class MRekanContactCrudFormPageFormState
     fieldComboMKota = record.comboMKota;
     fieldComboMPropinsi = record.comboMPropinsi;
     fieldComboRKodepos = record.comboRKodepos;
-
-    setState(() {});
   }
 
   void _setPhoneFieldFromRaw(String rawPhone) {
@@ -258,6 +271,12 @@ class MRekanContactCrudFormPageFormState
   }
 
   void loadData() {
+    if (mounted) {
+      setState(() {
+        _isLoadingInitialData = true;
+      });
+    }
+
     mRekanContactCrudBloc.add(MRekanContactCrudLihatEvent());
   }
 

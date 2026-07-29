@@ -52,6 +52,7 @@ class MRekanGeneralIdvCrudFormPageFormState
   final comboMJnsKelKey = GlobalKey<DropdownSearchState<ComboMJnskelModel>>();
 
   bool _isFirstLoad = true;
+  bool _isLoadingInitialData = true;
   bool _isTapLocked = false;
   @override
   void initState() {
@@ -61,6 +62,7 @@ class MRekanGeneralIdvCrudFormPageFormState
     mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudResetStatusEvent());
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       loadData();
     });
   }
@@ -82,24 +84,14 @@ class MRekanGeneralIdvCrudFormPageFormState
             width: double.infinity,
             height: constraints.maxHeight,
             color: secondaryBlackColor,
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
-                ),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                  child: BlocConsumer<MRekanGeneralIdvCrudBloc,
-                      MRekanGeneralIdvCrudState>(
-                    listenWhen: (prev, curr) =>
-                        prev.isLoaded != curr.isLoaded ||
-                        prev.isSaved != curr.isSaved,
-                    listener: (context, state) {
-                      if (state.isLoaded &&
-                          state.record != null &&
-                          _isFirstLoad) {
+            child: BlocConsumer<MRekanGeneralIdvCrudBloc,
+                MRekanGeneralIdvCrudState>(
+              listenWhen: (prev, curr) =>
+                  prev.isLoaded != curr.isLoaded ||
+                  prev.isSaved != curr.isSaved,
+              listener: (context, state) {
+                if (state.isLoaded && _isFirstLoad) {
+                  if (state.record != null) {
                         final rec = state.record!;
 
                         if (fieldRekanNamaController.text.trim().isEmpty) {
@@ -140,41 +132,59 @@ class MRekanGeneralIdvCrudFormPageFormState
 
                         fieldComboMPekerjaan ??= rec.comboMPekerjaan;
                         fieldComboMJnskel ??= rec.comboMJnskel;
-
-                        setState(() {});
-                        _isFirstLoad = false;
                       }
 
-                      if (state.isSaved) {
-                        if (mounted) {
-                          setState(() {
-                            isSaving = false;
-                          });
-                        }
+                  if (mounted) {
+                    setState(() {
+                      _isFirstLoad = false;
+                      _isLoadingInitialData = false;
+                    });
+                  }
+                }
 
-                        if (!state.hasFailure) {
-                          context
-                              .read<MRekan1CrudBloc>()
-                              .add(MRekan1CrudReloadEvent());
+                if (state.isSaved) {
+                  if (mounted) {
+                    setState(() {
+                      isSaving = false;
+                    });
+                  }
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            successSnackBar(
-                              "Informasi klien berhasil disimpan!",
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            errorSnackBar("Data gagal disimpan!"),
-                          );
-                        }
+                  if (!state.hasFailure) {
+                    context
+                        .read<MRekan1CrudBloc>()
+                        .add(MRekan1CrudReloadEvent());
 
-                        context
-                            .read<MRekanGeneralIdvCrudBloc>()
-                            .add(MRekanGeneralIdvCrudResetStatusEvent());
-                      }
-                    },
-                    builder: (context, state) {
-                      return Form(
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      successSnackBar(
+                        "Informasi klien berhasil disimpan!",
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      errorSnackBar("Data gagal disimpan!"),
+                    );
+                  }
+
+                  context
+                      .read<MRekanGeneralIdvCrudBloc>()
+                      .add(MRekanGeneralIdvCrudResetStatusEvent());
+                }
+              },
+              builder: (context, state) {
+                if (_isLoadingInitialData) {
+                  return const LoadingIndicator();
+                }
+
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 20),
+                      child: Form(
                         key: _formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -341,11 +351,11 @@ class MRekanGeneralIdvCrudFormPageFormState
                             )
                           ],
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           );
         },
@@ -361,6 +371,12 @@ class MRekanGeneralIdvCrudFormPageFormState
       );
 
   void loadData() {
+    if (mounted) {
+      setState(() {
+        _isLoadingInitialData = true;
+      });
+    }
+
     mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
     _futureJenisKelamin = ComboMJnskelRepository().getComboMJnskel();
 

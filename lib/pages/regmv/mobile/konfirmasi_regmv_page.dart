@@ -428,28 +428,27 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                   'Proses pembayaran kartu kredit dibatalkan.',
                 ),
               );
+            } else if (state.paymentStatus == "91") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentSuccess(
+                    display: "Pengajuan Tidak Dilanjutkan",
+                    description:
+                        "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
+                    displayButton: "Kembali",
+                    onButtonPressed: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (_) => const TransaksiPage(),
+                        ),
+                        (route) => route.isFirst,
+                      );
+                    },
+                  ),
+                ),
+              );
             }
-
-            // else if (state.paymentStatus == "91") {
-            //   Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //       builder: (context) => PaymentSuccess(
-            //         display: "Pengajuan Tidak Dilanjutkan",
-            //         description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
-            //         displayButton: "Kembali",
-            //         onButtonPressed: () {
-            //           Navigator.of(context).pushAndRemoveUntil(
-            //             MaterialPageRoute(
-            //               builder: (_) => const TransaksiPage(),
-            //             ),
-            //                 (route) => route.isFirst,
-            //           );
-            //         },
-            //       ),
-            //     ),
-            //   );
-            // }
 
             // optional: kalau kamu punya flag hasFailure dan mau tampilkan error umumnya
             // if (state.hasFailure) {
