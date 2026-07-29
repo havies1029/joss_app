@@ -96,6 +96,11 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final sectionGap = screenWidth >= 650 ? 50.0 : 40.0;
+    final testimoniTopPadding = vPadding;
+    final clientTopPadding = screenWidth < 768 ? 8.0 : 15.0;
+
     return Container(
       color: secondaryBlackColor,
       child: Column(
@@ -141,17 +146,19 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
                       key: tentangKey,
                       child: TentangCardWidget(),
                     ),
-                    const SizedBox(height: 40 * 2.5),
+                    SizedBox(height: sectionGap),
 
                     Container(
                       key: companyProfileKey,
                       child: CompanyProfileCard(),
                     ),
+                    SizedBox(height: sectionGap - testimoniTopPadding),
+
                     Container(
                       key: testimoniKey,
                       child: TestimoniPage1(),
                     ),
-                    const SizedBox(height: 40),
+                    SizedBox(height: sectionGap - clientTopPadding),
                     ClientSection(),
                   ],
                 ),

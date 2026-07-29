@@ -1246,6 +1246,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                     AppButton.primary(
                       text: _isLanjutkanLoading ? "Memproses..." : "Lanjutkan",
                       isLoading: _isLanjutkanLoading,
+                      backgroundColor: pGreen2,
                       onPressed: _isLanjutkanLoading
                           ? null
                           : () async {
@@ -1586,7 +1587,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
           text: _isHitungPremiLoading ? "Memproses..." : "Hitung Premi",
           isLoading: _isHitungPremiLoading,
           backgroundColor:
-              _isHitungPremiLoading ? secondaryBlackColor : primaryColor,
+              _isHitungPremiLoading ? secondaryBlackColor : pGreen2,
           onPressed: _isHitungPremiLoading
               ? null
               : () async {

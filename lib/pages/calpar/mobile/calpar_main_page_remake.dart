@@ -826,6 +826,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                                     ? "Memproses..."
                                     : "Lanjutkan",
                                 isLoading: state.isProcessing,
+                                backgroundColor: pGreen2,
                                 onPressed: state.isProcessing
                                     ? null
                                     : () {
@@ -1216,7 +1217,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           text: _isHitungPremiLoading ? "Memproses..." : "Hitung Premi",
           isLoading: _isHitungPremiLoading,
           backgroundColor:
-              _isHitungPremiLoading ? secondaryBlackColor : primaryColor,
+              _isHitungPremiLoading ? secondaryBlackColor : pGreen2,
           onPressed: _isHitungPremiLoading
               ? null
               : () async {

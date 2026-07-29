@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -17,35 +18,33 @@ class CompanyProfileCard extends StatelessWidget {
       create: (_) => ReqComproBloc(repository: ReqComproRepository()),
       child: LayoutBuilder(
         builder: (context, constraints) {
+          final double offsetY = kIsWeb ? -30 : -40;
           final double screenWidth = MediaQuery.sizeOf(context).width;
-          final double bgWidth = screenWidth;
-          final double bgHeight = (bgWidth * _ComproBackground.baseHeightRatio)
-              .clamp(134.0, 164.0)
-              .toDouble();
+          final double bgWidth =
+              constraints.maxWidth > 420 ? 392 : screenWidth;
           final double cardWidth =
-              constraints.maxWidth > 420 ? 340.0 : constraints.maxWidth * 0.9;
-          const double estimatedCardHeight = 198;
-          final double sectionHeight = (bgHeight + 48)
-              .clamp(estimatedCardHeight + 16, double.infinity)
-              .toDouble();
+              constraints.maxWidth > 420 ? 340 : constraints.maxWidth * 0.9;
 
-          return SizedBox(
-            width: constraints.maxWidth,
-            height: sectionHeight,
-            child: Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
-              children: [
-                Positioned(
-                  left: (constraints.maxWidth - bgWidth) / 2,
+          return Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              SizedBox(
+                width: constraints.maxWidth,
+                height: 134,
+              ),
+              Positioned(
+                top: 0,
+                left: (constraints.maxWidth - bgWidth) / 2,
+                width: bgWidth,
+                height: 134,
+                child: _ComproBackground(
                   width: bgWidth,
-                  height: bgHeight,
-                  child: _ComproBackground(
-                    width: bgWidth,
-                    height: bgHeight,
-                  ),
                 ),
-                Container(
+              ),
+              Transform.translate(
+                offset: Offset(0, offsetY),
+                child: Container(
                   width: cardWidth,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -119,8 +118,8 @@ class CompanyProfileCard extends StatelessWidget {
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
@@ -131,25 +130,22 @@ class CompanyProfileCard extends StatelessWidget {
 class _ComproBackground extends StatelessWidget {
   const _ComproBackground({
     required this.width,
-    required this.height,
   });
 
   final double width;
-  final double height;
 
+  static const double _height = 134;
   static const double _baseWidth = 390;
-  static const double _baseHeight = 134;
   static const double _watermarkWidth = 127;
-  static const double baseHeightRatio = _baseHeight / _baseWidth;
 
   @override
   Widget build(BuildContext context) {
     final double responsiveWatermarkWidth =
-        height * (_watermarkWidth / _baseHeight);
+        width * (_watermarkWidth / _baseWidth);
 
     return SizedBox(
       width: width,
-      height: height,
+      height: _height,
       child: ClipRect(
         child: Stack(
           fit: StackFit.expand,
@@ -198,12 +194,11 @@ class _ComproBackground extends StatelessWidget {
             Positioned(
               top: 0,
               right: 0,
-              height: height,
+              height: _height,
               width: responsiveWatermarkWidth,
-              child: Image.asset(
-                'assets/images/jps_dikanan2.png',
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
+              child: SvgPicture.asset(
+                'assets/images/jps_dikanan.svg',
+                fit: BoxFit.fill,
               ),
             ),
           ],

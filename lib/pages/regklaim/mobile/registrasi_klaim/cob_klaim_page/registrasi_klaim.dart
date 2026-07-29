@@ -48,7 +48,7 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
       case "10002":
         return pBlue;
       default:
-        return sGrey;
+        return primaryColor;
     }
   }
 

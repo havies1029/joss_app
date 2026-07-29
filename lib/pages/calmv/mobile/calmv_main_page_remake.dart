@@ -669,6 +669,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                                     ? "Memproses..."
                                     : "Lanjutkan",
                                 isLoading: state.isProcessing,
+                                backgroundColor : pBlue,
                                 onPressed: state.isProcessing
                                     ? null
                                     : () {
@@ -853,7 +854,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
           text: _isHitungPremiLoading ? "Memproses..." : "Hitung Premi",
           isLoading: _isHitungPremiLoading,
           backgroundColor:
-              _isHitungPremiLoading ? secondaryBlackColor : primaryColor,
+              _isHitungPremiLoading ? secondaryBlackColor : pBlue,
           onPressed: _isHitungPremiLoading
               ? null
               : () async {

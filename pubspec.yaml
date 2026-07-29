@@ -89,6 +89,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icons/logo_pp.svg
+    - assets/images/jps_dikanan2.png
     - assets/images/jps_dikanan.svg
     - assets/icons/belum_ada.svg
     - assets/icons/Logo_Gagal1.svg

@@ -1303,6 +1303,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     AppButton.primary(
                       text: _isLanjutkanLoading ? "Memproses..." : "Lanjutkan",
                       isLoading: _isLanjutkanLoading,
+                      backgroundColor: pBlue,
                       onPressed: _isLanjutkanLoading
                           ? null
                           : () async {
@@ -1672,7 +1673,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           text: _isHitungPremiLoading ? "Memproses..." : "Hitung Premi",
           isLoading: _isHitungPremiLoading,
           backgroundColor:
-              _isHitungPremiLoading ? secondaryBlackColor : primaryColor,
+              _isHitungPremiLoading ? secondaryBlackColor : pBlue,
           onPressed: _isHitungPremiLoading
               ? null
               : () async {

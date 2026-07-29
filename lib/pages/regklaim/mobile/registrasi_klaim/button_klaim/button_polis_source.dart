@@ -15,6 +15,8 @@ class ButtonPolisSourceWidget extends StatefulWidget {
 }
 
 class _ButtonPolisSourceWidgetState extends State<ButtonPolisSourceWidget> {
+  String? _pressedPolissourceId;
+
   @override
   void initState() {
     super.initState();
@@ -69,35 +71,71 @@ class _ButtonPolisSourceWidgetState extends State<ButtonPolisSourceWidget> {
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             child: Row(
-              children: items.map((item) {
+              children: List.generate(items.length, (index) {
+                final item = items[index];
                 final isSelected =
                     state.selectedPolissourceId == item.polissourceId;
+                final isPressed = _pressedPolissourceId == item.polissourceId;
 
                 return Padding(
-                  padding: const EdgeInsets.only(right: hPadding),
-                  child: SizedBox(
-                    width: (MediaQuery.of(context).size.width -
-                            (hPadding * 1.5 * 2) -
-                            hPadding) /
-                        2,
-                    child: AppButton.primary(
-                      text: item.sourceNama,
-                      backgroundColor: isSelected ? primaryColor : formGrey,
-                      textColor: primaryLightColor,
-                      borderRadius: cardBorderRadius,
-                      elevation: 0,
-                      isOutlined: false,
-                      onPressed: () {
+                  padding: EdgeInsets.only(
+                    right: index == items.length - 1 ? 0 : hPadding,
+                  ),
+                  child: GestureDetector(
+                    onTapDown: (_) {
+                      setState(() {
+                        _pressedPolissourceId = item.polissourceId;
+                      });
+                    },
+                    onTapUp: (_) {
+                      setState(() {
+                        _pressedPolissourceId = null;
+                      });
+                    },
+                    onTapCancel: () {
+                      setState(() {
+                        _pressedPolissourceId = null;
+                      });
+                    },
+                    onTap: () {
+                      if (state.selectedPolissourceId != item.polissourceId) {
                         context.read<PolissourcecariBloc>().add(
                               SelectPolissourcecariEvent(
                                 polissourceId: item.polissourceId,
                               ),
                             );
-                      },
+                      }
+                    },
+                    child: AnimatedScale(
+                      scale: isPressed ? 0.97 : 1,
+                      duration: const Duration(milliseconds: 120),
+                      curve: Curves.easeOut,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeOut,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected ? primaryColor : pGrey,
+                          borderRadius:
+                              BorderRadius.circular(cardBorderRadius),
+                        ),
+                        child: Text(
+                          item.sourceNama,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: bodyTextStyle(context).copyWith(
+                            color:
+                                isSelected ? Colors.white : primaryLightColor,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 );
-              }).toList(),
+              }),
             ),
           );
         }

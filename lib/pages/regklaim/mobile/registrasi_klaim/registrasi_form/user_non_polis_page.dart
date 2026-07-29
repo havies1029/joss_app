@@ -115,7 +115,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   Color get _submitButtonColor {
     if (widget.cobKlaimId == '10002') return pBlue;
     if (widget.cobKlaimId == '10001') return pGreen2;
-    return sGrey;
+    return primaryColor;
   }
 
   Future<void> _initDefaultInsurance() async {
