@@ -22,11 +22,17 @@ class AppData {
   // static String httpAuthority = "eassist-re.jpsre.co.id";
 
 
+  // static bool useSSL = false;
+  // static String apiDomain =
+  //     "http${useSSL ? "s" : ""}://eassisttoolsapi.smartsoft-id.com/";
+  // static String prefixEndPoint = "";
+  // static String httpAuthority = "eassisttoolsapi.smartsoft-id.com";
+
   static bool useSSL = false;
   static String apiDomain =
-      "http${useSSL ? "s" : ""}://eassisttoolsapi.smartsoft-id.com/";
+      "http${useSSL ? "s" : ""}://eassisttoolsv2api.smartsoft-id.com/";
   static String prefixEndPoint = "";
-  static String httpAuthority = "eassisttoolsapi.smartsoft-id.com";
+  static String httpAuthority = "eassisttoolsv2api.smartsoft-id.com";
 
   // static bool useSSL = false;
   // static String apiDomain =
