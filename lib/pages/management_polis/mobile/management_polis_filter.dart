@@ -145,15 +145,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                 if (state.status == ListStatus.success &&
                     state.selectedStatusId.isEmpty &&
                     state.items.isNotEmpty) {
-                  final allowedIds = {"10001", "10002", "10003", "10004"};
-                  final selected = state.items.firstWhere(
-                    (item) => allowedIds.contains(item.mstatusasetId),
-                    orElse: () => state.items.first,
-                  );
-
-                  context
-                      .read<StatusAsetCariBloc>()
-                      .add(SelectStatusAsetButton(selected.mstatusasetId));
+                  context.read<StatusAsetCariBloc>().add(
+                      SelectStatusAsetButton(state.items.first.mstatusasetId));
                   return;
                 }
 

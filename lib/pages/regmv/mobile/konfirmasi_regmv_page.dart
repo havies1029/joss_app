@@ -97,12 +97,25 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      if (widget.viewMode == "ubah" && widget.recordId?.isNotEmpty == true) {
-        context
-            .read<Regmv1CrudBloc>()
-            .add(Regmv1CrudLihatEvent(recordId: widget.recordId!));
-      }
+      _loadKonfirmasiData();
     });
+  }
+
+  void _loadKonfirmasiData() {
+    final recordId = widget.recordId?.trim() ?? "";
+    if (widget.viewMode != "ubah" || recordId.isEmpty) return;
+
+    debugPrint("[KONFIRMASI REGMV] dispatch lihat regmv1/2/3: $recordId");
+
+    context.read<Regmv1CrudBloc>().add(
+          Regmv1CrudLihatEvent(recordId: recordId),
+        );
+    context.read<Regmv2FormBloc>().add(
+          Regmv2FormLihatEvent(recordId: recordId),
+        );
+    context.read<Regmv3FormBloc>().add(
+          Regmv3FormLihatEvent(recordId: recordId),
+        );
   }
 
 /*
@@ -628,9 +641,6 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
         _buildGenericListener<Regmv1CrudBloc, Regmv1CrudState, Regmv1CrudModel>(
           onPayload: (record) {
             setState(() => regmv1Record = record);
-            context.read<Regmv2FormBloc>().add(
-                  Regmv2FormLihatEvent(recordId: record.regmv1Id),
-                );
           },
         ),
         _buildGenericListener<Regmv2FormBloc, Regmv2FormState, Regmv2FormModel>(
@@ -638,9 +648,6 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
             setState(() => regmv2Record = record);
 
             // Form2 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Form3 (PAKAI record.regmv1Id)
-            context.read<Regmv3FormBloc>().add(
-                  Regmv3FormLihatEvent(recordId: record.regmv1Id),
-                );
           },
         ),
         _buildGenericListener<Regmv3FormBloc, Regmv3FormState, Regmv3FormModel>(
@@ -664,9 +671,14 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
     required void Function(M record) onPayload,
   }) {
     return BlocListener<B, S>(
-      listenWhen: (prev, curr) =>
-          (prev as dynamic).isLoaded != (curr as dynamic).isLoaded &&
-          (curr as dynamic).isLoaded == true,
+      listenWhen: (prev, curr) {
+        final prevDynamic = prev as dynamic;
+        final currDynamic = curr as dynamic;
+        final currRecord = currDynamic.record;
+        if (currDynamic.isLoaded != true || currRecord == null) return false;
+        return prevDynamic.isLoaded != currDynamic.isLoaded ||
+            prevDynamic.record != currRecord;
+      },
       listener: (context, state) {
         final record = (state as dynamic).record;
         if (record != null && record is M) {

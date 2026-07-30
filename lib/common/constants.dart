@@ -110,6 +110,7 @@ const Color pBlue = Color(0xFF377BFC);
 const Color sBlue = Color(0xFF0088FF);
 const Color dBlue = Color(0xFF2196F3);
 const Color pRed = Color(0xFFFF0000);
+const Color zRed = Color(0xFFD41515);
 const Color pGreen = Color(0xFF90DE24);
 const Color pGreen2 = Color(0xFF91C050);
 const Color tGreen = Color(0xFF8bbb4e);

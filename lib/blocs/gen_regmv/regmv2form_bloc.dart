@@ -125,14 +125,34 @@ class Regmv2FormBloc extends Bloc<Regmv2FormEvents, Regmv2FormState> {
 
   Future<void> onLihatRegmv2Form(
       Regmv2FormLihatEvent event, Emitter<Regmv2FormState> emit) async {
-    emit(state.copyWith(isLoading: true, isLoaded: false));
-    Regmv2FormModel record = await repository.regmv2FormLihat(event.recordId);
     emit(state.copyWith(
+      isLoading: true,
+      isLoaded: false,
+      hasFailure: false,
+      failureMessage: '',
+      failureKind: '',
+    ));
+
+    try {
+      Regmv2FormModel record = await repository.regmv2FormLihat(event.recordId);
+      emit(state.copyWith(
+          isLoading: false,
+          isLoaded: true,
+          hasFailure: false,
+          failureMessage: '',
+          failureKind: '',
+          record: record,
+          comboMMvjnscover: record.comboMMvjnscover,
+          comboRMatauang: record.comboRMatauang));
+    } catch (e) {
+      emit(state.copyWith(
         isLoading: false,
-        isLoaded: true,
-        record: record,
-        comboMMvjnscover: record.comboMMvjnscover,
-        comboRMatauang: record.comboRMatauang));
+        isLoaded: false,
+        hasFailure: true,
+        failureMessage: e.toString(),
+        failureKind: 'technical',
+      ));
+    }
   }
 
   Future<void> onComboMMvjnscoverChanged(

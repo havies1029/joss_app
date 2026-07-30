@@ -42,6 +42,7 @@ import '../../../models/regpar/regpar3form_model.dart';
 import '../../../models/regpar/regpar4form_model.dart';
 import '../../../models/regpar/regpar5form_model.dart';
 import '../../../models/regpar/regpar6form_model.dart';
+import '../../../models/regpar/regpar_validation_preview_model.dart';
 import '../../../repositories/combobox/combomjnscoverpar_repository.dart';
 import '../../../repositories/combobox/combomkabzonagempa_repository.dart';
 import '../../../repositories/combobox/combomkecamatan_repository.dart';
@@ -52,6 +53,7 @@ import '../../../repositories/combobox/combomwilayah_repository.dart';
 import '../../../repositories/combobox/comborkonstruksiojk_repository.dart';
 import '../../../repositories/combobox/combormatauang_repository.dart';
 import '../../../repositories/combobox/comborokupasi_repository.dart';
+import '../../../repositories/regpar/regpar_validation_preview_repository.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/dropdown2.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
@@ -877,429 +879,458 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     final bool canShowLanjutkan = isAllFormComplete();
     return Scaffold(
       backgroundColor: secondaryBlackColor,
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: hPadding * 1.5),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-              child: const FormSectionHeader(
-                iconPath: "assets/icons/properti.svg",
-                title: "Polis Properti",
-                subtitle:
-                    "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
-              ),
-            ),
-            const SizedBox(height: hPadding * 1.5),
-            CustomProgressBar(
-              progress: getProgressValue(),
-              horizontalPadding: hPadding * 1.5,
-              barColor: primaryColor,
-              borderRadius: cardBorderRadius,
-            ),
-            const SizedBox(height: hPadding * 1.5),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: hPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Form1Page(
-                    context: context,
-                    title: "Data Tertanggung",
-                    isExpanded: expanded[0],
-                    onRefresh: () {
-                      if (regpar1Id != null && regpar1Id!.isNotEmpty) {
-                        refreshForm1(recordId: regpar1Id);
-                      }
-                    },
-                    child: Column(
-                      children: [
-                        buildFieldTtgNama(),
-                        const SizedBox(height: hPadding),
-                        buildFieldTtgAlamat(),
-                        const SizedBox(height: 8),
-                      ],
-                    ),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: hPadding * 1.5),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                  child: const FormSectionHeader(
+                    iconPath: "assets/icons/properti.svg",
+                    title: "Polis Properti",
+                    subtitle:
+                        "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
                   ),
-                  const SizedBox(height: hPadding),
-                  Form2Page(
-                    context: context,
-                    title: "Informasi Polis",
-                    isExpanded: expanded[1],
-                    onRefresh: () {
-                      if (regpar1Id != null && regpar1Id!.isNotEmpty) {
-                        refreshForm2(recordId: regpar1Id);
-                      }
-                    },
-                    child: Column(
-                      children: [
-                        Row(
+                ),
+                const SizedBox(height: hPadding * 1.5),
+                CustomProgressBar(
+                  progress: getProgressValue(),
+                  horizontalPadding: hPadding * 1.5,
+                  barColor: primaryColor,
+                  borderRadius: cardBorderRadius,
+                ),
+                const SizedBox(height: hPadding * 1.5),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: hPadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Form1Page(
+                        context: context,
+                        title: "Data Tertanggung",
+                        isExpanded: expanded[0],
+                        onRefresh: () {
+                          if (regpar1Id != null && regpar1Id!.isNotEmpty) {
+                            refreshForm1(recordId: regpar1Id);
+                          }
+                        },
+                        child: Column(
                           children: [
-                            Flexible(child: buildFieldPolisMulai()),
-                            const SizedBox(
-                              width: hPadding,
-                            ),
-                            Flexible(child: buildFieldPolisBerakhir()),
+                            buildFieldTtgNama(),
+                            const SizedBox(height: hPadding),
+                            buildFieldTtgAlamat(),
+                            const SizedBox(height: 8),
                           ],
                         ),
-                        const SizedBox(
-                          height: hPadding,
-                        ),
-                        buildFieldRokupasiId(),
-                        const SizedBox(height: hPadding),
-                        buildFieldRkonstruksiojkId(),
-                        const SizedBox(height: hPadding),
-                        buildFieldObjectAlamat(),
-                        const SizedBox(height: hPadding),
-                        buildFieldObjectPropinsiId(),
-                        const SizedBox(height: hPadding),
-                        buildFieldObjectKotaId(),
-                        const SizedBox(height: hPadding),
-                        buildFieldObjectKecamatanId(),
-                        const SizedBox(height: hPadding),
-                        buildFieldObjectKelurahanId(),
-                        const SizedBox(height: 8),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: hPadding),
-                  Form3Page(
-                    context: context,
-                    title: "Pertanggungan",
-                    isExpanded: expanded[2],
-                    onRefresh: () {
-                      if (regpar1Id != null && regpar1Id!.isNotEmpty) {
-                        refreshForm3(recordId: regpar1Id);
-                      }
-                    },
-                    child: Column(
-                      children: [
-                        buildFieldMjnscoverparId(),
-                        const SizedBox(height: hPadding),
-                        Text(
-                          "Jenis asuransi All Risk mencakup:",
-                          style: bodyTextStyle(context).copyWith(
-                            color: primaryLightColor,
-                            fontSize: getResponsiveFont(context, 16),
-                          ),
-                        ),
-                        const SizedBox(height: hPadding),
-                        Row(
+                      ),
+                      const SizedBox(height: hPadding),
+                      Form2Page(
+                        context: context,
+                        title: "Informasi Polis",
+                        isExpanded: expanded[1],
+                        onRefresh: () {
+                          if (regpar1Id != null && regpar1Id!.isNotEmpty) {
+                            refreshForm2(recordId: regpar1Id);
+                          }
+                        },
+                        child: Column(
                           children: [
-                            Flexible(child: buildFieldIsFlexas()),
-                            const SizedBox(width: 8),
-                            Flexible(child: buildFieldIsEq()),
-                          ],
-                        ),
-                        const SizedBox(height: hPadding),
-                        Row(
-                          children: [
-                            Flexible(child: buildFieldIsRsmdcc()),
-                            const SizedBox(width: 8),
-                            Flexible(child: buildFieldIsTsfwd()),
-                          ],
-                        ),
-                        const SizedBox(height: hPadding),
-                        Row(
-                          children: [
-                            Flexible(child: buildFieldIsOther()),
-                            const SizedBox(width: 8),
-                            const Flexible(child: SizedBox.shrink()),
-                          ],
-                        ),
-                        const SizedBox(height: hPadding),
-                        buildFieldMwilayahId(),
-                        if (!_showZonaGempa) ...[
-                          const SizedBox(height: 8),
-                        ],
-                        if (_showZonaGempa) ...[
-                          const SizedBox(height: hPadding),
-                          buildFieldKab2zonagempaId(),
-                          const SizedBox(height: 8),
-                        ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: hPadding),
-                  Form4Page(
-                    context: context,
-                    title: "Nilai Pertanggungan",
-                    isExpanded: expanded[3],
-                    onRefresh: () {
-                      if (regpar1Id != null && regpar1Id!.isNotEmpty) {
-                        refreshForm4(recordId: regpar1Id);
-                      }
-                    },
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Flexible(child: _buildComboCurddId()),
-                            const SizedBox(width: 8),
-                            Flexible(child: buildFieldSiMachinery()),
-                          ],
-                        ),
-                        const SizedBox(height: hPadding),
-                        Row(
-                          children: [
-                            Flexible(child: buildFieldSiBuilding()),
-                            const SizedBox(width: 8),
-                            Flexible(child: buildFieldSiContent()),
-                          ],
-                        ),
-                        const SizedBox(height: hPadding),
-                        Row(
-                          children: [
-                            Flexible(child: buildFieldSiStock()),
-                            const SizedBox(width: 8),
-                            Flexible(child: buildFieldSiOther()),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: hPadding),
-                  Form6Page(
-                    context: context,
-                    title: "Upload Foto Bangunan",
-                    isExpanded: expanded[4],
-                    onRefresh: () {
-                      if (regpar1Id != null && regpar1Id!.isNotEmpty) {
-                        refreshForm6(recordId: regpar1Id);
-                      }
-                    },
-                    child: Column(
-                      children: [
-                        BlocBuilder<RegparUploadFotoObjectBloc,
-                            RegParUploadFotoObjectState>(
-                          buildWhen: (p, c) => p.items.length != c.items.length,
-                          builder: (context, state) {
-                            if (_showVal6 && state.items.isNotEmpty) {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                if (mounted) setState(() => _showVal6 = false);
-                              });
-                            }
-
-                            return Regpar6StoragePickerSectionWidget(
-                              showRequiredError:
-                                  _showVal6 && state.items.isEmpty,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: hPadding),
-                  buildButtonHitungPremi(),
-                  const SizedBox(height: hPadding),
-                  Form5Page(
-                    context: context,
-                    title: "Premi",
-                    isExpanded: expanded[5],
-                    child: (hasForm5Record)
-                        ? Column(
-                            children: [
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "RATE",
-                                  style: bodyTextStyle(context).copyWith(
-                                    color: primaryLightColor,
-                                    fontSize: getResponsiveFont(context, 20),
-                                  ),
+                            Row(
+                              children: [
+                                Flexible(child: buildFieldPolisMulai()),
+                                const SizedBox(
+                                  width: hPadding,
                                 ),
+                                Flexible(child: buildFieldPolisBerakhir()),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: hPadding,
+                            ),
+                            buildFieldRokupasiId(),
+                            const SizedBox(height: hPadding),
+                            buildFieldRkonstruksiojkId(),
+                            const SizedBox(height: hPadding),
+                            buildFieldObjectAlamat(),
+                            const SizedBox(height: hPadding),
+                            buildFieldObjectPropinsiId(),
+                            const SizedBox(height: hPadding),
+                            buildFieldObjectKotaId(),
+                            const SizedBox(height: hPadding),
+                            buildFieldObjectKecamatanId(),
+                            const SizedBox(height: hPadding),
+                            buildFieldObjectKelurahanId(),
+                            const SizedBox(height: 8),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: hPadding),
+                      Form3Page(
+                        context: context,
+                        title: "Pertanggungan",
+                        isExpanded: expanded[2],
+                        onRefresh: () {
+                          if (regpar1Id != null && regpar1Id!.isNotEmpty) {
+                            refreshForm3(recordId: regpar1Id);
+                          }
+                        },
+                        child: Column(
+                          children: [
+                            buildFieldMjnscoverparId(),
+                            const SizedBox(height: hPadding),
+                            Text(
+                              "Jenis asuransi All Risk mencakup:",
+                              style: bodyTextStyle(context).copyWith(
+                                color: primaryLightColor,
+                                fontSize: getResponsiveFont(context, 16),
                               ),
-                              const SizedBox(height: 6),
-                              HitungPremiWidget(
-                                rows: [
-                                  HitungPremiRow(
-                                    label: "Kebakaran:",
-                                    controller: fieldRateParController,
-                                    layoutType:
-                                        HitungPremiLayoutType.horizontal,
-                                    // showValueBorder: true,
-                                    valueSuffix: "%",
-                                  ),
-                                  HitungPremiRow(
-                                    label: "Kerusuhan:",
-                                    controller: fieldRateRsmdccController,
-                                    layoutType:
-                                        HitungPremiLayoutType.horizontal,
-                                    // showValueBorder: true,
-                                    valueSuffix: "%",
-                                  ),
-                                  HitungPremiRow(
-                                    label: "Banjir:",
-                                    controller: fieldRateTsfwdController,
-                                    layoutType:
-                                        HitungPremiLayoutType.horizontal,
-                                    // showValueBorder: true,
-                                    valueSuffix: "%",
-                                  ),
-                                  HitungPremiRow(
-                                    label: "Gempa Bumi:",
-                                    controller: fieldRateEqvetController,
-                                    layoutType:
-                                        HitungPremiLayoutType.horizontal,
-                                    // showValueBorder: true,
-                                    valueSuffix: "%",
-                                  ),
-                                  HitungPremiRow(
-                                    label: "Lain-Lain:",
-                                    controller: fieldRateOtherController,
-                                    layoutType:
-                                        HitungPremiLayoutType.horizontal,
-                                    // showValueBorder: true,
-                                    valueSuffix: "%",
-                                  ),
-                                  HitungPremiRow(
-                                    label: "Total Rate:",
-                                    controller: fieldRateTotalController,
-                                    layoutType:
-                                        HitungPremiLayoutType.horizontal,
-                                    showValueBorder: true,
-                                    valueSuffix: "%",
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 2),
-                              const Divider(
-                                thickness: 1,
-                                color: sGrey,
-                              ),
-                              const SizedBox(height: 2),
-                              HitungPremiWidget(
-                                rows: [
-                                  HitungPremiRow(
-                                    label:
-                                        "PERHITUNGAN PREMI\n(Asuransi PAR Termasuk EQVET)",
-                                    description:
-                                        "${fieldComboRMatauang?.rmatauangSimbol} ${formatControllerNumber(fieldSumInsuredController)} x ${fieldRateTotalController.text}% =",
-                                    controller: fieldPremiTotalController,
-                                    layoutType: HitungPremiLayoutType.vertical,
-                                    valuePrefix:
-                                        fieldComboRMatauang?.rmatauangSimbol,
-                                    showValueBorder: true,
-                                    formatNumber: true,
-                                  ),
-                                  HitungPremiRow(
-                                    label: "DISKON",
-                                    controller: fieldDiskonNilaiController,
-                                    layoutType: HitungPremiLayoutType.vertical,
-                                    valuePrefix:
-                                        fieldComboRMatauang?.rmatauangSimbol,
-                                    showValueBorder: true,
-                                    formatNumber: true,
-                                  ),
-                                  HitungPremiRow(
-                                    label: "BIAYA POLIS",
-                                    controller: fieldBiayaPolisController,
-                                    layoutType: HitungPremiLayoutType.vertical,
-                                    valuePrefix:
-                                        fieldComboRMatauang?.rmatauangSimbol,
-                                    showValueBorder: true,
-                                    formatNumber: true,
-                                  ),
-                                  HitungPremiRow(
-                                    label: "BIAYA MATERAI",
-                                    controller: fieldBiayaMateraiController,
-                                    layoutType: HitungPremiLayoutType.vertical,
-                                    valuePrefix:
-                                        fieldComboRMatauang?.rmatauangSimbol,
-                                    showValueBorder: true,
-                                    formatNumber: true,
-                                  ),
-                                  // HitungPremiRow(
-                                  //   label: "TOTAL TAGIHAN",
-                                  //   controller: fieldPremiNetController,
-                                  //   layoutType: HitungPremiLayoutType.vertical,
-                                  //   valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                                  //   showValueBorder: true,
-                                  //   formatNumber: true,
-                                  // ),
-                                  HitungPremiRow(
-                                    // label: "TOTAL PREMI",
-                                    label: "TOTAL TAGIHAN",
-                                    controller: fieldTotalTagihanController,
-                                    layoutType: HitungPremiLayoutType.vertical,
-                                    valuePrefix:
-                                        fieldComboRMatauang?.rmatauangSimbol,
-                                    showValueBorder: true,
-                                    formatNumber: true,
-                                  ),
-                                ],
-                              ),
-                              // buildFieldPremiEqvet(),
-                              //                         // const SizedBox(height: hPadding),
-                              //                         // buildFieldDiskonNilai(),
-                              //                         // const SizedBox(height: hPadding),
-                              //                         // buildFieldPremiNet(),
+                            ),
+                            const SizedBox(height: hPadding),
+                            Row(
+                              children: [
+                                Flexible(child: buildFieldIsFlexas()),
+                                const SizedBox(width: 8),
+                                Flexible(child: buildFieldIsEq()),
+                              ],
+                            ),
+                            const SizedBox(height: hPadding),
+                            Row(
+                              children: [
+                                Flexible(child: buildFieldIsRsmdcc()),
+                                const SizedBox(width: 8),
+                                Flexible(child: buildFieldIsTsfwd()),
+                              ],
+                            ),
+                            const SizedBox(height: hPadding),
+                            Row(
+                              children: [
+                                Flexible(child: buildFieldIsOther()),
+                                const SizedBox(width: 8),
+                                const Flexible(child: SizedBox.shrink()),
+                              ],
+                            ),
+                            const SizedBox(height: hPadding),
+                            buildFieldMwilayahId(),
+                            if (!_showZonaGempa) ...[
+                              const SizedBox(height: 8),
                             ],
-                          )
-                        : const HitungPremiEmptyView(),
-                  ),
-                  const SizedBox(height: hPadding),
-                  if (canShowLanjutkan) ...[
-                    AppButton.primary(
-                      text: _isLanjutkanLoading ? "Memproses..." : "Lanjutkan",
-                      isLoading: _isLanjutkanLoading,
-                      backgroundColor: pGreen2,
-                      onPressed: _isLanjutkanLoading
-                          ? null
-                          : () async {
-                              setState(() {
-                                _isLanjutkanLoading = true;
-                              });
-
-                              _showGlobalLoading();
-
-                              try {
-                                draftForm1ToBloc(context);
-                                draftForm2ToBloc(context);
-                                draftForm3ToBloc(context);
-                                draftForm4ToBloc(context);
-
-                                context.read<RegparFlowBloc>().add(
-                                      RegparFlowStartEvent(),
-                                    );
-
-                                await Future.delayed(
-                                    const Duration(seconds: 2));
-
-                                if (!mounted) return;
-
-                                _hideGlobalLoading();
-
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => KonfirmasiRegParPage(
-                                      recordId: regpar1Id ?? '',
-                                      viewMode: 'ubah',
-                                    ),
-                                  ),
-                                );
-                              } finally {
-                                _hideGlobalLoading();
-
-                                if (mounted) {
-                                  setState(() {
-                                    _isLanjutkanLoading = false;
+                            if (_showZonaGempa) ...[
+                              const SizedBox(height: hPadding),
+                              buildFieldKab2zonagempaId(),
+                              const SizedBox(height: 8),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: hPadding),
+                      Form4Page(
+                        context: context,
+                        title: "Nilai Pertanggungan",
+                        isExpanded: expanded[3],
+                        onRefresh: () {
+                          if (regpar1Id != null && regpar1Id!.isNotEmpty) {
+                            refreshForm4(recordId: regpar1Id);
+                          }
+                        },
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Flexible(child: _buildComboCurddId()),
+                                const SizedBox(width: 8),
+                                Flexible(child: buildFieldSiMachinery()),
+                              ],
+                            ),
+                            const SizedBox(height: hPadding),
+                            Row(
+                              children: [
+                                Flexible(child: buildFieldSiBuilding()),
+                                const SizedBox(width: 8),
+                                Flexible(child: buildFieldSiContent()),
+                              ],
+                            ),
+                            const SizedBox(height: hPadding),
+                            Row(
+                              children: [
+                                Flexible(child: buildFieldSiStock()),
+                                const SizedBox(width: 8),
+                                Flexible(child: buildFieldSiOther()),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: hPadding),
+                      Form6Page(
+                        context: context,
+                        title: "Upload Foto Bangunan",
+                        isExpanded: expanded[4],
+                        onRefresh: () {
+                          if (regpar1Id != null && regpar1Id!.isNotEmpty) {
+                            refreshForm6(recordId: regpar1Id);
+                          }
+                        },
+                        child: Column(
+                          children: [
+                            BlocBuilder<RegparUploadFotoObjectBloc,
+                                RegParUploadFotoObjectState>(
+                              buildWhen: (p, c) =>
+                                  p.items.length != c.items.length,
+                              builder: (context, state) {
+                                if (_showVal6 && state.items.isNotEmpty) {
+                                  WidgetsBinding.instance
+                                      .addPostFrameCallback((_) {
+                                    if (mounted)
+                                      setState(() => _showVal6 = false);
                                   });
                                 }
-                              }
-                            },
-                    ),
-                  ],
-                  const SizedBox(height: 25),
-                ],
-              ),
+
+                                return Regpar6StoragePickerSectionWidget(
+                                  showRequiredError:
+                                      _showVal6 && state.items.isEmpty,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: hPadding),
+                      buildButtonHitungPremi(),
+                      const SizedBox(height: hPadding),
+                      Form5Page(
+                        context: context,
+                        title: "Premi",
+                        isExpanded: expanded[5],
+                        child: (hasForm5Record)
+                            ? Column(
+                                children: [
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      "RATE",
+                                      style: bodyTextStyle(context).copyWith(
+                                        color: primaryLightColor,
+                                        fontSize:
+                                            getResponsiveFont(context, 20),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  HitungPremiWidget(
+                                    rows: [
+                                      HitungPremiRow(
+                                        label: "Kebakaran:",
+                                        controller: fieldRateParController,
+                                        layoutType:
+                                            HitungPremiLayoutType.horizontal,
+                                        // showValueBorder: true,
+                                        valueSuffix: "%",
+                                      ),
+                                      HitungPremiRow(
+                                        label: "Kerusuhan:",
+                                        controller: fieldRateRsmdccController,
+                                        layoutType:
+                                            HitungPremiLayoutType.horizontal,
+                                        // showValueBorder: true,
+                                        valueSuffix: "%",
+                                      ),
+                                      HitungPremiRow(
+                                        label: "Banjir:",
+                                        controller: fieldRateTsfwdController,
+                                        layoutType:
+                                            HitungPremiLayoutType.horizontal,
+                                        // showValueBorder: true,
+                                        valueSuffix: "%",
+                                      ),
+                                      HitungPremiRow(
+                                        label: "Gempa Bumi:",
+                                        controller: fieldRateEqvetController,
+                                        layoutType:
+                                            HitungPremiLayoutType.horizontal,
+                                        // showValueBorder: true,
+                                        valueSuffix: "%",
+                                      ),
+                                      HitungPremiRow(
+                                        label: "Lain-Lain:",
+                                        controller: fieldRateOtherController,
+                                        layoutType:
+                                            HitungPremiLayoutType.horizontal,
+                                        // showValueBorder: true,
+                                        valueSuffix: "%",
+                                      ),
+                                      HitungPremiRow(
+                                        label: "Total Rate:",
+                                        controller: fieldRateTotalController,
+                                        layoutType:
+                                            HitungPremiLayoutType.horizontal,
+                                        showValueBorder: true,
+                                        valueSuffix: "%",
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  const Divider(
+                                    thickness: 1,
+                                    color: sGrey,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  HitungPremiWidget(
+                                    rows: [
+                                      HitungPremiRow(
+                                        label:
+                                            "PERHITUNGAN PREMI\n(Asuransi PAR Termasuk EQVET)",
+                                        description:
+                                            "${fieldComboRMatauang?.rmatauangSimbol} ${formatControllerNumber(fieldSumInsuredController)} x ${fieldRateTotalController.text}% =",
+                                        controller: fieldPremiTotalController,
+                                        layoutType:
+                                            HitungPremiLayoutType.vertical,
+                                        valuePrefix: fieldComboRMatauang
+                                            ?.rmatauangSimbol,
+                                        showValueBorder: true,
+                                        formatNumber: true,
+                                      ),
+                                      HitungPremiRow(
+                                        label: "DISKON",
+                                        controller: fieldDiskonNilaiController,
+                                        layoutType:
+                                            HitungPremiLayoutType.vertical,
+                                        valuePrefix: fieldComboRMatauang
+                                            ?.rmatauangSimbol,
+                                        showValueBorder: true,
+                                        formatNumber: true,
+                                      ),
+                                      HitungPremiRow(
+                                        label: "BIAYA POLIS",
+                                        controller: fieldBiayaPolisController,
+                                        layoutType:
+                                            HitungPremiLayoutType.vertical,
+                                        valuePrefix: fieldComboRMatauang
+                                            ?.rmatauangSimbol,
+                                        showValueBorder: true,
+                                        formatNumber: true,
+                                      ),
+                                      HitungPremiRow(
+                                        label: "BIAYA MATERAI",
+                                        controller: fieldBiayaMateraiController,
+                                        layoutType:
+                                            HitungPremiLayoutType.vertical,
+                                        valuePrefix: fieldComboRMatauang
+                                            ?.rmatauangSimbol,
+                                        showValueBorder: true,
+                                        formatNumber: true,
+                                      ),
+                                      // HitungPremiRow(
+                                      //   label: "TOTAL TAGIHAN",
+                                      //   controller: fieldPremiNetController,
+                                      //   layoutType: HitungPremiLayoutType.vertical,
+                                      //   valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
+                                      //   showValueBorder: true,
+                                      //   formatNumber: true,
+                                      // ),
+                                      HitungPremiRow(
+                                        // label: "TOTAL PREMI",
+                                        label: "TOTAL TAGIHAN",
+                                        controller: fieldTotalTagihanController,
+                                        layoutType:
+                                            HitungPremiLayoutType.vertical,
+                                        valuePrefix: fieldComboRMatauang
+                                            ?.rmatauangSimbol,
+                                        showValueBorder: true,
+                                        formatNumber: true,
+                                      ),
+                                    ],
+                                  ),
+                                  // buildFieldPremiEqvet(),
+                                  //                         // const SizedBox(height: hPadding),
+                                  //                         // buildFieldDiskonNilai(),
+                                  //                         // const SizedBox(height: hPadding),
+                                  //                         // buildFieldPremiNet(),
+                                ],
+                              )
+                            : const HitungPremiEmptyView(),
+                      ),
+                      const SizedBox(height: hPadding),
+                      if (canShowLanjutkan) ...[
+                        AppButton.primary(
+                          text: _isLanjutkanLoading
+                              ? "Memproses..."
+                              : "Lanjutkan",
+                          isLoading: _isLanjutkanLoading,
+                          backgroundColor: pGreen2,
+                          onPressed: _isLanjutkanLoading
+                              ? null
+                              : () async {
+                                  setState(() {
+                                    _isLanjutkanLoading = true;
+                                  });
+
+                                  final canContinueByPreview =
+                                      await _runValidationPreviewBeforeFlow();
+                                  if (!mounted || !canContinueByPreview) {
+                                    if (mounted) {
+                                      setState(() {
+                                        _isLanjutkanLoading = false;
+                                      });
+                                    }
+                                    return;
+                                  }
+
+                                  _showGlobalLoading();
+
+                                  try {
+                                    draftForm1ToBloc(context);
+                                    draftForm2ToBloc(context);
+                                    draftForm3ToBloc(context);
+                                    draftForm4ToBloc(context);
+
+                                    context.read<RegparFlowBloc>().add(
+                                          RegparFlowStartEvent(),
+                                        );
+
+                                    await Future.delayed(
+                                        const Duration(seconds: 2));
+
+                                    if (!mounted) return;
+
+                                    _hideGlobalLoading();
+
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            KonfirmasiRegParPage(
+                                          recordId: regpar1Id ?? '',
+                                          viewMode: 'ubah',
+                                        ),
+                                      ),
+                                    );
+                                  } finally {
+                                    _hideGlobalLoading();
+
+                                    if (mounted) {
+                                      setState(() {
+                                        _isLanjutkanLoading = false;
+                                      });
+                                    }
+                                  }
+                                },
+                        ),
+                      ],
+                      const SizedBox(height: 25),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          if (_showValidationPreviewFloatingIcon)
+            _buildValidationPreviewFloatingButton(),
+        ],
       ),
     );
   }
@@ -1580,6 +1611,13 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
   bool _isHitungPremiLoading = false;
   int _hitungPremiAttempt = 0;
+  final RegparValidationPreviewRepository _validationPreviewRepository =
+      RegparValidationPreviewRepository();
+  RegparValidationPreviewResponseModel? _lastValidationPreviewResponse;
+  String? _lastValidationPreviewKey;
+  bool _showValidationPreviewFloatingIcon = false;
+  bool _isValidationPreviewDialogOpen = false;
+  final Set<String> _validationPreviewFieldErrorKeys = <String>{};
 
   Widget buildButtonHitungPremi() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -1639,6 +1677,15 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         _isHitungPremiLoading = true;
       });
     }
+
+    final canContinueByPreview = await _runValidationPreviewBeforeFlow();
+    if (!mounted || !canContinueByPreview) return;
+
+    if (mounted) {
+      setState(() {
+        _isHitungPremiLoading = true;
+      });
+    }
     _startHitungPremiTimeout();
 
     final localIds6 = form6State.items.map((e) => e.localId).toList();
@@ -1656,6 +1703,487 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     draftForm4ToBloc(context);
 
     context.read<RegparFlowBloc>().add(RegparFlowStartEvent());
+  }
+
+  Future<bool> _runValidationPreviewBeforeFlow() async {
+    final previewKey = _currentValidationPreviewKey();
+    final cachedPreview = _lastValidationPreviewResponse;
+
+    if (_lastValidationPreviewKey == previewKey &&
+        cachedPreview != null &&
+        cachedPreview.success &&
+        cachedPreview.hasIssue &&
+        cachedPreview.issues.any((issue) => issue.hasError)) {
+      _applyValidationPreviewIssue(cachedPreview, previewKey);
+      return false;
+    }
+
+    try {
+      final response = await _validationPreviewRepository
+          .check(_buildValidationPreviewRequest())
+          .timeout(
+            const Duration(seconds: 8),
+            onTimeout: RegparValidationPreviewResponseModel.failure,
+          );
+
+      if (!mounted) return false;
+
+      if (!response.success) {
+        debugPrint(
+          '[REGPAR VALIDATION PREVIEW] Technical failure, continue main flow.',
+        );
+        return true;
+      }
+
+      if (!response.hasIssue ||
+          !response.issues.any((issue) => issue.hasError)) {
+        _clearValidationPreviewState();
+        return true;
+      }
+
+      _applyValidationPreviewIssue(response, previewKey);
+      return false;
+    } catch (e) {
+      debugPrint(
+        '[REGPAR VALIDATION PREVIEW] Exception, continue main flow: $e',
+      );
+      return true;
+    }
+  }
+
+  RegparValidationPreviewRequestModel _buildValidationPreviewRequest() {
+    return RegparValidationPreviewRequestModel(
+      regpar1Id: regpar1Id ?? '',
+      rokupasiId: fieldComboROkupasi?.rokupasiId,
+      currId: fieldComboRMatauang?.rmatauangKode,
+      siBuilding: _parseMoney(fieldSiBuildingController.text),
+      siMachinery: _parseMoney(fieldSiMachineryController.text),
+      siContent: _parseMoney(fieldSiContentController.text),
+      siStock: _parseMoney(fieldSiStockController.text),
+      siOther: _parseMoney(fieldSiOtherController.text),
+    );
+  }
+
+  double _parseMoney(String value) {
+    return double.tryParse(value.replaceAll(',', '').trim()) ?? 0;
+  }
+
+  String _currentValidationPreviewKey() {
+    String moneyKey(TextEditingController controller) =>
+        _parseMoney(controller.text).toStringAsFixed(2);
+
+    return [
+      regpar1Id ?? '',
+      fieldComboROkupasi?.rokupasiId ?? '',
+      fieldComboRMatauang?.rmatauangKode ?? '',
+      moneyKey(fieldSiBuildingController),
+      moneyKey(fieldSiMachineryController),
+      moneyKey(fieldSiContentController),
+      moneyKey(fieldSiStockController),
+      moneyKey(fieldSiOtherController),
+    ].join('|');
+  }
+
+  void _applyValidationPreviewIssue(
+    RegparValidationPreviewResponseModel response,
+    String previewKey,
+  ) {
+    final issues = response.issues
+        .where((issue) => issue.hasError && issue.message.trim().isNotEmpty)
+        .toList();
+
+    if (issues.isEmpty) return;
+
+    final idx = sectionIndex(RegparSection.form4);
+
+    setState(() {
+      _hitungPremiAttempt++;
+      _isHitungPremiLoading = false;
+      _isLanjutkanLoading = false;
+      _clearValidationPreviewData();
+
+      _lastValidationPreviewResponse = response;
+      _lastValidationPreviewKey = previewKey;
+      _showValidationPreviewFloatingIcon = false;
+
+      for (final issue in issues) {
+        final fieldKey = _fieldKeyFromPreviewIssue(issue);
+        _appendValidationPreviewFieldError(fieldKey, issue.message);
+        _validationPreviewFieldErrorKeys.add(fieldKey);
+      }
+
+      expanded = List<bool>.filled(expanded.length, false);
+      expanded[idx] = true;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _showValidationPreviewDialog(response);
+    });
+  }
+
+  void _appendValidationPreviewFieldError(String fieldKey, String message) {
+    final trimmedMessage = message.trim();
+    if (trimmedMessage.isEmpty) return;
+
+    final existing = fieldErrors[fieldKey]?.trim();
+    if (existing == null || existing.isEmpty) {
+      fieldErrors[fieldKey] = trimmedMessage;
+      return;
+    }
+
+    if (existing.contains(trimmedMessage)) return;
+
+    fieldErrors[fieldKey] = '$existing\n$trimmedMessage';
+  }
+
+  String _fieldKeyFromPreviewIssue(RegparValidationPreviewIssueModel issue) {
+    final fieldKey = issue.fieldKey.trim();
+    if (fieldKey.isNotEmpty) return fieldKey;
+    return 'form4.siOther';
+  }
+
+  void _clearValidationPreviewForChangedField(String fieldKey) {
+    if (_lastValidationPreviewResponse == null) return;
+    if (!fieldKey.startsWith('form2.') && !fieldKey.startsWith('form4.')) {
+      return;
+    }
+
+    setState(() {
+      _clearValidationPreviewData();
+    });
+  }
+
+  void _clearValidationPreviewState() {
+    if (!mounted) return;
+    setState(() {
+      _clearValidationPreviewData();
+    });
+  }
+
+  void _clearValidationPreviewData() {
+    for (final fieldKey in _validationPreviewFieldErrorKeys) {
+      fieldErrors.remove(fieldKey);
+    }
+    _validationPreviewFieldErrorKeys.clear();
+    _lastValidationPreviewResponse = null;
+    _lastValidationPreviewKey = null;
+    _showValidationPreviewFloatingIcon = false;
+  }
+
+  Future<void> _showValidationPreviewDialog(
+    RegparValidationPreviewResponseModel response,
+  ) async {
+    if (!mounted || _isValidationPreviewDialogOpen) return;
+
+    setState(() {
+      _showValidationPreviewFloatingIcon = false;
+    });
+    _isValidationPreviewDialogOpen = true;
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.65),
+      builder: (_) => _buildValidationPreviewDialog(response),
+    );
+
+    _isValidationPreviewDialogOpen = false;
+    if (!mounted) return;
+
+    final stillCurrentIssue = _lastValidationPreviewResponse != null &&
+        _lastValidationPreviewKey == _currentValidationPreviewKey();
+    if (stillCurrentIssue) {
+      setState(() {
+        _showValidationPreviewFloatingIcon = true;
+      });
+    }
+  }
+
+  Widget _buildValidationPreviewFloatingButton() {
+    final issueCount = _lastValidationPreviewResponse?.issues
+            .where((issue) => issue.hasError)
+            .length ??
+        0;
+
+    return Positioned(
+      top: 12,
+      left: 12,
+      child: SafeArea(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(24),
+            onTap: () {
+              final response = _lastValidationPreviewResponse;
+              if (response != null) {
+                _showValidationPreviewDialog(response);
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: pGrey,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: pRed),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.25),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.warning_amber_rounded,
+                      color: pRed, size: 20),
+                  if (issueCount > 0) ...[
+                    const SizedBox(width: 4),
+                    Text(
+                      issueCount.toString(),
+                      style: bodyTextStyle(context, fontSize: 12).copyWith(
+                        color: primaryLightColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildValidationPreviewDialog(
+    RegparValidationPreviewResponseModel response,
+  ) {
+    final issues = response.issues.where((issue) => issue.hasError).toList();
+    final propertyLabel = response.propertyLabel.trim();
+    final maxDialogHeight = MediaQuery.of(context).size.height * 0.82;
+
+    return Dialog(
+      backgroundColor: pGrey,
+      insetPadding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(color: sGrey),
+      ),
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: maxDialogHeight,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: SizedBox(
+                height: 48,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Text(
+                      'Validasi Properti',
+                      style: bodyTextStyle(
+                        context,
+                        fontSize: getResponsiveFont(context, 18),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                        icon: const Icon(Icons.close),
+                        color: primaryLightColor,
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: hPadding * 1.5,
+                  vertical: hPadding,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (propertyLabel.isNotEmpty) ...[
+                      Text(
+                        propertyLabel,
+                        style: bodyTextStyle(context, fontSize: 16).copyWith(
+                          color: primaryLightColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    Text(
+                      'Nilai pertanggungan belum sesuai ketentuan asuransi. Sesuaikan nilai berikut sebelum hitung premi.',
+                      style: bodyTextStyle(context, fontSize: 14).copyWith(
+                        color: primaryLightColor.withOpacity(0.85),
+                      ),
+                    ),
+                    const SizedBox(height: hPadding),
+                    const Divider(height: 1),
+                    const SizedBox(height: hPadding),
+                    ..._buildValidationPreviewIssueCards(issues),
+                  ],
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.all(hPadding),
+              child: AppButton.primary(
+                text: 'Mengerti',
+                backgroundColor: pGreen2,
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildValidationPreviewIssueCards(
+    List<RegparValidationPreviewIssueModel> issues,
+  ) {
+    final widgets = <Widget>[];
+
+    for (var i = 0; i < issues.length; i++) {
+      widgets.add(_buildValidationPreviewIssueCard(issues[i]));
+
+      if (i < issues.length - 1) {
+        widgets.add(const SizedBox(height: 12));
+      }
+    }
+
+    return widgets;
+  }
+
+  Widget _buildValidationPreviewIssueCard(
+    RegparValidationPreviewIssueModel issue,
+  ) {
+    final details = _validationPreviewIssueDetails(issue);
+    final suggestion = issue.suggestion.trim();
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: zRed.withOpacity(0.20),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 1),
+                child: SvgPicture.asset(
+                  'assets/icons/bi_exclamation-circle.svg',
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(zRed, BlendMode.srcIn),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  issue.message,
+                  style: bodyTextStyle(context, fontSize: 15).copyWith(
+                    color: primaryLightColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (suggestion.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              suggestion,
+              style: bodyTextStyle(context, fontSize: 14).copyWith(
+                color: primaryLightColor.withOpacity(0.92),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+          if (details.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ...details,
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _validationPreviewIssueDetails(
+    RegparValidationPreviewIssueModel issue,
+  ) {
+    final rows = <Widget>[];
+
+    if (issue.expectedValue.trim().isNotEmpty) {
+      rows.add(_buildValidationPreviewDetailRow(
+        'Total saat ini',
+        _formatValidationIdr(issue.expectedValue),
+      ));
+    }
+
+    if (issue.maxValue.trim().isNotEmpty) {
+      rows.add(_buildValidationPreviewDetailRow(
+        'Batas maksimum',
+        _formatValidationIdr(issue.maxValue),
+      ));
+    }
+
+    return rows;
+  }
+
+  Widget _buildValidationPreviewDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 3),
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: '$label : ',
+              style: bodyTextStyle(context, fontSize: 13).copyWith(
+                color: primaryLightColor.withOpacity(0.7),
+              ),
+            ),
+            TextSpan(
+              text: value,
+              style: bodyTextStyle(context, fontSize: 13).copyWith(
+                color: primaryLightColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatValidationIdr(String value) {
+    final number = double.tryParse(value.replaceAll(',', '').trim());
+    if (number == null) return value.trim();
+    return 'IDR ${NumberFormat.decimalPattern('en_US').format(number)}';
   }
 
   void _startHitungPremiTimeout() {
@@ -2106,6 +2634,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
           setState(() {
             fieldComboROkupasi = v;
             clearErr('form2.okupasi');
+            _clearValidationPreviewData();
 
             fieldComboRKonstruksiojk = null;
             previousKonstruksi = null;
@@ -2412,6 +2941,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboRMatauang = v;
+            _clearValidationPreviewData();
             if (v != null) {
               clearErr('form4.mataUang');
             }
@@ -2658,6 +3188,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     final clean = v.replaceAll(",", "").trim();
     final angka = double.tryParse(clean);
     if (angka != null && angka >= 0) clearErr(key);
+    _clearValidationPreviewForChangedField(key);
   }
 
   final Map<String, String?> fieldErrors = {};

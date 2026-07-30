@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/helper/api_side_effects.dart';
 import 'package:http/http.dart' as http;
@@ -88,12 +89,19 @@ class Regmv3FormAPI {
     Map<String, String> queryParams = {'regmv1Id': regmv1Id};
     var uri =
         AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+    debugPrint("=== REGMV3 LIHAT REQUEST ===");
+    debugPrint("URI: $uri");
+    debugPrint("============================");
     final http.Response response =
         await http.get(uri, headers: <String, String>{
       'Content-Type': 'application/json; odata=verbos',
       'Accept': 'application/json; odata=verbos',
       'Authorization': 'Bearer ${AppData.userToken}'
     });
+    debugPrint("=== REGMV3 LIHAT RESPONSE ===");
+    debugPrint("Status: ${response.statusCode}");
+    debugPrint("Body  : ${response.body}");
+    debugPrint("=============================");
 
     if (response.statusCode == 200) {
       ApiSideEffects.refreshHakakses();

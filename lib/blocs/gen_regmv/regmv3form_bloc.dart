@@ -138,9 +138,33 @@ class Regmv3FormBloc extends Bloc<Regmv3FormEvents, Regmv3FormState> {
 
   Future<void> onLihatRegmv3Form(
       Regmv3FormLihatEvent event, Emitter<Regmv3FormState> emit) async {
-    emit(state.copyWith(isLoading: true, isLoaded: false));
-    Regmv3FormModel record = await repository.regmv3FormLihat(event.recordId);
-    emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
+    emit(state.copyWith(
+      isLoading: true,
+      isLoaded: false,
+      hasFailure: false,
+      failureMessage: '',
+      failureKind: '',
+    ));
+
+    try {
+      Regmv3FormModel record = await repository.regmv3FormLihat(event.recordId);
+      emit(state.copyWith(
+        isLoading: false,
+        isLoaded: true,
+        hasFailure: false,
+        failureMessage: '',
+        failureKind: '',
+        record: record,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        isLoaded: false,
+        hasFailure: true,
+        failureMessage: e.toString(),
+        failureKind: 'technical',
+      ));
+    }
   }
 
   Future<void> onComboMWilayahChanged(

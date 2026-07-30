@@ -119,12 +119,19 @@ class Regmv2FormAPI {
     Map<String, String> queryParams = {'regmv1Id': regmv1Id};
     var uri =
         AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+    debugPrint("=== REGMV2 LIHAT REQUEST ===");
+    debugPrint("URI: $uri");
+    debugPrint("============================");
     final http.Response response =
         await http.get(uri, headers: <String, String>{
       'Content-Type': 'application/json; odata=verbos',
       'Accept': 'application/json; odata=verbos',
       'Authorization': 'Bearer ${AppData.userToken}'
     });
+    debugPrint("=== REGMV2 LIHAT RESPONSE ===");
+    debugPrint("Status: ${response.statusCode}");
+    debugPrint("Body  : ${response.body}");
+    debugPrint("=============================");
 
     if (response.statusCode == 200) {
       ApiSideEffects.refreshHakakses();

@@ -57,26 +57,7 @@ class _ButtonGroupStatusAsetWidgetState
             });
           }
 
-          final allowedIds = {"10001", "10002", "10003", "10004"};
-
-          final items = state.items
-              .where((e) => allowedIds.contains(e.mstatusasetId))
-              .toList();
-
-          String statusNama(String id) {
-            switch (id) {
-              case "10001":
-                return "Aktif";
-              case "10003":
-                return "Non Aktif";
-              case "10002":
-                return "Diproses";
-              case "10004":
-                return "Jatuh Tempo";
-              default:
-                return "";
-            }
-          }
+          final items = state.items;
 
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -93,7 +74,7 @@ class _ButtonGroupStatusAsetWidgetState
                       EdgeInsets.only(right: i < items.length - 1 ? 10 : 0),
                   child: StatusChip(
                     statusId: id,
-                    label: statusNama(id),
+                    label: status.statusNama,
                     isSelected: isSelected,
                     onTap: () {
                       context
