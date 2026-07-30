@@ -449,6 +449,33 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
     );
   }
 
+  Widget _buildLoginFooter(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "Sudah Punya Akun? ",
+          style: bodyTextStyle(context).copyWith(color: hintGrey),
+        ),
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => NewLoginClient(
+                  requestFrom: widget.requestFrom,
+                ),
+              ),
+            );
+          },
+          child: Text(
+            "Masuk Sebagai Klien",
+            style: bodyTextStyle(context).copyWith(color: primaryColor),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -472,107 +499,121 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
                 listener: _handleOtpStateChanged,
                 child: BlocBuilder<RegUserOtpBloc, RegUserOtpState>(
                   builder: (context, otpState) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: MediaQuery.of(context).size.height,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: headerSpacing),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 15,
-                                vertical: vPadding,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/logo.png',
-                                    gaplessPlayback: true,
-                                    height: isDesktop(context)
-                                        ? 56
-                                        : isTablet(context)
-                                            ? 48
-                                            : 42,
-                                    width: isDesktop(context)
-                                        ? 180
-                                        : isTablet(context)
-                                            ? 140
-                                            : 120,
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          child: SizedBox(
+                            height: constraints.maxHeight,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: headerSpacing),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 15,
+                                    vertical: vPadding,
                                   ),
-                                  SizedBox(height: vPadding * 0.6),
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 4),
-                                      child: TextButton.icon(
-                                        onPressed: _handleBack,
-                                        style: TextButton.styleFrom(
-                                          padding: EdgeInsets.zero,
-                                          minimumSize: const Size(0, 0),
-                                          tapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/logo.png',
+                                        gaplessPlayback: true,
+                                        height: isDesktop(context)
+                                            ? 56
+                                            : isTablet(context)
+                                                ? 48
+                                                : 42,
+                                        width: isDesktop(context)
+                                            ? 180
+                                            : isTablet(context)
+                                                ? 140
+                                                : 120,
+                                      ),
+                                      SizedBox(height: vPadding * 0.6),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 4),
+                                          child: TextButton.icon(
+                                            onPressed: _handleBack,
+                                            style: TextButton.styleFrom(
+                                              padding: EdgeInsets.zero,
+                                              minimumSize: const Size(0, 0),
+                                              tapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                            ),
+                                            icon: Icon(
+                                              Icons.arrow_back_ios_new,
+                                              color: primaryColor,
+                                              size: getResponsiveFont(
+                                                  context, 18),
+                                            ),
+                                            label: Text(
+                                              'Kembali',
+                                              style: bodyTextStyle(context)
+                                                  .copyWith(
+                                                      color: primaryColor),
+                                            ),
+                                          ),
                                         ),
-                                        icon: Icon(
-                                          Icons.arrow_back_ios_new,
-                                          color: primaryColor,
-                                          size: getResponsiveFont(context, 18),
+                                      ),
+                                      SizedBox(height: vPadding * 0.8),
+                                      const WelcomeHeader(
+                                        type: 'register_client',
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: cardBorderGradient,
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(20),
+                                        topRight: Radius.circular(20),
+                                      ),
+                                    ),
+                                    child: Container(
+                                      margin: const EdgeInsets.all(1),
+                                      decoration: BoxDecoration(
+                                        color: secondaryBlackColor,
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(20),
+                                          topRight: Radius.circular(20),
                                         ),
-                                        label: Text(
-                                          'Kembali',
-                                          style: bodyTextStyle(context)
-                                              .copyWith(color: primaryColor),
+                                      ),
+                                      child: Card(
+                                        color: secondaryBlackColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Container(
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          padding: const EdgeInsets.all(20),
+                                          child: Column(
+                                            children: [
+                                              _buildPhoneOtpRow(otpState),
+                                              _buildVerifiedActionButton(),
+                                              SizedBox(height: vPadding * 1.2),
+                                              _buildLoginFooter(context),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                  SizedBox(height: vPadding * 0.8),
-                                  const WelcomeHeader(type: 'register_client'),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: cardBorderGradient,
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(20),
-                                  topRight: Radius.circular(20),
-                                ),
-                              ),
-                              child: Container(
-                                margin: const EdgeInsets.all(1),
-                                decoration: BoxDecoration(
-                                  color: secondaryBlackColor,
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    topRight: Radius.circular(20),
-                                  ),
-                                ),
-                                child: Card(
-                                  color: secondaryBlackColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(20),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        _buildPhoneOtpRow(otpState),
-                                        _buildVerifiedActionButton(),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
