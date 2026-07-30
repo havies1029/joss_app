@@ -26,7 +26,7 @@ class InvoiceDownloadApi {
     try {
       final uri = Uri.https(
         // 'jossadminapi.smartsoft-id.com',
-        'uat.smartsoft-id.com',
+        'eassisttoolsv2adminapi.smartsoft-id.com',
         '/api/inv/download',
         {
           'no_inv': noInv,
