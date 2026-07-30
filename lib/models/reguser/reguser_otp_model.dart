@@ -37,3 +37,20 @@ class ReguserOtpValidateModel {
     };
   }
 }
+
+class ReguserOtpHpRequestModel {
+  final String requestId;
+  final String target;
+
+  const ReguserOtpHpRequestModel({
+    required this.requestId,
+    required this.target,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'requestId': requestId,
+      'target': target,
+    };
+  }
+}

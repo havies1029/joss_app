@@ -5,10 +5,12 @@ import 'package:joss_app/pages/login/mobile/client/new_login_client/new_login_fo
 
 class NewLoginClient extends StatelessWidget {
   final String requestFrom;
+  final String initialUsername;
 
   const NewLoginClient({
     super.key,
     this.requestFrom = '',
+    this.initialUsername = '',
   });
 
   @override
@@ -30,7 +32,10 @@ class NewLoginClient extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SizedBox(height: headerSpacing),
-                        NewLoginFormClient(requestFrom: requestFrom),
+                        NewLoginFormClient(
+                          requestFrom: requestFrom,
+                          initialUsername: initialUsername,
+                        ),
                       ],
                     ),
                   ),

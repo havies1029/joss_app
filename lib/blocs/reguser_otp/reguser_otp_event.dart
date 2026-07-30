@@ -37,6 +37,32 @@ class RegUserOtpValidasiEvent extends RegUserOtpEvent {
   List<Object?> get props => [requestId, target, requestFrom, pin];
 }
 
+class RegUserOtpHpStatusEvent extends RegUserOtpEvent {
+  final String requestId;
+  final String target;
+
+  const RegUserOtpHpStatusEvent({
+    required this.requestId,
+    required this.target,
+  });
+
+  @override
+  List<Object?> get props => [requestId, target];
+}
+
+class RegUserOtpSetHpVerifiedEvent extends RegUserOtpEvent {
+  final String requestId;
+  final String target;
+
+  const RegUserOtpSetHpVerifiedEvent({
+    required this.requestId,
+    required this.target,
+  });
+
+  @override
+  List<Object?> get props => [requestId, target];
+}
+
 class RegUserOtpTargetChangedEvent extends RegUserOtpEvent {
   final String target;
   final String requestFrom;

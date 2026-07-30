@@ -71,4 +71,70 @@ class ReguserOtpApi {
       );
     }
   }
+
+  Future<ReturnDataAPI> hpStatus(ReguserOtpHpRequestModel record) async {
+    final endpoint = "${AppData.prefixEndPoint}/api/reguser/otp/hp-status";
+    final queryParams = {"modul_id": "regUserOtpHpStatusAPI"};
+    final uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
+
+    try {
+      final response = await http.post(
+        uri,
+        headers: const <String, String>{
+          'Content-Type': 'application/json; odata=verbose',
+          'Accept': 'application/json; odata=verbose',
+        },
+        body: jsonEncode(record.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        return ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+      }
+
+      return ReturnDataAPI(
+        success: false,
+        data: "Gagal mengecek status No. HP.",
+        rowcount: 0,
+      );
+    } catch (_) {
+      return ReturnDataAPI(
+        success: false,
+        data: "Gagal mengecek status No. HP.",
+        rowcount: 0,
+      );
+    }
+  }
+
+  Future<ReturnDataAPI> kirimPassword(ReguserOtpHpRequestModel record) async {
+    final endpoint = "${AppData.prefixEndPoint}/api/reguser/otp/send-password";
+    final queryParams = {"modul_id": "regUserOtpPasswordKirimAPI"};
+    final uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
+
+    try {
+      final response = await http.post(
+        uri,
+        headers: const <String, String>{
+          'Content-Type': 'application/json; odata=verbose',
+          'Accept': 'application/json; odata=verbose',
+        },
+        body: jsonEncode(record.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        return ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+      }
+
+      return ReturnDataAPI(
+        success: false,
+        data: "Gagal mengirim kata sandi.",
+        rowcount: 0,
+      );
+    } catch (_) {
+      return ReturnDataAPI(
+        success: false,
+        data: "Gagal mengirim kata sandi.",
+        rowcount: 0,
+      );
+    }
+  }
 }

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:joss_app/pages/register/mobile/client/register_form_client_remake.dart';
 
@@ -7,7 +6,17 @@ import '../../../base/base_background_firstpage.dart';
 
 class RegisterClient extends StatefulWidget {
   final String requestFrom;
-  const RegisterClient({super.key, required this.requestFrom});
+  final String initialPhone;
+  final String initialHpReqtokenId;
+  final bool initialHpVerified;
+
+  const RegisterClient({
+    super.key,
+    required this.requestFrom,
+    this.initialPhone = '',
+    this.initialHpReqtokenId = '',
+    this.initialHpVerified = false,
+  });
 
   @override
   RegisterClientState createState() => RegisterClientState();
@@ -36,9 +45,13 @@ class RegisterClientState extends State<RegisterClient>
     super.dispose();
   }
 
-  // Widget yang mengandung RegisterFormClient
   Widget _buildDesignRegisterFormClient() {
-    return RegisterFormClientRemake(requestFrom: widget.requestFrom);
+    return RegisterFormClientRemake(
+      requestFrom: widget.requestFrom,
+      initialPhone: widget.initialPhone,
+      initialHpReqtokenId: widget.initialHpReqtokenId,
+      initialHpVerified: widget.initialHpVerified,
+    );
   }
 
   @override
@@ -55,7 +68,6 @@ class RegisterClientState extends State<RegisterClient>
             children: [
               Expanded(
                 child: SingleChildScrollView(
-
                   child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -73,5 +85,4 @@ class RegisterClientState extends State<RegisterClient>
       ),
     );
   }
-
 }

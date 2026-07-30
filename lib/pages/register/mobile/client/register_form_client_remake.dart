@@ -12,17 +12,30 @@ import '../../../../helper/international_phone_result.dart';
 import '../../../../models/combobox/combomjnsclient_model.dart';
 import '../../../../models/combobox/combomreferral_model.dart';
 import '../../../../models/reguser/reguser_model.dart';
+import '../../../../models/reguser/reguser_otp_model.dart';
 import '../../../../repositories/combobox/combomjnsclient_repository.dart';
 import '../../../../repositories/combobox/combomreferral_repository.dart';
+import '../../../../repositories/reguser/reguser_otp_repository.dart';
 import '../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../widgets/apptheme/phone_number_field.dart';
 import '../../../login/welcome_header.dart';
 import '../../../../common/constants.dart';
 import 'widget/register_otp_popup_widget.dart';
+import 'widget/register_phone_status_popup_widget.dart';
 
 class RegisterFormClientRemake extends StatefulWidget {
   final String requestFrom;
-  const RegisterFormClientRemake({super.key, required this.requestFrom});
+  final String initialPhone;
+  final String initialHpReqtokenId;
+  final bool initialHpVerified;
+
+  const RegisterFormClientRemake({
+    super.key,
+    required this.requestFrom,
+    this.initialPhone = '',
+    this.initialHpReqtokenId = '',
+    this.initialHpVerified = false,
+  });
 
   @override
   State<RegisterFormClientRemake> createState() =>
@@ -50,15 +63,28 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   bool _isDialogLoadingShown = false;
   final Map<String, String> _verifiedEmailRequestIds = {};
   final Map<String, String> _verifiedHpRequestIds = {};
+  final Set<String> _registeredHpTargets = {};
+  final ReguserOtpRepository _otpRepository = ReguserOtpRepository();
+  String _lastHandledHpStatusKey = '';
+  bool _isPhoneStatusPopupOpen = false;
 
   late final RegUserModel? record;
 
   @override
   void initState() {
     super.initState();
+    final initialPhone = widget.initialPhone.trim();
+    if (initialPhone.isNotEmpty) {
+      fieldTeleponController.text = InternationalPhoneHelper.toNationalInput(
+        initialPhone,
+        countryCode: fieldTeleponCountryCode,
+      );
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
+      _applyInitialHpVerification();
     });
   }
 
@@ -93,6 +119,26 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     );
 
     return phoneRes;
+  }
+
+  void _applyInitialHpVerification() {
+    if (!widget.initialHpVerified) return;
+
+    final requestId = widget.initialHpReqtokenId.trim();
+    if (requestId.isEmpty) return;
+
+    final target = _hpOtpTarget(fieldTeleponController.text);
+    if (target.isEmpty) return;
+
+    _verifiedHpRequestIds[target] = requestId;
+    context.read<RegUserOtpBloc>().add(
+          RegUserOtpSetHpVerifiedEvent(
+            requestId: requestId,
+            target: target,
+          ),
+        );
+    clearErr('form1.telepon');
+    setState(() {});
   }
 
   String? _validatePasswordRules(String pass) {
@@ -338,6 +384,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
           clearErr('form1.telepon');
         }
         final target = _hpOtpTarget(v);
+        _lastHandledHpStatusKey = '';
         final isVerifiedAfterChange =
             target.isNotEmpty && _verifiedHpRequestIds.containsKey(target);
         if (!isVerifiedAfterChange) {
@@ -869,6 +916,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     final target = phoneRes.phone ?? '';
 
     clearErr('form1.telepon');
+    _lastHandledHpStatusKey = '';
     _pendingOpenOtpFor = 'hp';
     context.read<RegUserOtpBloc>().add(
           RegUserOtpKirimEvent(
@@ -878,7 +926,88 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         );
   }
 
+  Future<bool> _sendPasswordToWhatsapp(String requestId, String target) async {
+    final result = await _otpRepository.kirimPassword(
+      ReguserOtpHpRequestModel(requestId: requestId, target: target),
+    );
+
+    if (!mounted) return false;
+
+    if (!result.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(
+          result.data.isNotEmpty ? result.data : 'Gagal mengirim kata sandi.',
+        ),
+      );
+      return false;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      successSnackBar(
+        result.data.isNotEmpty
+            ? result.data
+            : 'Kata sandi berhasil dikirim ke WhatsApp.',
+      ),
+    );
+    return true;
+  }
+
+  Future<void> _showRegisteredHpPopup(RegUserOtpState state) async {
+    final target = state.hpStatusTarget;
+    final requestId = state.hpStatusRequestId;
+    if (target.isEmpty || requestId.isEmpty) return;
+
+    bool shouldNavigate = false;
+    _isPhoneStatusPopupOpen = true;
+
+    await showRegisterPhoneStatusPopup(
+      context,
+      isRegistered: true,
+      onPressed: () async {
+        final ok = await _sendPasswordToWhatsapp(requestId, target);
+        shouldNavigate = ok;
+        return ok;
+      },
+    );
+
+    _isPhoneStatusPopupOpen = false;
+    if (!mounted || !shouldNavigate) return;
+
+    context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => NewLoginClient(
+          requestFrom: widget.requestFrom,
+          initialUsername: target,
+        ),
+      ),
+    );
+  }
+
+  void _handleHpRegistrationStatus(
+      BuildContext context, RegUserOtpState state) {
+    if (!state.isHpVerified || state.isHpStatusChecking) return;
+    if (state.hpRegistrationStatus.isEmpty) return;
+    if (_isPhoneStatusPopupOpen) return;
+
+    final target = _hpOtpTarget(fieldTeleponController.text);
+    if (target.isEmpty || target != state.hpStatusTarget) return;
+
+    final key = '${state.hpStatusRequestId};${state.hpRegistrationStatus}';
+    if (key == _lastHandledHpStatusKey) return;
+    _lastHandledHpStatusKey = key;
+
+    if (RegUserHpRegistrationStatus.isRegisteredStatus(
+      state.hpRegistrationStatus,
+    )) {
+      _registeredHpTargets.add(target);
+      setErr('form1.telepon', 'No. HP sudah terdaftar.');
+      _showRegisteredHpPopup(state);
+    }
+  }
+
   void _handleOtpStateChanged(BuildContext context, RegUserOtpState state) {
+    _handleHpRegistrationStatus(context, state);
     if (state.isEmailVerified &&
         state.activeRequestFrom == 'email' &&
         state.activeTarget.isNotEmpty &&
@@ -936,7 +1065,11 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       ok = false;
     }
 
-    if (!_isHpVerifiedForCurrent(otpState)) {
+    final hpTarget = _hpOtpTarget(fieldTeleponController.text);
+    if (_registeredHpTargets.contains(hpTarget)) {
+      setErr('form1.telepon', 'No. HP sudah terdaftar.');
+      ok = false;
+    } else if (!_isHpVerifiedForCurrent(otpState)) {
       setErr('form1.telepon', 'No. HP belum diverifikasi');
       ok = false;
     }

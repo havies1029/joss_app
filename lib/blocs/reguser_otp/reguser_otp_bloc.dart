@@ -15,6 +15,8 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
         super(const RegUserOtpState()) {
     on<RegUserOtpKirimEvent>(_onKirim);
     on<RegUserOtpValidasiEvent>(_onValidasi);
+    on<RegUserOtpHpStatusEvent>(_onHpStatus);
+    on<RegUserOtpSetHpVerifiedEvent>(_onSetHpVerified);
     on<RegUserOtpTargetChangedEvent>(_onTargetChanged);
     on<RegUserOtpResetEmailEvent>(_onResetEmail);
     on<RegUserOtpResetHpEvent>(_onResetHp);
@@ -75,6 +77,12 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
     ];
   }
 
+  String _parseHpRegistrationStatus(String data) {
+    final parts = data.split(';');
+    if (parts.length < 2) return '';
+    return parts[1].trim().toUpperCase();
+  }
+
   Future<void> _onKirim(
     RegUserOtpKirimEvent event,
     Emitter<RegUserOtpState> emit,
@@ -86,8 +94,12 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
       state.copyWith(
         isEmailSending: isEmail ? true : state.isEmailSending,
         isHpSending: isEmail ? state.isHpSending : true,
+        isHpStatusChecking: isEmail ? state.isHpStatusChecking : false,
         emailError: isEmail ? '' : state.emailError,
         hpError: isEmail ? state.hpError : '',
+        hpRegistrationStatus: isEmail ? state.hpRegistrationStatus : '',
+        hpStatusRequestId: isEmail ? state.hpStatusRequestId : '',
+        hpStatusTarget: isEmail ? state.hpStatusTarget : '',
         activeTarget: event.target,
         activeRequestFrom: requestFrom,
         message: '',
@@ -145,8 +157,12 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
       state.copyWith(
         isEmailValidating: isEmail ? true : state.isEmailValidating,
         isHpValidating: isEmail ? state.isHpValidating : true,
+        isHpStatusChecking: isEmail ? state.isHpStatusChecking : false,
         emailError: isEmail ? '' : state.emailError,
         hpError: isEmail ? state.hpError : '',
+        hpRegistrationStatus: isEmail ? state.hpRegistrationStatus : '',
+        hpStatusRequestId: isEmail ? state.hpStatusRequestId : '',
+        hpStatusTarget: isEmail ? state.hpStatusTarget : '',
         activeTarget: event.target,
         activeRequestFrom: requestFrom,
         message: '',
@@ -164,16 +180,17 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
     );
 
     if (result.success) {
+      final requestId = result.data;
       final verifiedTargets = _upsertVerifiedTarget(
         requestFrom: requestFrom,
         target: event.target,
-        requestId: result.data,
+        requestId: requestId,
       );
 
       emit(
         state.copyWith(
-          emailRequestId: isEmail ? result.data : state.emailRequestId,
-          hpRequestId: isEmail ? state.hpRequestId : result.data,
+          emailRequestId: isEmail ? requestId : state.emailRequestId,
+          hpRequestId: isEmail ? state.hpRequestId : requestId,
           isEmailValidating: isEmail ? false : state.isEmailValidating,
           isHpValidating: isEmail ? state.isHpValidating : false,
           isEmailVerified: isEmail ? true : state.isEmailVerified,
@@ -187,6 +204,11 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
           verifiedTargets: verifiedTargets,
         ),
       );
+
+      if (!isEmail) {
+        add(RegUserOtpHpStatusEvent(
+            requestId: requestId, target: event.target));
+      }
       return;
     }
 
@@ -202,6 +224,93 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
         activeRequestFrom: requestFrom,
         message: result.data,
         hasFailure: true,
+      ),
+    );
+  }
+
+  Future<void> _onHpStatus(
+    RegUserOtpHpStatusEvent event,
+    Emitter<RegUserOtpState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        isHpStatusChecking: true,
+        hpRegistrationStatus: '',
+        hpStatusRequestId: event.requestId,
+        hpStatusTarget: event.target,
+        hpError: '',
+        activeTarget: event.target,
+        activeRequestFrom: 'hp',
+        message: '',
+        hasFailure: false,
+      ),
+    );
+
+    final ReturnDataAPI result = await repository.hpStatus(
+      ReguserOtpHpRequestModel(
+        requestId: event.requestId,
+        target: event.target,
+      ),
+    );
+
+    if (result.success) {
+      emit(
+        state.copyWith(
+          isHpStatusChecking: false,
+          hpRegistrationStatus: _parseHpRegistrationStatus(result.data),
+          hpStatusRequestId: event.requestId,
+          hpStatusTarget: event.target,
+          hpError: '',
+          activeTarget: event.target,
+          activeRequestFrom: 'hp',
+          message: result.data,
+          hasFailure: false,
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        isHpStatusChecking: false,
+        hpRegistrationStatus: '',
+        hpStatusRequestId: event.requestId,
+        hpStatusTarget: event.target,
+        hpError: result.data,
+        activeTarget: event.target,
+        activeRequestFrom: 'hp',
+        message: result.data,
+        hasFailure: true,
+      ),
+    );
+  }
+
+  void _onSetHpVerified(
+    RegUserOtpSetHpVerifiedEvent event,
+    Emitter<RegUserOtpState> emit,
+  ) {
+    final verifiedTargets = _upsertVerifiedTarget(
+      requestFrom: 'hp',
+      target: event.target,
+      requestId: event.requestId,
+    );
+
+    emit(
+      state.copyWith(
+        hpRequestId: event.requestId,
+        isHpSending: false,
+        isHpValidating: false,
+        isHpStatusChecking: false,
+        isHpVerified: true,
+        hpError: _successMessage('hp'),
+        hpRegistrationStatus: RegUserHpRegistrationStatus.notRegistered,
+        hpStatusRequestId: event.requestId,
+        hpStatusTarget: event.target,
+        activeTarget: event.target,
+        activeRequestFrom: 'hp',
+        message: _successMessage('hp'),
+        hasFailure: false,
+        verifiedTargets: verifiedTargets,
       ),
     );
   }
@@ -226,10 +335,17 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
           isHpSending: isEmail ? state.isHpSending : false,
           isEmailValidating: isEmail ? false : state.isEmailValidating,
           isHpValidating: isEmail ? state.isHpValidating : false,
+          isHpStatusChecking: isEmail ? state.isHpStatusChecking : false,
           isEmailVerified: isEmail ? true : state.isEmailVerified,
           isHpVerified: isEmail ? state.isHpVerified : true,
           emailError: isEmail ? _successMessage(requestFrom) : state.emailError,
           hpError: isEmail ? state.hpError : _successMessage(requestFrom),
+          hpRegistrationStatus: isEmail
+              ? state.hpRegistrationStatus
+              : RegUserHpRegistrationStatus.notRegistered,
+          hpStatusRequestId:
+              isEmail ? state.hpStatusRequestId : verifiedTarget.requestId,
+          hpStatusTarget: isEmail ? state.hpStatusTarget : target,
           activeTarget: target,
           activeRequestFrom: requestFrom,
           message: '',
@@ -247,10 +363,14 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
         isHpSending: isEmail ? state.isHpSending : false,
         isEmailValidating: isEmail ? false : state.isEmailValidating,
         isHpValidating: isEmail ? state.isHpValidating : false,
+        isHpStatusChecking: isEmail ? state.isHpStatusChecking : false,
         isEmailVerified: isEmail ? false : state.isEmailVerified,
         isHpVerified: isEmail ? state.isHpVerified : false,
         emailError: isEmail ? '' : state.emailError,
         hpError: isEmail ? state.hpError : '',
+        hpRegistrationStatus: isEmail ? state.hpRegistrationStatus : '',
+        hpStatusRequestId: isEmail ? state.hpStatusRequestId : '',
+        hpStatusTarget: isEmail ? state.hpStatusTarget : '',
         activeTarget:
             state.activeRequestFrom == requestFrom ? '' : state.activeTarget,
         activeRequestFrom: state.activeRequestFrom == requestFrom
@@ -292,8 +412,12 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
         hpRequestId: '',
         isHpSending: false,
         isHpValidating: false,
+        isHpStatusChecking: false,
         isHpVerified: false,
         hpError: '',
+        hpRegistrationStatus: '',
+        hpStatusRequestId: '',
+        hpStatusTarget: '',
         activeTarget: state.activeRequestFrom == 'hp' ? '' : state.activeTarget,
         activeRequestFrom:
             state.activeRequestFrom == 'hp' ? '' : state.activeRequestFrom,

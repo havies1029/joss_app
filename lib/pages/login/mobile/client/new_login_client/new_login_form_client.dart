@@ -12,14 +12,16 @@ import 'package:joss_app/helper/indo_phone_result.dart';
 import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import 'package:joss_app/pages/login/mobile/forgot/new_forgot_page/new_forgot_password_page.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
-import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
+import 'package:joss_app/pages/register/mobile/client/register_phone_gate_page.dart';
 
 class NewLoginFormClient extends StatefulWidget {
   final String requestFrom;
+  final String initialUsername;
 
   const NewLoginFormClient({
     super.key,
     this.requestFrom = '',
+    this.initialUsername = '',
   });
 
   @override
@@ -98,6 +100,14 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
   }
 
   void _applyInitialEmailFromState() {
+    final initialUsername = widget.initialUsername.trim();
+    if (initialUsername.isNotEmpty && !_isInitialEmailApplied) {
+      _usernameController.text = initialUsername;
+      _passwordController.clear();
+      _isInitialEmailApplied = true;
+      return;
+    }
+
     final emailState = context.read<EmailVerificationBloc>().state.email.trim();
     if (emailState.isEmpty) return;
 
@@ -545,7 +555,8 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
                                             Navigator.of(context)
                                                 .pushReplacement(
                                               MaterialPageRoute(
-                                                builder: (_) => RegisterClient(
+                                                builder: (_) =>
+                                                    RegisterPhoneGatePage(
                                                   requestFrom:
                                                       widget.requestFrom.isEmpty
                                                           ? 'daftarclient_page'
@@ -555,7 +566,7 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
                                             );
                                           },
                                           child: Text(
-                                            "Daftar Sebagai Klien",
+                                            "Daftar Klien",
                                             style: bodyTextStyle(context)
                                                 .copyWith(color: primaryColor),
                                           ),

@@ -55,6 +55,7 @@ class _RegisterOtpPopupWidgetState extends State<RegisterOtpPopupWidget>
   int _remainingTime = 59;
   bool _isResendAvailable = false;
   bool _otpError = false;
+  bool _hasClosedAfterVerified = false;
   String _inlineMessage = '';
   bool _inlineMessageIsError = false;
 
@@ -180,7 +181,6 @@ class _RegisterOtpPopupWidgetState extends State<RegisterOtpPopupWidget>
       });
       return;
     }
-
     context.read<RegUserOtpBloc>().add(
           RegUserOtpValidasiEvent(
             requestId: requestId,
@@ -234,7 +234,11 @@ class _RegisterOtpPopupWidgetState extends State<RegisterOtpPopupWidget>
         final isVerified =
             _isEmail ? state.isEmailVerified : state.isHpVerified;
 
-        if (isCurrentFlow && isVerified && !state.hasFailure) {
+        if (isCurrentFlow &&
+            isVerified &&
+            !state.hasFailure &&
+            !_hasClosedAfterVerified) {
+          _hasClosedAfterVerified = true;
           Navigator.of(context).pop();
           return;
         }

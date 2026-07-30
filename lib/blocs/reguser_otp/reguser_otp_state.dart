@@ -1,5 +1,15 @@
 part of 'reguser_otp_bloc.dart';
 
+class RegUserHpRegistrationStatus {
+  static const registered = 'REGISTERED';
+  static const registeredPic = 'REGISTERED_PIC';
+  static const notRegistered = 'NOT_REGISTERED';
+
+  static bool isRegisteredStatus(String value) {
+    return value == registered || value == registeredPic;
+  }
+}
+
 class RegUserOtpVerifiedTarget extends Equatable {
   final String requestFrom;
   final String target;
@@ -22,10 +32,14 @@ class RegUserOtpState extends Equatable {
   final bool isHpSending;
   final bool isEmailValidating;
   final bool isHpValidating;
+  final bool isHpStatusChecking;
   final bool isEmailVerified;
   final bool isHpVerified;
   final String emailError;
   final String hpError;
+  final String hpRegistrationStatus;
+  final String hpStatusRequestId;
+  final String hpStatusTarget;
   final String activeTarget;
   final String activeRequestFrom;
   final String message;
@@ -39,10 +53,14 @@ class RegUserOtpState extends Equatable {
     this.isHpSending = false,
     this.isEmailValidating = false,
     this.isHpValidating = false,
+    this.isHpStatusChecking = false,
     this.isEmailVerified = false,
     this.isHpVerified = false,
     this.emailError = '',
     this.hpError = '',
+    this.hpRegistrationStatus = '',
+    this.hpStatusRequestId = '',
+    this.hpStatusTarget = '',
     this.activeTarget = '',
     this.activeRequestFrom = '',
     this.message = '',
@@ -57,10 +75,14 @@ class RegUserOtpState extends Equatable {
     bool? isHpSending,
     bool? isEmailValidating,
     bool? isHpValidating,
+    bool? isHpStatusChecking,
     bool? isEmailVerified,
     bool? isHpVerified,
     String? emailError,
     String? hpError,
+    String? hpRegistrationStatus,
+    String? hpStatusRequestId,
+    String? hpStatusTarget,
     String? activeTarget,
     String? activeRequestFrom,
     String? message,
@@ -74,10 +96,14 @@ class RegUserOtpState extends Equatable {
       isHpSending: isHpSending ?? this.isHpSending,
       isEmailValidating: isEmailValidating ?? this.isEmailValidating,
       isHpValidating: isHpValidating ?? this.isHpValidating,
+      isHpStatusChecking: isHpStatusChecking ?? this.isHpStatusChecking,
       isEmailVerified: isEmailVerified ?? this.isEmailVerified,
       isHpVerified: isHpVerified ?? this.isHpVerified,
       emailError: emailError ?? this.emailError,
       hpError: hpError ?? this.hpError,
+      hpRegistrationStatus: hpRegistrationStatus ?? this.hpRegistrationStatus,
+      hpStatusRequestId: hpStatusRequestId ?? this.hpStatusRequestId,
+      hpStatusTarget: hpStatusTarget ?? this.hpStatusTarget,
       activeTarget: activeTarget ?? this.activeTarget,
       activeRequestFrom: activeRequestFrom ?? this.activeRequestFrom,
       message: message ?? this.message,
@@ -94,10 +120,14 @@ class RegUserOtpState extends Equatable {
         isHpSending,
         isEmailValidating,
         isHpValidating,
+        isHpStatusChecking,
         isEmailVerified,
         isHpVerified,
         emailError,
         hpError,
+        hpRegistrationStatus,
+        hpStatusRequestId,
+        hpStatusTarget,
         activeTarget,
         activeRequestFrom,
         message,

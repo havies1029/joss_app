@@ -84,7 +84,7 @@ const Color primaryLightColor = Color(0xFFF7F7F7);
 
 const Color primaryBlackColor = Color(0xFF121212);
 const Color secondaryBlackColor = Color(0xFF181818);
-
+const Color thirdBlackColor = Color(0xFF242625);
 const Color cardGrey = Color(0xFF8C8C8C);
 const Color formGrey = Color(0xFF333333);
 const Color dGrey = Color(0xFFA2A2A2);

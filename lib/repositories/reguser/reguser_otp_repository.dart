@@ -14,4 +14,12 @@ class ReguserOtpRepository {
   Future<ReturnDataAPI> validasi(ReguserOtpValidateModel record) {
     return api.validasi(record);
   }
+
+  Future<ReturnDataAPI> hpStatus(ReguserOtpHpRequestModel record) {
+    return api.hpStatus(record);
+  }
+
+  Future<ReturnDataAPI> kirimPassword(ReguserOtpHpRequestModel record) {
+    return api.kirimPassword(record);
+  }
 }
