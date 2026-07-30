@@ -74,6 +74,18 @@ enum RegmvFormSection {
   form6,
 }
 
+class _RegmvBackendValidationTarget {
+  final RegmvFormSection section;
+  final String fieldKey;
+  final List<String> affectedFieldKeys;
+
+  const _RegmvBackendValidationTarget({
+    required this.section,
+    required this.fieldKey,
+    required this.affectedFieldKeys,
+  });
+}
+
 class RegmvFormMainRemake extends StatefulWidget {
   final String? regmv1Id;
   final String? calmv1Id;
@@ -762,6 +774,15 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             ),
             BlocListener<Regmv2FormBloc, Regmv2FormState>(
               listener: (context, state) {
+                if (state.hasFailure) {
+                  _handleBackendSaveFailure(
+                    source: 'regmv2',
+                    message: state.failureMessage,
+                    kind: state.failureKind,
+                  );
+                  return;
+                }
+
                 if (state.isSaved &&
                     !state.hasFailure &&
                     state.record != null) {
@@ -778,6 +799,15 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             ),
             BlocListener<Regmv3FormBloc, Regmv3FormState>(
               listener: (context, state) {
+                if (state.hasFailure) {
+                  _handleBackendSaveFailure(
+                    source: 'regmv3',
+                    message: state.failureMessage,
+                    kind: state.failureKind,
+                  );
+                  return;
+                }
+
                 if (state.isSaved &&
                     !state.hasFailure &&
                     state.record != null) {
@@ -906,6 +936,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     },
                     child: Column(
                       children: [
+                        _buildFormError('form2.general'),
                         Row(
                           children: [
                             Flexible(child: buildFieldPolisMulai()),
@@ -988,6 +1019,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     },
                     child: Column(
                       children: [
+                        _buildFormError('form3.general'),
                         Row(
                           children: [
                             Flexible(child: _buildFieldComboTahun()),
@@ -1632,7 +1664,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       mmvjnscoverId: fieldComboMMvjnscover?.mmvjnscoverId,
       pad: double.tryParse(fieldPadController.text.replaceAll(',', '')) ?? 0,
       pap: double.tryParse(fieldPapController.text.replaceAll(',', '')) ?? 0,
-      passangerCount: int.tryParse(selectedPassengerCount ?? '') ?? 0,
+      passangerCount: int.tryParse(selectedPassengerCount) ?? 0,
       pll: double.tryParse(fieldPllController.text.replaceAll(',', '')) ?? 0,
       polisMulai: polis.mulai,
       polisAkhir: polis.berakhir,
@@ -1666,14 +1698,18 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   bool _isHitungPremiLoading = false;
   int _hitungPremiAttempt = 0;
+  String? _lastBackendValidationKey;
+  String? _lastBackendValidationError;
+  RegmvFormSection? _lastBackendValidationSection;
+  String? _lastBackendValidationFieldKey;
+  List<String> _lastBackendValidationAffectedFieldKeys = const [];
 
   Widget buildButtonHitungPremi() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: AppButton.primary(
           text: _isHitungPremiLoading ? "Memproses..." : "Hitung Premi",
           isLoading: _isHitungPremiLoading,
-          backgroundColor:
-              _isHitungPremiLoading ? secondaryBlackColor : pBlue,
+          backgroundColor: _isHitungPremiLoading ? secondaryBlackColor : pBlue,
           onPressed: _isHitungPremiLoading
               ? null
               : () async {
@@ -1698,6 +1734,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     final okForm3 = validateForm3();
     if (!okForm3) {
       openForm3(recordId: regmv1Id);
+      return;
+    }
+
+    if (_shouldReplayBackendValidation()) {
+      _replayBackendValidation();
       return;
     }
 
@@ -1792,6 +1833,358 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         ),
       );
     });
+  }
+
+  bool _shouldReplayBackendValidation() {
+    final key = _lastBackendValidationKey;
+    if (key == null || _lastBackendValidationError == null) return false;
+    return key == _currentBackendValidationKey();
+  }
+
+  void _replayBackendValidation() {
+    final section = _lastBackendValidationSection;
+    final fieldKey = _lastBackendValidationFieldKey;
+    final message = _lastBackendValidationError;
+    if (section == null || fieldKey == null || message == null) return;
+
+    final idx = sectionIndex(section);
+    setState(() {
+      _isHitungPremiLoading = false;
+      fieldErrors[fieldKey] = message;
+      expanded = List<bool>.filled(expanded.length, false);
+      expanded[idx] = true;
+    });
+  }
+
+  void _handleBackendSaveFailure({
+    required String source,
+    required String message,
+    required String kind,
+  }) {
+    if (!mounted) return;
+
+    _hitungPremiAttempt++;
+    final trimmedMessage = message.trim();
+
+    if (kind == 'validation' && trimmedMessage.isNotEmpty) {
+      _applyBackendValidation(source: source, message: trimmedMessage);
+      return;
+    }
+
+    setState(() {
+      _isHitungPremiLoading = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      errorSnackBar(
+        trimmedMessage.isNotEmpty
+            ? trimmedMessage
+            : "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
+      ),
+    );
+  }
+
+  void _applyBackendValidation({
+    required String source,
+    required String message,
+  }) {
+    final target = _mapBackendValidationTarget(source, message);
+    final idx = sectionIndex(target.section);
+
+    setState(() {
+      _isHitungPremiLoading = false;
+      fieldErrors[target.fieldKey] = message;
+      expanded = List<bool>.filled(expanded.length, false);
+      expanded[idx] = true;
+
+      _lastBackendValidationKey = _currentBackendValidationKey();
+      _lastBackendValidationError = message;
+      _lastBackendValidationSection = target.section;
+      _lastBackendValidationFieldKey = target.fieldKey;
+      _lastBackendValidationAffectedFieldKeys = target.affectedFieldKeys;
+    });
+  }
+
+  _RegmvBackendValidationTarget _mapBackendValidationTarget(
+    String source,
+    String message,
+  ) {
+    if (source == 'regmv2') {
+      if (message.contains('Jenis Coverage')) {
+        return const _RegmvBackendValidationTarget(
+          section: RegmvFormSection.form2,
+          fieldKey: 'form2.jenisCover',
+          affectedFieldKeys: ['form2.jenisCover'],
+        );
+      }
+      if (message.contains('Mata Uang')) {
+        return const _RegmvBackendValidationTarget(
+          section: RegmvFormSection.form2,
+          fieldKey: 'form2.mataUang',
+          affectedFieldKeys: ['form2.mataUang'],
+        );
+      }
+      if (message.contains('Jumlah Penumpang')) {
+        return const _RegmvBackendValidationTarget(
+          section: RegmvFormSection.form2,
+          fieldKey: 'form2.passengerCount',
+          affectedFieldKeys: ['form2.passengerCount'],
+        );
+      }
+      if (message.contains('Pilihan perluasan jaminan')) {
+        return const _RegmvBackendValidationTarget(
+          section: RegmvFormSection.form2,
+          fieldKey: 'form2.general',
+          affectedFieldKeys: [
+            'form2.isSrcc',
+            'form2.isFlood',
+            'form2.isEq',
+            'form2.isTerrorism',
+          ],
+        );
+      }
+      if (message.contains('TPL/PAD/PAP/PLL')) {
+        return const _RegmvBackendValidationTarget(
+          section: RegmvFormSection.form2,
+          fieldKey: 'form2.tpl',
+          affectedFieldKeys: [
+            'form2.tpl',
+            'form2.pad',
+            'form2.pap',
+            'form2.pll',
+          ],
+        );
+      }
+      if (message.contains('Tanggal') ||
+          message.contains('Periode Polis') ||
+          message.contains('Backdate')) {
+        return const _RegmvBackendValidationTarget(
+          section: RegmvFormSection.form2,
+          fieldKey: 'form2.general',
+          affectedFieldKeys: ['form2.polisMulai', 'form2.polisAkhir'],
+        );
+      }
+
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form2,
+        fieldKey: 'form2.general',
+        affectedFieldKeys: [
+          'form2.mataUang',
+          'form2.jenisCover',
+          'form2.passengerCount',
+          'form2.tpl',
+          'form2.pad',
+          'form2.pap',
+          'form2.pll',
+          'form2.isSrcc',
+          'form2.isFlood',
+          'form2.isEq',
+          'form2.isTerrorism',
+          'form2.isAw',
+        ],
+      );
+    }
+
+    if (message ==
+        'Kendaraan Motor hanya dapat menggunakan jaminan Total Loss Only!') {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form2,
+        fieldKey: 'form2.jenisCover',
+        affectedFieldKeys: [
+          'form2.jenisCover',
+          'form3.merek',
+          'form3.model',
+          'form3.subModel',
+        ],
+      );
+    }
+    if (message ==
+        'Jaminan Authorized Workshop hanya berlaku untuk usia kendaraan maksimal 15 tahun!') {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form2,
+        fieldKey: 'form2.isAw',
+        affectedFieldKeys: [
+          'form2.isAw',
+          'form3.tahun',
+          'form3.merek',
+          'form3.model',
+          'form3.subModel',
+        ],
+      );
+    }
+    if (message ==
+        'Maksimal usia Kendaraan Listrik (Mobil/Motor) adalah 3 tahun!') {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form3,
+        fieldKey: 'form3.tahun',
+        affectedFieldKeys: [
+          'form3.tahun',
+          'form3.merek',
+          'form3.model',
+          'form3.subModel',
+        ],
+      );
+    }
+    if (message.contains('Harga Kendaraan')) {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form3,
+        fieldKey: 'form3.hargaMobil',
+        affectedFieldKeys: [
+          'form3.hargaMobil',
+          'form3.tahun',
+          'form3.merek',
+          'form3.model',
+          'form3.subModel',
+        ],
+      );
+    }
+    if (message.contains('Wilayah')) {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form3,
+        fieldKey: 'form3.wilayah',
+        affectedFieldKeys: ['form3.wilayah'],
+      );
+    }
+    if (message.contains('Plat')) {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form3,
+        fieldKey: 'form3.platNo',
+        affectedFieldKeys: ['form3.platNo'],
+      );
+    }
+    if (message.contains('Mesin')) {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form3,
+        fieldKey: 'form3.mesinNo',
+        affectedFieldKeys: ['form3.mesinNo'],
+      );
+    }
+    if (message.contains('Rangka')) {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form3,
+        fieldKey: 'form3.rangkaNo',
+        affectedFieldKeys: ['form3.rangkaNo'],
+      );
+    }
+    if (message.contains('Merk')) {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form3,
+        fieldKey: 'form3.merek',
+        affectedFieldKeys: ['form3.merek', 'form3.model', 'form3.subModel'],
+      );
+    }
+    if (message.contains('Tipe')) {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form3,
+        fieldKey: 'form3.model',
+        affectedFieldKeys: ['form3.merek', 'form3.model', 'form3.subModel'],
+      );
+    }
+    if (message.contains('Model')) {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form3,
+        fieldKey: 'form3.subModel',
+        affectedFieldKeys: ['form3.merek', 'form3.model', 'form3.subModel'],
+      );
+    }
+    if (message.contains('Warna')) {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form3,
+        fieldKey: 'form3.warna',
+        affectedFieldKeys: ['form3.warna'],
+      );
+    }
+    if (message.contains('Penggunaan')) {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form3,
+        fieldKey: 'form3.penggunaan',
+        affectedFieldKeys: ['form3.penggunaan'],
+      );
+    }
+    if (message.contains('Tahun')) {
+      return const _RegmvBackendValidationTarget(
+        section: RegmvFormSection.form3,
+        fieldKey: 'form3.tahun',
+        affectedFieldKeys: ['form3.tahun'],
+      );
+    }
+
+    return const _RegmvBackendValidationTarget(
+      section: RegmvFormSection.form3,
+      fieldKey: 'form3.general',
+      affectedFieldKeys: [
+        'form3.tahun',
+        'form3.hargaMobil',
+        'form3.wilayah',
+        'form3.platNo',
+        'form3.rangkaNo',
+        'form3.mesinNo',
+        'form3.merek',
+        'form3.model',
+        'form3.subModel',
+        'form3.penggunaan',
+        'form3.warna',
+      ],
+    );
+  }
+
+  String _currentBackendValidationKey() {
+    final polis = context.read<PolisTanggalBloc>().state;
+    final values = <String>[
+      regmv1Id ?? '',
+      polis.mulai.toIso8601String(),
+      polis.berakhir.toIso8601String(),
+      fieldComboRMatauang?.rmatauangKode ?? '',
+      fieldComboMMvjnscover?.mmvjnscoverId ?? '',
+      toBoolean(fieldIsSrccController.text).toString(),
+      toBoolean(fieldIsFloodController.text).toString(),
+      toBoolean(fieldIsEqController.text).toString(),
+      toBoolean(fieldIsTerrorismController.text).toString(),
+      false.toString(),
+      toBoolean(fieldIsAwController.text).toString(),
+      _cleanNumberText(fieldTplController.text),
+      _cleanNumberText(fieldPadController.text),
+      _cleanNumberText(fieldPapController.text),
+      _cleanNumberText(fieldPllController.text),
+      selectedPassengerCount.trim(),
+      fieldComboMWilayah?.mwilayahId ?? '',
+      fieldPlatNoController.text.trim().toUpperCase(),
+      fieldMesinNoController.text.trim().toUpperCase(),
+      fieldRangkaNoController.text.trim().toUpperCase(),
+      fieldComboMMvmerk?.mmvmerkId ?? '',
+      fieldComboMMvtipe?.mmvtipeId ?? '',
+      fieldComboMMvmodel?.mmvmodelId ?? '',
+      fieldComboMWarna?.mwarnaId ?? '',
+      selectedYearform3.trim(),
+      fieldComboMMvpakai?.mmvpakaiId ?? '',
+      _cleanNumberText(fieldHargaController.text),
+    ];
+
+    return values.map((e) => e.replaceAll('|', '/')).join('|');
+  }
+
+  String _cleanNumberText(String value) => value.replaceAll(',', '').trim();
+
+  void _clearBackendValidationForChangedField(String fieldKey) {
+    if (!_lastBackendValidationAffectedFieldKeys.contains(fieldKey)) return;
+    setState(() {
+      _clearBackendValidationCacheIfAffected(fieldKey);
+    });
+  }
+
+  void _clearBackendValidationCacheIfAffected(String fieldKey) {
+    if (!_lastBackendValidationAffectedFieldKeys.contains(fieldKey)) return;
+
+    final lastFieldKey = _lastBackendValidationFieldKey;
+    if (lastFieldKey != null) {
+      fieldErrors.remove(lastFieldKey);
+    }
+
+    _lastBackendValidationKey = null;
+    _lastBackendValidationError = null;
+    _lastBackendValidationSection = null;
+    _lastBackendValidationFieldKey = null;
+    _lastBackendValidationAffectedFieldKeys = const [];
   }
 
   void openForm1({required String? recordId}) {
@@ -2232,6 +2625,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           validator: (_) => null,
           onChanged: (dt) {
             if (dt == null) return;
+            _clearBackendValidationForChangedField('form2.polisMulai');
             context
                 .read<PolisTanggalBloc>()
                 .add(PolisMulaiChanged(dt)); // <- trigger event aja
@@ -2271,6 +2665,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboRMatauang = v;
+            _clearBackendValidationCacheIfAffected('form2.mataUang');
             if (v != null) clearErr('form2.mataUang');
           });
         },
@@ -2289,6 +2684,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboMMvjnscover = v;
+            _clearBackendValidationCacheIfAffected('form2.jenisCover');
             if (v != null) clearErr('form2.jenisCover');
           });
         },
@@ -2298,44 +2694,71 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   Widget _buildFieldIsEq() => CheckboxWidget(
         rightLabel: "Gempa Bumi",
         initialValue: toBoolean(fieldIsEqController.text),
-        callback: (v) => fieldIsEqController.text = v.toString(),
+        callback: (v) {
+          fieldIsEqController.text = v.toString();
+          _clearBackendValidationForChangedField('form2.isEq');
+        },
         leftLabel: "",
       );
 
   Widget _buildFieldIsFlood() => CheckboxWidget(
         rightLabel: "Banjir",
         initialValue: toBoolean(fieldIsFloodController.text),
-        callback: (v) => fieldIsFloodController.text = v.toString(),
+        callback: (v) {
+          fieldIsFloodController.text = v.toString();
+          _clearBackendValidationForChangedField('form2.isFlood');
+        },
         leftLabel: "",
       );
 
   Widget _buildFieldIsSrcc() => CheckboxWidget(
         rightLabel: "Kerusuhan",
         initialValue: toBoolean(fieldIsSrccController.text),
-        callback: (v) => fieldIsSrccController.text = v.toString(),
+        callback: (v) {
+          fieldIsSrccController.text = v.toString();
+          _clearBackendValidationForChangedField('form2.isSrcc');
+        },
         leftLabel: "",
       );
 
   Widget _buildFieldIsTbod() => CheckboxWidget(
         rightLabel: "Pencurian Barang oleh Supir",
         initialValue: toBoolean(fieldIsTbodController.text),
-        callback: (v) => fieldIsTbodController.text = v.toString(),
+        callback: (v) {
+          fieldIsTbodController.text = v.toString();
+          _clearBackendValidationForChangedField('form2.isTbod');
+        },
         leftLabel: "",
       );
 
   Widget _buildFieldIsTerrorism() => CheckboxWidget(
         rightLabel: "Terorisme",
         initialValue: toBoolean(fieldIsTerrorismController.text),
-        callback: (v) => fieldIsTerrorismController.text = v.toString(),
+        callback: (v) {
+          fieldIsTerrorismController.text = v.toString();
+          _clearBackendValidationForChangedField('form2.isTerrorism');
+        },
         leftLabel: "",
       );
 
-  Widget _buildFieldIsAw() => CheckboxWidget(
-        rightLabel: "Bengkel Resmi",
-        initialValue: toBoolean(fieldIsAwController.text),
-        callback: (v) => fieldIsAwController.text = v.toString(),
-        leftLabel: "",
-      );
+  Widget _buildFieldIsAw() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CheckboxWidget(
+          rightLabel: "Bengkel Resmi",
+          initialValue: toBoolean(fieldIsAwController.text),
+          callback: (v) {
+            fieldIsAwController.text = v.toString();
+            _clearBackendValidationForChangedField('form2.isAw');
+            clearErr('form2.isAw');
+          },
+          leftLabel: "",
+        ),
+        _buildFormError('form2.isAw'),
+      ],
+    );
+  }
 
   Widget _buildFieldPLL() => appTextField(
         label: "Tanggung Jawab Penumpang",
@@ -2348,12 +2771,21 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             symbol: '',
           ),
         ],
+        errorText: err('form2.pll'),
         validator: (v) {
+          final backendError = err('form2.pll');
+          if (backendError != null) return backendError;
           if (v == null || v.isEmpty) return null;
           final clean = v.replaceAll(",", "");
           final angka = double.tryParse(clean);
           if (angka == null || angka < 0) return "Tidak boleh minus";
           return null;
+        },
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka >= 0) clearErr('form2.pll');
+          _clearBackendValidationForChangedField('form2.pll');
         },
       );
 
@@ -2368,12 +2800,21 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             symbol: '',
           ),
         ],
+        errorText: err('form2.tpl'),
         validator: (v) {
+          final backendError = err('form2.tpl');
+          if (backendError != null) return backendError;
           if (v == null || v.isEmpty) return null;
           final clean = v.replaceAll(",", "");
           final angka = double.tryParse(clean);
           if (angka == null || angka < 0) return "Tidak boleh minus";
           return null;
+        },
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka >= 0) clearErr('form2.tpl');
+          _clearBackendValidationForChangedField('form2.tpl');
         },
       );
 
@@ -2388,12 +2829,21 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             symbol: '',
           ),
         ],
+        errorText: err('form2.pad'),
         validator: (v) {
+          final backendError = err('form2.pad');
+          if (backendError != null) return backendError;
           if (v == null || v.isEmpty) return null;
           final clean = v.replaceAll(",", "");
           final angka = double.tryParse(clean);
           if (angka == null || angka < 0) return "Tidak boleh minus";
           return null;
+        },
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka >= 0) clearErr('form2.pad');
+          _clearBackendValidationForChangedField('form2.pad');
         },
       );
 
@@ -2408,12 +2858,21 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             symbol: '',
           ),
         ],
+        errorText: err('form2.pap'),
         validator: (v) {
+          final backendError = err('form2.pap');
+          if (backendError != null) return backendError;
           if (v == null || v.isEmpty) return null;
           final clean = v.replaceAll(",", "");
           final angka = double.tryParse(clean);
           if (angka == null || angka < 0) return "Tidak boleh minus";
           return null;
+        },
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka >= 0) clearErr('form2.pap');
+          _clearBackendValidationForChangedField('form2.pap');
         },
       );
   Widget _buildFieldPassengerCountCombo() {
@@ -2432,6 +2891,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       onChangedCallback: (v) {
         setState(() {
           selectedPassengerCount = v ?? "";
+          _clearBackendValidationCacheIfAffected('form2.passengerCount');
 
           if (v != null) {
             clearErr('form2.passengerCount');
@@ -2466,6 +2926,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       onChangedCallback: (value) {
         setState(() {
           selectedYearform3 = value ?? "";
+          _clearBackendValidationCacheIfAffected('form3.tahun');
           if (value != null) {
             clearErr('form3.tahun');
           }
@@ -2491,6 +2952,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           final clean = v.replaceAll(",", "").trim();
           final angka = double.tryParse(clean);
           if (angka != null && angka > 0) clearErr('form3.hargaMobil');
+          _clearBackendValidationForChangedField('form3.hargaMobil');
         },
       );
 
@@ -2506,6 +2968,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboMWilayah = v;
+            _clearBackendValidationCacheIfAffected('form3.wilayah');
 
             if (v != null) {
               clearErr('form3.wilayah');
@@ -2528,6 +2991,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           if (_isValidPlatNomor(v)) {
             clearErr('form3.platNo');
           }
+          _clearBackendValidationForChangedField('form3.platNo');
         },
       );
 
@@ -2543,6 +3007,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChanged: (v) {
           final t = v.trim();
           if (t.isNotEmpty && t.length >= 5) clearErr('form3.rangkaNo');
+          _clearBackendValidationForChangedField('form3.rangkaNo');
         },
       );
 
@@ -2558,6 +3023,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChanged: (v) {
           final t = v.trim();
           if (t.isNotEmpty && t.length >= 5) clearErr('form3.mesinNo');
+          _clearBackendValidationForChangedField('form3.mesinNo');
         },
       );
 
@@ -2577,6 +3043,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             fieldComboMMvmerk = v;
             fieldComboMMvtipe = null;
             fieldComboMMvmodel = null;
+            _clearBackendValidationCacheIfAffected('form3.merek');
             if (v != null) {
               clearErr('form3.merek');
               regmv3formbloc?.add(ComboMMvmerkChangedEvent(comboMMvmerk: v));
@@ -2610,6 +3077,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           setState(() {
             fieldComboMMvtipe = v;
             fieldComboMMvmodel = null;
+            _clearBackendValidationCacheIfAffected('form3.model');
             if (v != null) {
               clearErr('form3.model');
               regmv3formbloc?.add(ComboMMvtipeChangedEvent(comboMMvtipe: v));
@@ -2642,6 +3110,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboMMvmodel = v;
+            _clearBackendValidationCacheIfAffected('form3.subModel');
             if (v != null) {
               clearErr('form3.subModel');
               regmv3formbloc?.add(ComboMMvmodelChangedEvent(comboMMvmodel: v));
@@ -2664,6 +3133,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboMMvpakai = v;
+            _clearBackendValidationCacheIfAffected('form3.penggunaan');
             if (v != null) {
               clearErr('form3.penggunaan');
               regmv3formbloc?.add(ComboMMvpakaiChangedEvent(comboMMvpakai: v));
@@ -2685,6 +3155,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboMWarna = v;
+            _clearBackendValidationCacheIfAffected('form3.warna');
             if (v != null) {
               clearErr('form3.warna');
               regmv3formbloc?.add(ComboMWarnaChangedEvent(comboMWarna: v));
@@ -2834,6 +3305,24 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     });
   }
 
+  Widget _buildFormError(String key) {
+    final message = err(key);
+    if (message == null || message.trim().isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          message,
+          style: bodyTextStyle(context, fontSize: 12).copyWith(color: pRed),
+        ),
+      ),
+    );
+  }
+
   double getProgressValue() {
     final done = [
       isForm1Complete(),
@@ -2893,8 +3382,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   // bool isForm7Complete() => context.read<RegmvUploadFotoAccBloc>().state.items.isNotEmpty;
   bool isForm7Complete() => true;
   // form6 = premi sudah terhitung
-  bool isForm6Complete() =>
-      context.read<Regmv6FormBloc>().state.record != null;
+  bool isForm6Complete() => context.read<Regmv6FormBloc>().state.record != null;
 
   bool validateOpenedForm() {
     final opened = getOpenedIndex();

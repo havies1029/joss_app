@@ -31,7 +31,7 @@ class Regmv3FormAPI {
     return returnData;
   }
 
-  Future<bool> regmv3FormUbahAPI(Regmv3FormModel record) async {
+  Future<ReturnDataAPI> regmv3FormUbahAPI(Regmv3FormModel record) async {
     String ubahEndpoint =
         "${AppData.prefixEndPoint}/api/regmv/regmv3form/update";
     Map<String, String> queryParams = {"modul_id": "regmv3FormUbahAPI"};
@@ -53,7 +53,7 @@ class Regmv3FormAPI {
     } else {
       returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
     }
-    return returnData.success;
+    return returnData;
   }
 
   Future<bool> regmv3FormHapusAPI(String regmv3Id) async {
