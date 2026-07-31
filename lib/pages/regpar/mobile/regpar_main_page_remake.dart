@@ -1598,13 +1598,19 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       polisAkhir: polis.berakhir,
       regpar2Id: regpar1Id ?? "",
       rkonstruksiojkId: fieldComboRKonstruksiojk?.rkonstruksiojkId,
+      comboRKonstruksiojk: fieldComboRKonstruksiojk,
       rokupasiId: fieldComboROkupasi?.rokupasiId,
+      comboROkupasi: fieldComboROkupasi,
       regpar1Id: widget.regpar1Id!,
       objectAlamat: fieldObjectAlamatController.text ?? '',
       objectPropinsiId: fieldComboMPropinsi?.mpropinsiId,
+      comboMPropinsi: fieldComboMPropinsi,
       objectKotaId: fieldComboMKota?.mkotaId,
+      comboMKota: fieldComboMKota,
       objectKecamatanId: fieldComboMKecamatan?.mkecamatanId,
+      comboMKecamatan: fieldComboMKecamatan,
       objectKelurahanId: fieldComboMKelurahan?.mkelurahanId,
+      comboMKelurahan: fieldComboMKelurahan,
     );
 
     context.read<Regpar2FormBloc>().add(Regpar2DraftEvent(record: record));
@@ -1620,8 +1626,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       isTsfwd: toBoolean(fieldIsTsfwdController.text),
       kab2zonagempaId:
           _showZonaGempa ? fieldComboMKabZonaGempa?.mkabzonagempaId : '',
+      comboMKabZonaGempa: _showZonaGempa ? fieldComboMKabZonaGempa : null,
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
+      comboMJnscoverPar: fieldComboMJnscoverPar,
       mwilayahId: fieldComboMWilayah?.mwilayahId,
+      comboMWilayah: fieldComboMWilayah,
       regpar3Id: regpar1Id ?? "",
     );
 
@@ -1634,6 +1643,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     final record = Regpar4FormModel(
       regpar1Id: regpar1Id ?? "",
       currId: fieldComboRMatauang?.rmatauangKode,
+      comboRMatauang: fieldComboRMatauang,
       siBuilding:
           double.parse(fieldSiBuildingController.text.replaceAll(',', '')),
       siContent:
