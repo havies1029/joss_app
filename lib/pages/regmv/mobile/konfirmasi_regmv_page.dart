@@ -1027,7 +1027,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
           ),
 
           _buildDetailRow(
-            "Jenis Cover:",
+            "Jenis Jaminan:",
             data.comboMMvjnscover?.coverName ?? "-",
           ),
           _buildDetailRowIcon("Gempa Bumi:", data.isEq),

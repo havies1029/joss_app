@@ -314,13 +314,13 @@ class _RegisterOtpPopupWidgetState extends State<RegisterOtpPopupWidget>
                     const SizedBox(height: 14),
                     Text(
                       'Verifikasi OTP',
-                      style: headingStyle(context, fontSize: 16),
+                      style: headingStyle(context, fontSize: 18),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 14),
                     Text(
                       'Kami sudah mengirim kode OTP ke $_targetLabel',
-                      style: bodyTextStyle(context, fontSize: 14).copyWith(
+                      style: bodyTextStyle(context, fontSize: 16).copyWith(
                         color: hintGrey,
                       ),
                       textAlign: TextAlign.center,
@@ -328,7 +328,7 @@ class _RegisterOtpPopupWidgetState extends State<RegisterOtpPopupWidget>
                     const SizedBox(height: 4),
                     Text(
                       _targetValue,
-                      style: bodyTextStyle(context, fontSize: 14).copyWith(
+                      style: bodyTextStyle(context, fontSize: 16).copyWith(
                         color: primaryColor,
                         fontWeight: FontWeight.w600,
                       ),
@@ -423,7 +423,7 @@ class _RegisterOtpPopupWidgetState extends State<RegisterOtpPopupWidget>
                     const SizedBox(height: 18),
                     Text(
                       'Belum menerima kode OTP?',
-                      style: bodyTextStyle(context, fontSize: 13).copyWith(
+                      style: bodyTextStyle(context, fontSize: 15).copyWith(
                         color: hintGrey,
                       ),
                       textAlign: TextAlign.center,
@@ -443,7 +443,7 @@ class _RegisterOtpPopupWidgetState extends State<RegisterOtpPopupWidget>
                                 ),
                                 child: Text(
                                   'Kirim Ulang OTP',
-                                  style: bodyTextStyle(context, fontSize: 14)
+                                  style: bodyTextStyle(context, fontSize: 16)
                                       .copyWith(
                                     color: isBusy ? hintGrey : primaryColor,
                                     fontWeight: FontWeight.w600,

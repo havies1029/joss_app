@@ -1791,6 +1791,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     final record = Regmv2FormModel(
       isAw: toBoolean(fieldIsAwController.text),
       currId: fieldComboRMatauang?.rmatauangKode,
+      comboRMatauang: fieldComboRMatauang,
       isEq: toBoolean(fieldIsEqController.text),
       isFlood: toBoolean(fieldIsFloodController.text),
       isSrcc: toBoolean(fieldIsSrccController.text),
@@ -1798,6 +1799,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       isTbod: false,
       isTerrorism: toBoolean(fieldIsTerrorismController.text),
       mmvjnscoverId: fieldComboMMvjnscover?.mmvjnscoverId,
+      comboMMvjnscover: fieldComboMMvjnscover,
       pad: double.tryParse(fieldPadController.text.replaceAll(',', '')) ?? 0,
       pap: double.tryParse(fieldPapController.text.replaceAll(',', '')) ?? 0,
       passangerCount: int.tryParse(selectedPassengerCount) ?? 0,
