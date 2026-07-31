@@ -5,9 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:joss_app/blocs/gallery/galleryeventcari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../common/loading_indicator.dart';
+import 'carousel_webview_page.dart';
 
 class CarouselMenuWidget extends StatefulWidget {
   const CarouselMenuWidget({super.key});
@@ -49,24 +49,27 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
     super.dispose();
   }
 
-  Future<void> _openUrl(String url) async {
+  Future<void> _openUrl(String url, {String title = 'Informasi'}) async {
     if (url.trim().isEmpty) return;
 
-    final uri = Uri.tryParse(url.trim());
+    final trimmedUrl = url.trim();
+    final normalizedUrl =
+        trimmedUrl.contains('://') ? trimmedUrl : 'https://$trimmedUrl';
+    final uri = Uri.tryParse(normalizedUrl);
 
     if (uri == null || !uri.hasScheme) {
       debugPrint('[CAROUSEL] invalid url: $url');
       return;
     }
 
-    final success = await launchUrl(
-      uri,
-      mode: LaunchMode.externalApplication,
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CarouselWebViewPage(
+          url: uri,
+          title: title,
+        ),
+      ),
     );
-
-    if (!success) {
-      debugPrint('[CAROUSEL] tidak bisa membuka url: $url');
-    }
   }
 
   void _syncInitialPageIfNeeded(int itemLength) {
@@ -89,7 +92,6 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
 
       _hasSyncedInitialPage = true;
       _lastItemLength = itemLength;
-
 
       setState(() {
         _currentRealIndex = 0;
@@ -240,7 +242,10 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onTap: () => _openUrl(item.eventUrl),
+                    onTap: () => _openUrl(
+                      item.eventUrl,
+                      title: item.eventNama,
+                    ),
                     child: _buildCachedImage(item.galleryUrl),
                   ),
                 ),
@@ -249,8 +254,8 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
 
                   if (_pageController.hasClients &&
                       _pageController.position.haveDimensions) {
-                    final currentPage =
-                        _pageController.page ?? _pageController.initialPage.toDouble();
+                    final currentPage = _pageController.page ??
+                        _pageController.initialPage.toDouble();
 
                     final diff = currentPage - pageIndex;
                     scale = (1 - (diff.abs() * 0.25)).clamp(0.9, 1.0);

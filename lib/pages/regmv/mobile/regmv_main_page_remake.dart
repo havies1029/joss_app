@@ -215,11 +215,36 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   final fieldSumInsuredController = TextEditingController();
   final fieldRateTotalController = TextEditingController();
   final fieldTotalTagihanController = TextEditingController();
+
+  Iterable<TextEditingController> get _premiInputControllers =>
+      <TextEditingController>[
+        fieldCalmv1IdController,
+        fieldTtgAlamatController,
+        fieldTtgNamaController,
+        fieldIsAwController,
+        fieldIsEqController,
+        fieldIsFloodController,
+        fieldIsSrccController,
+        fieldIsTerrorismController,
+        fieldPadController,
+        fieldPapController,
+        fieldPllController,
+        fieldTplController,
+        fieldAksesorisController,
+        fieldHargaController,
+        fieldMesinNoController,
+        fieldPlatNoController,
+        fieldRangkaNoController,
+      ];
   //form6
 
   @override
   void initState() {
     super.initState();
+
+    for (final controller in _premiInputControllers) {
+      controller.addListener(_refreshPremiSnapshotVisibility);
+    }
 
     final regmv1 = context.read<Regmv1CrudBloc>().state.record?.regmv1Id ?? "";
     regmv1Id = widget.regmv1Id ?? regmv1;
@@ -237,6 +262,10 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   @override
   void dispose() {
+    for (final controller in _premiInputControllers) {
+      controller.removeListener(_refreshPremiSnapshotVisibility);
+    }
+
     //form1
     fieldCalmv1IdController.dispose();
     fieldTtgAlamatController.dispose();
@@ -834,6 +863,23 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                 }
               },
             ),
+            BlocListener<PolisTanggalBloc, PolisTanggalState>(
+              listenWhen: (prev, curr) =>
+                  prev.mulai != curr.mulai || prev.berakhir != curr.berakhir,
+              listener: (_, __) => _refreshPremiSnapshotVisibility(),
+            ),
+            BlocListener<RegmvUploadStnkBloc, Regmv4UploadFotoObjectState>(
+              listenWhen: (prev, curr) => prev.items != curr.items,
+              listener: (_, __) => _refreshPremiSnapshotVisibility(),
+            ),
+            BlocListener<RegmvUploadFotoMobilBloc, Regmv5UploadFotoObjectState>(
+              listenWhen: (prev, curr) => prev.items != curr.items,
+              listener: (_, __) => _refreshPremiSnapshotVisibility(),
+            ),
+            BlocListener<RegmvUploadFotoAccBloc, Regmv7UploadFotoObjectState>(
+              listenWhen: (prev, curr) => prev.items != curr.items,
+              listener: (_, __) => _refreshPremiSnapshotVisibility(),
+            ),
             BlocListener<Regmv6FormBloc, Regmv6FormState>(
               listener: (context, state) {
                 if (state.hasFailure) {
@@ -852,6 +898,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                   if (mounted) {
                     setState(() {
                       _isHitungPremiLoading = false;
+                      _lastCalculatedPremiKey = _currentPremiInputKey();
                     });
                   }
 
@@ -882,7 +929,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     final bool hasForm6Record = _hasValidRegmv6Premium(
       context.read<Regmv6FormBloc>().state.record,
     );
-    final bool canShowLanjutkan = isAllFormComplete();
+    final bool canShowLanjutkan =
+        isAllFormComplete() && _isCalculatedPremiCurrent();
     return Scaffold(
       backgroundColor: secondaryBlackColor,
       body: Stack(
@@ -1793,6 +1841,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   bool _showValidationPreviewFloatingIcon = false;
   bool _isValidationPreviewDialogOpen = false;
   final Set<String> _validationPreviewFieldErrorKeys = <String>{};
+  String? _lastCalculatedPremiKey;
   String? _lastBackendValidationKey;
   String? _lastBackendValidationError;
   RegmvFormSection? _lastBackendValidationSection;
@@ -2815,8 +2864,52 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       _cleanNumberText(fieldHargaController.text),
     ];
 
-    return values.map((e) => e.replaceAll('|', '/')).join('|');
+    return values.map(_keyPart).join('|');
   }
+
+  bool _isCalculatedPremiCurrent() {
+    final calculatedKey = _lastCalculatedPremiKey;
+    return calculatedKey != null && calculatedKey == _currentPremiInputKey();
+  }
+
+  void _refreshPremiSnapshotVisibility() {
+    if (!mounted || _lastCalculatedPremiKey == null) return;
+    setState(() {});
+  }
+
+  String _currentPremiInputKey() {
+    final values = <String>[
+      _currentBackendValidationKey(),
+      fieldCalmv1IdController.text.trim(),
+      fieldTtgNamaController.text.trim(),
+      fieldTtgAlamatController.text.trim(),
+      fieldAksesorisController.text.trim(),
+      _uploadItemsKey(context.read<RegmvUploadStnkBloc>().state.items),
+      _uploadItemsKey(context.read<RegmvUploadFotoMobilBloc>().state.items),
+      _uploadItemsKey(context.read<RegmvUploadFotoAccBloc>().state.items),
+    ];
+
+    return values.map(_keyPart).join('|');
+  }
+
+  String _uploadItemsKey(Iterable<dynamic> items) {
+    final values = items.map((dynamic item) {
+      final size = item.size;
+      return <String>[
+        item.localId?.toString() ?? '',
+        item.name?.toString() ?? '',
+        item.path?.toString() ?? '',
+        size == null ? '' : size.toString(),
+        item.mime?.toString() ?? '',
+      ].map(_keyPart).join('~');
+    }).toList()
+      ..sort();
+
+    return values.join(',');
+  }
+
+  String _keyPart(String value) =>
+      value.replaceAll('|', '/').replaceAll('\n', ' ').trim();
 
   String _cleanNumberText(String value) => value.replaceAll(',', '').trim();
 

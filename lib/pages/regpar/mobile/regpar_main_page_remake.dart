@@ -245,11 +245,35 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   final fieldBiayaPolisController = TextEditingController();
   final fieldBiayaMateraiController = TextEditingController();
   final fieldTotalTagihanController = TextEditingController();
+
+  Iterable<TextEditingController> get _premiInputControllers =>
+      <TextEditingController>[
+        fieldTtgAlamatController,
+        fieldTtgNamaController,
+        fieldObjectAlamatController,
+        fieldCoverLamaController,
+        fieldPolisAkhirController,
+        fieldPolisMulaiController,
+        fieldIsEqController,
+        fieldIsFlexasController,
+        fieldIsOtherController,
+        fieldIsRsmdccController,
+        fieldIsTsfwdController,
+        fieldSiBuildingController,
+        fieldSiContentController,
+        fieldSiMachineryController,
+        fieldSiOtherController,
+        fieldSiStockController,
+      ];
   //form5
 
   @override
   void initState() {
     super.initState();
+
+    for (final controller in _premiInputControllers) {
+      controller.addListener(_refreshPremiSnapshotVisibility);
+    }
 
     expanded = List.filled(RegparSection.values.length, false);
     expanded[sectionIndex(RegparSection.form1)] = true;
@@ -270,6 +294,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
   @override
   void dispose() {
+    for (final controller in _premiInputControllers) {
+      controller.removeListener(_refreshPremiSnapshotVisibility);
+    }
+
     // form1
     fieldTtgAlamatController.dispose();
     fieldTtgNamaController.dispose();
@@ -825,6 +853,16 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                 }
               },
             ),
+            BlocListener<PolisTanggalBloc, PolisTanggalState>(
+              listenWhen: (prev, curr) =>
+                  prev.mulai != curr.mulai || prev.berakhir != curr.berakhir,
+              listener: (_, __) => _refreshPremiSnapshotVisibility(),
+            ),
+            BlocListener<RegparUploadFotoObjectBloc,
+                RegParUploadFotoObjectState>(
+              listenWhen: (prev, curr) => prev.items != curr.items,
+              listener: (_, __) => _refreshPremiSnapshotVisibility(),
+            ),
             BlocListener<Regpar5FormBloc, Regpar5FormState>(
               listenWhen: (prev, curr) =>
                   prev.isCalculated != curr.isCalculated ||
@@ -846,6 +884,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                   setState(() {
                     _isHitungPremiLoading = false;
                     regpar5Id = rec.regpar5Id;
+                    _lastCalculatedPremiKey = _currentPremiInputKey();
                   });
                 }
 
@@ -876,7 +915,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Widget _buildForm() {
     final bool hasForm5Record =
         context.read<Regpar5FormBloc>().state.record != null;
-    final bool canShowLanjutkan = isAllFormComplete();
+    final bool canShowLanjutkan =
+        isAllFormComplete() && _isCalculatedPremiCurrent();
     return Scaffold(
       backgroundColor: secondaryBlackColor,
       body: Stack(
@@ -1615,6 +1655,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       RegparValidationPreviewRepository();
   RegparValidationPreviewResponseModel? _lastValidationPreviewResponse;
   String? _lastValidationPreviewKey;
+  String? _lastCalculatedPremiKey;
   bool _showValidationPreviewFloatingIcon = false;
   bool _isValidationPreviewDialogOpen = false;
   final Set<String> _validationPreviewFieldErrorKeys = <String>{};
@@ -1781,8 +1822,69 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       moneyKey(fieldSiContentController),
       moneyKey(fieldSiStockController),
       moneyKey(fieldSiOtherController),
-    ].join('|');
+    ].map(_keyPart).join('|');
   }
+
+  bool _isCalculatedPremiCurrent() {
+    final calculatedKey = _lastCalculatedPremiKey;
+    return calculatedKey != null && calculatedKey == _currentPremiInputKey();
+  }
+
+  void _refreshPremiSnapshotVisibility() {
+    if (!mounted || _lastCalculatedPremiKey == null) return;
+    setState(() {});
+  }
+
+  String _currentPremiInputKey() {
+    final polis = context.read<PolisTanggalBloc>().state;
+    final values = <String>[
+      _currentValidationPreviewKey(),
+      fieldTtgNamaController.text.trim(),
+      fieldTtgAlamatController.text.trim(),
+      polis.mulai.toIso8601String(),
+      polis.berakhir.toIso8601String(),
+      fieldComboRKonstruksiojk?.rkonstruksiojkId ?? '',
+      fieldComboROkupasi?.rokupasiId ?? '',
+      fieldObjectAlamatController.text.trim(),
+      fieldComboMPropinsi?.mpropinsiId ?? '',
+      fieldComboMKota?.mkotaId ?? '',
+      fieldComboMKecamatan?.mkecamatanId ?? '',
+      fieldComboMKelurahan?.mkelurahanId ?? '',
+      fieldComboMJnscoverPar?.mjnscoverparId ?? '',
+      fieldComboMWilayah?.mwilayahId ?? '',
+      _showZonaGempa.toString(),
+      fieldComboMKabZonaGempa?.mkabzonagempaId ?? '',
+      toBoolean(fieldIsEqController.text).toString(),
+      toBoolean(fieldIsFlexasController.text).toString(),
+      toBoolean(fieldIsOtherController.text).toString(),
+      toBoolean(fieldIsRsmdccController.text).toString(),
+      toBoolean(fieldIsTsfwdController.text).toString(),
+      _uploadItemsKey(
+        context.read<RegparUploadFotoObjectBloc>().state.items,
+      ),
+    ];
+
+    return values.map(_keyPart).join('|');
+  }
+
+  String _uploadItemsKey(Iterable<dynamic> items) {
+    final values = items.map((dynamic item) {
+      final size = item.size;
+      return <String>[
+        item.localId?.toString() ?? '',
+        item.name?.toString() ?? '',
+        item.path?.toString() ?? '',
+        size == null ? '' : size.toString(),
+        item.mime?.toString() ?? '',
+      ].map(_keyPart).join('~');
+    }).toList()
+      ..sort();
+
+    return values.join(',');
+  }
+
+  String _keyPart(String value) =>
+      value.replaceAll('|', '/').replaceAll('\n', ' ').trim();
 
   void _applyValidationPreviewIssue(
     RegparValidationPreviewResponseModel response,
