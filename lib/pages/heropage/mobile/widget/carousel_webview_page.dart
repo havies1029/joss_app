@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../../common/constants.dart';
@@ -128,50 +129,64 @@ class _CarouselWebViewPageState extends State<CarouselWebViewPage> {
 
     final title = 'Detail';
 
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: horizontalPadding,
-        vertical: hPadding,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          IconButton(
-            onPressed: _closePage,
-            icon: const Icon(Icons.arrow_back),
-            color: primaryLightColor,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(
-              minWidth: 40,
-              minHeight: 40,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              title,
-              style: bodyTextStyle(context, fontSize: 22),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Flexible(
-            child: Text(
-              'Claim Is Simple',
-              style: headingStyle(
-                context,
-                fontSize: getResponsiveFont(context, 18),
-              ).copyWith(
-                fontStyle: FontStyle.italic,
-                color: primaryLightColor,
+    return SizedBox(
+      height: 56,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: SizedBox(
+                width: 44,
+                height: double.infinity,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: _closePage,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: SvgPicture.asset(
+                      'assets/icons/arrow_back.svg',
+                    ),
+                  ),
+                ),
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              textAlign: TextAlign.right,
             ),
-          ),
-        ],
+            Positioned.fill(
+              left: 44,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: bodyTextStyle(context, fontSize: 22),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: Text(
+                      'Claim Is Simple',
+                      style: headingStyle(
+                        context,
+                        fontSize: getResponsiveFont(context, 18),
+                      ).copyWith(
+                        fontStyle: FontStyle.italic,
+                        color: primaryLightColor,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      textAlign: TextAlign.right,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

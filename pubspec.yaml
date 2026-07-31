@@ -88,6 +88,7 @@ flutter_launcher_icons:
 flutter:
   uses-material-design: true
   assets:
+    - assets/images/test213.png
     - assets/icons/simple-line-icons_check.svg
     - assets/icons/logo_pp.svg
     - assets/images/jps_dikanan2.png
