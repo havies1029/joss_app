@@ -566,7 +566,7 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
                                             );
                                           },
                                           child: Text(
-                                            "Daftar Klien",
+                                            "Daftar sebagai Klien",
                                             style: bodyTextStyle(context)
                                                 .copyWith(color: primaryColor),
                                           ),

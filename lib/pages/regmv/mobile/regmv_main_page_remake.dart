@@ -2415,7 +2415,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
     if (issue.minValue.trim().isNotEmpty || issue.maxValue.trim().isNotEmpty) {
       rows.add(_buildValidationPreviewDetailRow(
-        isPriceRange ? 'Batas aman' : 'Batas tahun',
+        isPriceRange ? 'Batas Harga' : 'Tahun Berlaku',
         isPriceRange
             ? '${_formatValidationIdr(issue.minValue)} - ${_formatValidationIdr(issue.maxValue)}'
             : '${issue.minValue.trim()} - ${issue.maxValue.trim()}',
@@ -3609,7 +3609,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   Widget _buildHargaMobil() => appTextField(
-        label: "Harga Mobil",
+        label: "Harga Kendaraan",
         controller: fieldHargaController,
         keyboardType: TextInputType.number,
         inputFormatters: [

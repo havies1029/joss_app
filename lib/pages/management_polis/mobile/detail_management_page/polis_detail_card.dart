@@ -4,6 +4,7 @@ import 'package:joss_app/common/constants.dart';
 
 import '../../../../blocs/regother/regother1crud_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 class PolisDetailCard extends StatelessWidget {
   final Map<String, dynamic> dataMap;
   final String cobId;
@@ -117,9 +118,8 @@ class PolisDetailCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool hasCobId = cobId.trim().isNotEmpty;
-    final rows = _rowsForCard(context)
-        .where((r) => !_isEmptyValue(r.value))
-        .toList();
+    final rows =
+        _rowsForCard(context).where((r) => !_isEmptyValue(r.value)).toList();
 
     return InkWell(
       borderRadius: BorderRadius.circular(borderRadius),
@@ -146,34 +146,18 @@ class PolisDetailCard extends StatelessWidget {
               ),
               const SizedBox(height: 10),
             ],
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "No:",
-                  style: TextStyle(
-                    color: primaryLightColor,
-                    fontSize: fontSize(context, 16),
-                  ),
-                ),
-                Text(
-                  dataMap["no"]?.toString() ?? "1",
-                  style: TextStyle(
-                    color: valueColor,
-                    fontSize: fontSize(context, 16),
-                  ),
-                ),
-              ],
-            ),
-
-            Divider(color: dividerColor, height: 20),
-
-            ...rows.map((row) => _kvRow(
+            _kvRow(
               context: context,
-              label: row.key,
-              value: row.value,
-            )),
+              label: "No",
+              value: dataMap["no"]?.toString() ?? "1",
+              labelTextColor: primaryLightColor,
+            ),
+            Divider(color: dividerColor, height: 20),
+            ...rows.map((row) => _kvRow(
+                  context: context,
+                  label: row.key,
+                  value: row.value,
+                )),
           ],
         ),
       ),
@@ -184,6 +168,7 @@ class PolisDetailCard extends StatelessWidget {
     required BuildContext context,
     required String label,
     required String value,
+    Color? labelTextColor,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -191,11 +176,11 @@ class PolisDetailCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            flex: 2,
+            flex: 5,
             child: Text(
               "$label:",
               style: TextStyle(
-                color: labelColor,
+                color: labelTextColor ?? labelColor,
                 fontSize: fontSize(context, 16),
               ),
               overflow: TextOverflow.ellipsis,
@@ -203,7 +188,7 @@ class PolisDetailCard extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            flex: 3,
+            flex: 5,
             child: Align(
               alignment: Alignment.centerRight,
               child: Text(
@@ -269,8 +254,8 @@ class PolisDetailCard extends StatelessWidget {
         .trim()
         .split(' ')
         .map((w) => w.isEmpty
-        ? ''
-        : '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
+            ? ''
+            : '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
         .join(' ');
   }
 }
