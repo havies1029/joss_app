@@ -176,17 +176,13 @@ class _RincianPageState extends State<RincianPage> {
               if (_hasHandledPaymentCancel) return;
               _hasHandledPaymentCancel = true;
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                successSnackBar('Pembayaran berhasil dibatalkan.'),
-              );
-
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => PaymentSuccess(
-                    display: "Pengajuan Tidak Dilanjutkan",
+                    display: "Invoice Tidak Dapat Dilanjutkan",
                     description:
-                        "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kemba",
+                        "Invoice ini telah dibatalkan atau masa pembayarannya telah berakhir. Silakan buat pengajuan atau pembayaran baru.",
                     displayButton: "Kembali",
                     assetPath: "assets/icons/Logo_Gagal1.svg",
                     onButtonPressed: () {

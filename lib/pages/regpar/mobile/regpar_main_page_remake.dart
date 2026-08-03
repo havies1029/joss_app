@@ -1955,15 +1955,33 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     return 'form4.siOther';
   }
 
-  void _clearValidationPreviewForChangedField(String fieldKey) {
+  void _clearValidationPreviewForChangedFields(Iterable<String> fieldKeys) {
     if (_lastValidationPreviewResponse == null) return;
-    if (!fieldKey.startsWith('form2.') && !fieldKey.startsWith('form4.')) {
-      return;
-    }
+    final keys = fieldKeys.where(_isValidationPreviewFieldKey).toList();
+    if (keys.isEmpty) return;
 
     setState(() {
-      _clearValidationPreviewData();
+      _clearValidationPreviewChangedFields(keys);
     });
+  }
+
+  bool _isValidationPreviewFieldKey(String fieldKey) {
+    return fieldKey.startsWith('form2.') || fieldKey.startsWith('form4.');
+  }
+
+  void _clearValidationPreviewChangedFields(Iterable<String> fieldKeys) {
+    final keys = fieldKeys.where(_isValidationPreviewFieldKey).toSet();
+    if (keys.isEmpty) return;
+
+    for (final fieldKey in keys) {
+      if (_validationPreviewFieldErrorKeys.remove(fieldKey)) {
+        fieldErrors.remove(fieldKey);
+      }
+    }
+
+    _lastValidationPreviewResponse = null;
+    _lastValidationPreviewKey = null;
+    _showValidationPreviewFloatingIcon = false;
   }
 
   void _clearValidationPreviewState() {
@@ -2746,7 +2764,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
           setState(() {
             fieldComboROkupasi = v;
             clearErr('form2.okupasi');
-            _clearValidationPreviewData();
+            _clearValidationPreviewChangedFields([
+              'form2.okupasi',
+              'form4.siOther',
+            ]);
 
             fieldComboRKonstruksiojk = null;
             previousKonstruksi = null;
@@ -3053,7 +3074,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboRMatauang = v;
-            _clearValidationPreviewData();
+            _clearValidationPreviewChangedFields(['form4.mataUang']);
             if (v != null) {
               clearErr('form4.mataUang');
             }
@@ -3300,7 +3321,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     final clean = v.replaceAll(",", "").trim();
     final angka = double.tryParse(clean);
     if (angka != null && angka >= 0) clearErr(key);
-    _clearValidationPreviewForChangedField(key);
+    _clearValidationPreviewForChangedFields([key, 'form4.siOther']);
   }
 
   final Map<String, String?> fieldErrors = {};

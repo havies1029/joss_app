@@ -2153,13 +2153,30 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   void _clearValidationPreviewForChangedField(String fieldKey) {
     if (_lastValidationPreviewResponse == null) return;
-    if (!fieldKey.startsWith('form2.') && !fieldKey.startsWith('form3.')) {
-      return;
-    }
+    if (!_isValidationPreviewFieldKey(fieldKey)) return;
 
     setState(() {
-      _clearValidationPreviewData();
+      _clearValidationPreviewChangedFields([fieldKey]);
     });
+  }
+
+  bool _isValidationPreviewFieldKey(String fieldKey) {
+    return fieldKey.startsWith('form2.') || fieldKey.startsWith('form3.');
+  }
+
+  void _clearValidationPreviewChangedFields(Iterable<String> fieldKeys) {
+    final keys = fieldKeys.where(_isValidationPreviewFieldKey).toSet();
+    if (keys.isEmpty) return;
+
+    for (final fieldKey in keys) {
+      if (_validationPreviewFieldErrorKeys.remove(fieldKey)) {
+        fieldErrors.remove(fieldKey);
+      }
+    }
+
+    _lastValidationPreviewResponse = null;
+    _lastValidationPreviewKey = null;
+    _showValidationPreviewFloatingIcon = false;
   }
 
   void _clearValidationPreviewState() {
@@ -3416,7 +3433,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboRMatauang = v;
-            _clearValidationPreviewData();
+            _clearValidationPreviewChangedFields(['form2.mataUang']);
             _clearBackendValidationCacheIfAffected('form2.mataUang');
             if (v != null) clearErr('form2.mataUang');
           });
@@ -3436,7 +3453,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboMMvjnscover = v;
-            _clearValidationPreviewData();
+            _clearValidationPreviewChangedFields(['form2.jenisCover']);
             _clearBackendValidationCacheIfAffected('form2.jenisCover');
             if (v != null) clearErr('form2.jenisCover');
           });
@@ -3654,7 +3671,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       onChangedCallback: (v) {
         setState(() {
           selectedPassengerCount = v ?? "";
-          _clearValidationPreviewData();
+          _clearValidationPreviewChangedFields(['form2.passengerCount']);
           _clearBackendValidationCacheIfAffected('form2.passengerCount');
 
           if (v != null) {
@@ -3690,7 +3707,10 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       onChangedCallback: (value) {
         setState(() {
           selectedYearform3 = value ?? "";
-          _clearValidationPreviewData();
+          _clearValidationPreviewChangedFields([
+            'form3.tahun',
+            'form3.hargaMobil',
+          ]);
           _clearBackendValidationCacheIfAffected('form3.tahun');
           if (value != null) {
             clearErr('form3.tahun');
@@ -3734,7 +3754,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboMWilayah = v;
-            _clearValidationPreviewData();
+            _clearValidationPreviewChangedFields(['form3.wilayah']);
             _clearBackendValidationCacheIfAffected('form3.wilayah');
 
             if (v != null) {
@@ -3813,7 +3833,13 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             fieldComboMMvmerk = v;
             fieldComboMMvtipe = null;
             fieldComboMMvmodel = null;
-            _clearValidationPreviewData();
+            _clearValidationPreviewChangedFields([
+              'form3.merek',
+              'form3.model',
+              'form3.subModel',
+              'form3.tahun',
+              'form3.hargaMobil',
+            ]);
             _clearBackendValidationCacheIfAffected('form3.merek');
             if (v != null) {
               clearErr('form3.merek');
@@ -3848,7 +3874,12 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           setState(() {
             fieldComboMMvtipe = v;
             fieldComboMMvmodel = null;
-            _clearValidationPreviewData();
+            _clearValidationPreviewChangedFields([
+              'form3.model',
+              'form3.subModel',
+              'form3.tahun',
+              'form3.hargaMobil',
+            ]);
             _clearBackendValidationCacheIfAffected('form3.model');
             if (v != null) {
               clearErr('form3.model');
@@ -3882,7 +3913,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboMMvmodel = v;
-            _clearValidationPreviewData();
+            _clearValidationPreviewChangedFields([
+              'form3.subModel',
+              'form3.tahun',
+              'form3.hargaMobil',
+            ]);
             _clearBackendValidationCacheIfAffected('form3.subModel');
             if (v != null) {
               clearErr('form3.subModel');
@@ -3906,7 +3941,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboMMvpakai = v;
-            _clearValidationPreviewData();
+            _clearValidationPreviewChangedFields(['form3.penggunaan']);
             _clearBackendValidationCacheIfAffected('form3.penggunaan');
             if (v != null) {
               clearErr('form3.penggunaan');
@@ -3929,7 +3964,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboMWarna = v;
-            _clearValidationPreviewData();
+            _clearValidationPreviewChangedFields(['form3.warna']);
             _clearBackendValidationCacheIfAffected('form3.warna');
             if (v != null) {
               clearErr('form3.warna');

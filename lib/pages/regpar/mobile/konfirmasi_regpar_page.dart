@@ -60,6 +60,9 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
   bool isAgreementChecked = false;
   bool _isCardWebViewOpen = false;
   bool _hasHandledPaymentCancel = false;
+  ScaffoldMessengerState? _scaffoldMessenger;
+  NavigatorState? _navigator;
+  NavigatorState? _rootNavigator;
 
   String toCurrency(double value) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0)
@@ -77,14 +80,21 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
     }
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _scaffoldMessenger = ScaffoldMessenger.maybeOf(context);
+    _navigator = Navigator.maybeOf(context);
+    _rootNavigator = Navigator.maybeOf(context, rootNavigator: true);
+  }
+
   void refreshData() {
     regpar1listBloc.add(
         RefreshRegpar1ListEvent(searchText: _searchController.text, hal: 0));
   }
 
   void onViewPaymentMethods(String curr, double totalBayar) {
-    Navigator.push(
-      context,
+    _navigator?.push(
       MaterialPageRoute(
         builder: (_) => PaymentMethodPage(
           curr: curr,
@@ -92,6 +102,13 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
         ),
       ),
     );
+  }
+
+  void _showSafeSnackBar(SnackBar snackBar) {
+    final messenger = _scaffoldMessenger;
+    if (messenger == null) return;
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(snackBar);
   }
 
   void _showPdfLoadingDialog(BuildContext context) {
@@ -308,7 +325,10 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
     if (!mounted || !_isGlobalLoadingShown) return;
 
     _isGlobalLoadingShown = false;
-    Navigator.of(context, rootNavigator: true).pop();
+    final navigator = _rootNavigator;
+    if (navigator != null && navigator.canPop()) {
+      navigator.pop();
+    }
   }
 
   @override
@@ -340,16 +360,13 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
 
             if (state.isProcessed || state.hasFailure) {
               _hideGlobalLoading();
+              if (!mounted) return;
 
-              if (mounted) {
-                setState(() => isSubmitting = false);
-              }
+              setState(() => isSubmitting = false);
             }
 
-            final messenger = ScaffoldMessenger.of(context);
-
             if (state.hasFailure) {
-              messenger.showSnackBar(
+              _showSafeSnackBar(
                 errorSnackBar(
                   "Gagal memproses pembayaran. Silakan coba lagi.",
                 ),
@@ -360,22 +377,21 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
             if (!state.isProcessed) return;
 
             if (state.paymentStatus == "20") {
-              messenger.showSnackBar(
+              final curr =
+                  (state.curr.isEmpty) ? globalMataUang ?? "" : state.curr;
+              onViewPaymentMethods(curr, state.totalBayar);
+              _showSafeSnackBar(
                 successSnackBar(
                   "Invoice berhasil dibuat. Silakan lanjut ke metode pembayaran.",
                 ),
               );
-
-              final curr =
-                  (state.curr.isEmpty) ? globalMataUang ?? "" : state.curr;
-              onViewPaymentMethods(curr, state.totalBayar);
               return;
             }
 
             if (state.paymentStatus == "30") {
               refreshData();
 
-              messenger.showSnackBar(
+              _showSafeSnackBar(
                 successSnackBar(
                   "Silakan lanjutkan proses pembayaran Anda.",
                 ),
@@ -400,7 +416,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 Navigator.of(context).pop();
               }
 
-              messenger.showSnackBar(
+              _showSafeSnackBar(
                 successSnackBar(
                   "Pembayaran berhasil diselesaikan.",
                 ),
@@ -427,9 +443,9 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => PaymentSuccess(
-                    display: "Pengajuan Tidak Dilanjutkan",
+                    display: "Invoice Tidak Dapat Dilanjutkan",
                     description:
-                        "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
+                        "Invoice ini telah dibatalkan atau masa pembayarannya telah berakhir. Silakan buat pengajuan atau pembayaran baru.",
                     displayButton: "Kembali",
                     onButtonPressed: () {
                       Navigator.of(context).pushAndRemoveUntil(
@@ -455,7 +471,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 Navigator.of(context, rootNavigator: true).pop();
               }
 
-              messenger.showSnackBar(
+              _showSafeSnackBar(
                 errorSnackBar(
                   "Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.",
                 ),
@@ -473,7 +489,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 Navigator.of(context, rootNavigator: true).pop();
               }
 
-              messenger.showSnackBar(
+              _showSafeSnackBar(
                 infoSnackBar(
                   "Proses pembayaran kartu kredit dibatalkan.",
                 ),
@@ -482,7 +498,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
               return;
             }
 
-            messenger.showSnackBar(
+            _showSafeSnackBar(
               errorSnackBar(
                 "Status pembayaran tidak dikenali. Silakan periksa kembali.",
               ),
@@ -545,16 +561,13 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
 
               refreshData();
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                successSnackBar('Pembayaran berhasil dibatalkan.'),
-              );
-
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (_) => PaymentSuccess(
-                    display: "Pembayaran Berhasil Dibatalkan",
-                    description: "Tagihan pembayaran telah dibatalkan.",
+                    display: "Invoice Tidak Dapat Dilanjutkan",
+                    description:
+                        "Invoice ini telah dibatalkan atau masa pembayarannya telah berakhir. Silakan buat pengajuan atau pembayaran baru.",
                     displayButton: "Kembali",
                     assetPath: "assets/icons/Logo_Gagal1.svg",
                     onButtonPressed: () {

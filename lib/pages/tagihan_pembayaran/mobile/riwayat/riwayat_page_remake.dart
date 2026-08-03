@@ -112,16 +112,31 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                   Navigator.of(context).pop();
                 }
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  infoSnackBar(
-                    'Tagihan sudah kedaluwarsa atau dibatalkan. Silakan cek riwayat pembayaran.',
-                  ),
-                );
-
                 context
                     .read<DnRekap2invBloc>()
                     .add(InitializeDnRekap2invEvent());
                 refreshData();
+
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PaymentSuccess(
+                      display: "Invoice Tidak Dapat Dilanjutkan",
+                      description:
+                          "Invoice ini telah dibatalkan atau masa pembayarannya telah berakhir. Silakan buat pengajuan atau pembayaran baru.",
+                      displayButton: "Kembali",
+                      assetPath: "assets/icons/Logo_Gagal1.svg",
+                      onButtonPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (_) => const TransaksiPage(),
+                          ),
+                          (route) => route.isFirst,
+                        );
+                      },
+                    ),
+                  ),
+                );
                 return;
               }
 
@@ -130,17 +145,13 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
 
               context.read<DnRekap2invBloc>().add(InitializeDnRekap2invEvent());
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                successSnackBar('Pembayaran berhasil dibatalkan.'),
-              );
-
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (_) => PaymentSuccess(
-                    display: "Pengajuan Tidak Dilanjutkan",
+                    display: "Invoice Tidak Dapat Dilanjutkan",
                     description:
-                        "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
+                        "Invoice ini telah dibatalkan atau masa pembayarannya telah berakhir. Silakan buat pengajuan atau pembayaran baru.",
                     displayButton: "Kembali",
                     assetPath: "assets/icons/Logo_Gagal1.svg",
                     onButtonPressed: () {
