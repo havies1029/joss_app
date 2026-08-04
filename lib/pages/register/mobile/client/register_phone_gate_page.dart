@@ -6,15 +6,13 @@ import 'package:joss_app/blocs/reguser_otp/reguser_otp_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/helper/international_phone_result.dart';
 import 'package:joss_app/helper/ios_left_edge_swipe.dart';
-import 'package:joss_app/models/reguser/reguser_otp_model.dart';
 import 'package:joss_app/pages/base/base_background_firstpage.dart';
 import 'package:joss_app/pages/login/mobile/client/new_login_client/new_login_client_page.dart';
-import 'package:joss_app/pages/login/mobile/client/verification_login_client/verification_login_client_page.dart';
+import 'package:joss_app/pages/login/mobile/forgot/kata_sandi_baru_page.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
 import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
 import 'package:joss_app/pages/register/mobile/client/widget/register_otp_popup_widget.dart';
 import 'package:joss_app/pages/register/mobile/client/widget/register_phone_status_popup_widget.dart';
-import 'package:joss_app/repositories/reguser/reguser_otp_repository.dart';
 import 'package:joss_app/widgets/apptheme/phone_number_field.dart';
 
 const _phoneGateEmptyError = 'No. Handphone belum valid';
@@ -33,7 +31,6 @@ class RegisterPhoneGatePage extends StatefulWidget {
 
 class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
   final TextEditingController _phoneController = TextEditingController();
-  final ReguserOtpRepository _otpRepository = ReguserOtpRepository();
   final Map<String, String?> fieldErrors = {};
 
   int _countryCode = InternationalPhoneHelper.defaultCountryCode;
@@ -111,24 +108,6 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
         );
   }
 
-  Future<bool> _sendPasswordToWhatsapp(String requestId, String target) async {
-    final result = await _otpRepository.kirimPassword(
-      ReguserOtpHpRequestModel(requestId: requestId, target: target),
-    );
-
-    if (!mounted) return false;
-    if (!result.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        errorSnackBar(
-          result.data.isNotEmpty ? result.data : 'Gagal mengirim kata sandi.',
-        ),
-      );
-      return false;
-    }
-
-    return true;
-  }
-
   Future<void> _showRegisteredPopup(RegUserOtpState state) async {
     final target = state.hpStatusTarget;
     final requestId = state.hpStatusRequestId;
@@ -140,9 +119,8 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
       context,
       isRegistered: true,
       onPressed: () async {
-        final ok = await _sendPasswordToWhatsapp(requestId, target);
-        shouldNavigate = ok;
-        return ok;
+        shouldNavigate = true;
+        return true;
       },
     );
 
@@ -154,9 +132,11 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
 
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => VerificationLoginClient(
-          requestFrom: widget.requestFrom,
-          initialUsername: target,
+        builder: (_) => KataSandiBaruPage(
+          email: target,
+          requestId: requestId,
+          requestFrom: 'hp',
+          useResetPasswordDomain: true,
         ),
       ),
     );
@@ -266,19 +246,19 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
     if (_isVerifiedRegistered) {
       if (_isBottomActionLoading) return;
       setState(() => _isBottomActionLoading = true);
-      final ok = await _sendPasswordToWhatsapp(requestId, target);
       if (!mounted) return;
       setState(() => _isBottomActionLoading = false);
-      if (!ok) return;
 
       context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
       _phoneController.clear();
 
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) => VerificationLoginClient(
-            requestFrom: widget.requestFrom,
-            initialUsername: target,
+          builder: (_) => KataSandiBaruPage(
+            email: target,
+            requestId: requestId,
+            requestFrom: 'hp',
+            useResetPasswordDomain: true,
           ),
         ),
       );
@@ -433,9 +413,7 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
     return Padding(
       padding: EdgeInsets.only(top: vPadding),
       child: AppButton.primary(
-        text: _isVerifiedRegistered
-            ? 'Dapatkan Kode Verifikasi'
-            : 'Lengkapi Data',
+        text: _isVerifiedRegistered ? 'Atur Kata Sandi' : 'Lengkapi Data',
         isLoading: _isBottomActionLoading,
         backgroundColor:
             _isBottomActionLoading ? secondaryBlackColor : primaryColor,

@@ -6,16 +6,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import 'package:joss_app/pages/login/mobile/client/new_login_client/new_login_client_page.dart';
+import 'package:joss_app/pages/login/mobile/forgot/kata_sandi_baru_page.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../blocs/reguser_otp/reguser_otp_bloc.dart';
 import '../../../../helper/international_phone_result.dart';
 import '../../../../models/combobox/combomjnsclient_model.dart';
 import '../../../../models/combobox/combomreferral_model.dart';
 import '../../../../models/reguser/reguser_model.dart';
-import '../../../../models/reguser/reguser_otp_model.dart';
 import '../../../../repositories/combobox/combomjnsclient_repository.dart';
 import '../../../../repositories/combobox/combomreferral_repository.dart';
-import '../../../../repositories/reguser/reguser_otp_repository.dart';
 import '../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../widgets/apptheme/phone_number_field.dart';
 import '../../../login/welcome_header.dart';
@@ -64,7 +63,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   final Map<String, String> _verifiedEmailRequestIds = {};
   final Map<String, String> _verifiedHpRequestIds = {};
   final Set<String> _registeredHpTargets = {};
-  final ReguserOtpRepository _otpRepository = ReguserOtpRepository();
   String _lastHandledHpStatusKey = '';
   bool _isPhoneStatusPopupOpen = false;
 
@@ -926,32 +924,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         );
   }
 
-  Future<bool> _sendPasswordToWhatsapp(String requestId, String target) async {
-    final result = await _otpRepository.kirimPassword(
-      ReguserOtpHpRequestModel(requestId: requestId, target: target),
-    );
-
-    if (!mounted) return false;
-
-    if (!result.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        errorSnackBar(
-          result.data.isNotEmpty ? result.data : 'Gagal mengirim kata sandi.',
-        ),
-      );
-      return false;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      successSnackBar(
-        result.data.isNotEmpty
-            ? result.data
-            : 'Kata sandi berhasil dikirim ke WhatsApp.',
-      ),
-    );
-    return true;
-  }
-
   Future<void> _showRegisteredHpPopup(RegUserOtpState state) async {
     final target = state.hpStatusTarget;
     final requestId = state.hpStatusRequestId;
@@ -964,9 +936,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       context,
       isRegistered: true,
       onPressed: () async {
-        final ok = await _sendPasswordToWhatsapp(requestId, target);
-        shouldNavigate = ok;
-        return ok;
+        shouldNavigate = true;
+        return true;
       },
     );
 
@@ -976,9 +947,11 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => NewLoginClient(
-          requestFrom: widget.requestFrom,
-          initialUsername: target,
+        builder: (_) => KataSandiBaruPage(
+          email: target,
+          requestId: requestId,
+          requestFrom: 'hp',
+          useResetPasswordDomain: true,
         ),
       ),
     );

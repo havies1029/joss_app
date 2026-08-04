@@ -44,11 +44,11 @@ class _RegisterPhoneStatusPopupState extends State<_RegisterPhoneStatusPopup> {
       : 'Nomor telepon berhasil diverifikasi';
 
   String get _description => widget.isRegistered
-      ? 'Nomor telepon ini sudah terhubung dengan akun Proteksi Plus. Silahkan dapatkan kode verifikasi untuk melanjutkan.'
+      ? 'Akun Anda telah terdaftar. Silahkan atur kata sandi baru untuk mengakses akun tersebut.'
       : 'Nomor telepon Anda berhasil diverifikasi. Silahkan lengkapi data diri untuk membuat akun Proteksi Plus.';
 
   String get _buttonText =>
-      widget.isRegistered ? 'Dapatkan Kode Verifikasi' : 'Lengkapi Data';
+      widget.isRegistered ? 'Atur Kata Sandi' : 'Lengkapi Data';
 
   Future<void> _handlePressed() async {
     if (_isLoading) return;

@@ -48,6 +48,21 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
   bool _hasStartedTypingNewPassword = false;
   bool _hasStartedTypingConfirmPassword = false;
 
+  bool get _isHpReset => widget.requestFrom.trim().toLowerCase() == 'hp';
+
+  String get _targetLabel => _isHpReset ? 'No. HP' : 'Email';
+
+  void _openLoginAfterReset() {
+    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => NewLoginClient(
+          initialUsername: _isHpReset ? widget.email : '',
+        ),
+      ),
+      (route) => route.isFirst,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -232,12 +247,7 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
                   .read<ForgotPasswordResetBloc>()
                   .add(const ForgotPasswordResetClearMessageEvent());
 
-              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (_) => const NewLoginClient(),
-                ),
-                (route) => route.isFirst,
-              );
+              _openLoginAfterReset();
               return;
             }
 
@@ -270,12 +280,7 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
                   .read<ForgotPasswordBloc>()
                   .add(const ForgotPswdClearMessageEvent());
 
-              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (_) => const NewLoginClient(),
-                ),
-                (route) => route.isFirst,
-              );
+              _openLoginAfterReset();
               return;
             }
 
@@ -331,7 +336,7 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
                       children: [
                         appTextField(
                           controller: _emailController,
-                          label: "Email",
+                          label: _targetLabel,
                           enabled: false,
                         ),
                         const SizedBox(height: 12),
