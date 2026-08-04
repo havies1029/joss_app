@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
+import 'package:joss_app/blocs/login/forgot_password_reset_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/common/loading_indicator.dart';
 import 'package:joss_app/helper/ios_left_edge_swipe.dart';
-import 'package:joss_app/models/login/forgot_password_model.dart';
+import 'package:joss_app/models/login/forgot_password_reset_model.dart';
 import 'package:joss_app/pages/base/base_background_firstpage.dart';
 import 'package:joss_app/pages/login/mobile/client/new_login_client/new_login_client_page.dart';
 import 'package:joss_app/pages/login/mobile/forgot/widget/otp_forgot_widget.dart';
@@ -110,14 +110,13 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
       return;
     }
 
-    final record = RequestOtpModel(
-      sentTo: email,
-      sentVia: "email",
-      purpose: "forgot_password",
+    final record = ForgotPasswordOtpSendModel(
+      target: email,
+      requestFrom: 'email',
     );
 
-    context.read<ForgotPasswordBloc>().add(
-          ForgotPswdRequestPinEvent(record: record),
+    context.read<ForgotPasswordResetBloc>().add(
+          ForgotPasswordResetSendOtpEvent(record: record),
         );
   }
 
@@ -145,8 +144,8 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
   }
 
   Widget _buildSubmitButton() {
-    return BlocBuilder<ForgotPasswordBloc, ForgotPasswordState>(
-      buildWhen: (prev, curr) => prev.isLoading != curr.isLoading,
+    return BlocBuilder<ForgotPasswordResetBloc, ForgotPasswordResetState>(
+      buildWhen: (prev, curr) => prev.isSending != curr.isSending,
       builder: (context, state) {
         return AppButton.primary(
           text: "Kirim",
@@ -182,12 +181,12 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
 
           _handleBack();
         },
-        child: BlocListener<ForgotPasswordBloc, ForgotPasswordState>(
+        child: BlocListener<ForgotPasswordResetBloc, ForgotPasswordResetState>(
           listenWhen: (prev, curr) =>
-              prev.requestOtpSuccess != curr.requestOtpSuccess ||
+              prev.sendOtpSuccess != curr.sendOtpSuccess ||
               prev.errorMessage != curr.errorMessage,
           listener: (context, state) {
-            if (state.requestOtpSuccess) {
+            if (state.sendOtpSuccess) {
               _hideGlobalLoading();
 
               if (mounted) {
@@ -199,15 +198,17 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => OtpForgotWidget(
-                    sentTo:
-                        state.record?.sentTo ?? _emailController.text.trim(),
+                    sentTo: state.target.isNotEmpty
+                        ? state.target
+                        : _emailController.text.trim(),
+                    useResetPasswordDomain: true,
                   ),
                 ),
               );
 
               context
-                  .read<ForgotPasswordBloc>()
-                  .add(const ForgotPswdResetFlagsEvent());
+                  .read<ForgotPasswordResetBloc>()
+                  .add(const ForgotPasswordResetFlagsEvent());
               return;
             }
 
@@ -225,8 +226,8 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
               );
 
               context
-                  .read<ForgotPasswordBloc>()
-                  .add(const ForgotPswdClearMessageEvent());
+                  .read<ForgotPasswordResetBloc>()
+                  .add(const ForgotPasswordResetClearMessageEvent());
             }
           },
           child: Scaffold(

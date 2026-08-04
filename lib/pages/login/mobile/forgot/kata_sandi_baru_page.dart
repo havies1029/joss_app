@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
+import 'package:joss_app/blocs/login/forgot_password_reset_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/authentication/reset_password_model.dart';
+import 'package:joss_app/models/login/forgot_password_reset_model.dart';
 import 'package:joss_app/pages/login/mobile/client/new_login_client/new_login_client_page.dart';
 
 class KataSandiBaruPage extends StatefulWidget {
   final String email;
   final String requestId;
+  final String requestFrom;
+  final bool useResetPasswordDomain;
   final Future<bool> Function({
     required String email,
     required String newPassword,
@@ -19,6 +23,8 @@ class KataSandiBaruPage extends StatefulWidget {
     super.key,
     required this.email,
     required this.requestId,
+    this.requestFrom = 'email',
+    this.useResetPasswordDomain = false,
     this.onSubmit,
   });
 
@@ -152,6 +158,20 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
       return;
     }
 
+    if (widget.useResetPasswordDomain) {
+      final record = ForgotPasswordResetModel(
+        requestId: widget.requestId,
+        target: widget.email,
+        requestFrom: widget.requestFrom,
+        newPassword: pwd,
+      );
+
+      context.read<ForgotPasswordResetBloc>().add(
+            ForgotPasswordResetSubmitEvent(record: record),
+          );
+      return;
+    }
+
     final record = ResetPasswordModel(
       requestId: widget.requestId,
       newPassword: pwd,
@@ -162,46 +182,115 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
         );
   }
 
+  Widget _buildSubmitButton() {
+    if (widget.useResetPasswordDomain) {
+      return BlocBuilder<ForgotPasswordResetBloc, ForgotPasswordResetState>(
+        buildWhen: (prev, curr) => prev.isResetting != curr.isResetting,
+        builder: (context, state) {
+          return AppButton.primary(
+            text: state.isResetting ? "Memproses..." : "Kirim",
+            onPressed: state.isResetting ? null : _submit,
+            isLoading: state.isResetting,
+          );
+        },
+      );
+    }
+
+    return BlocBuilder<ForgotPasswordBloc, ForgotPasswordState>(
+      buildWhen: (prev, curr) => prev.isLoading != curr.isLoading,
+      builder: (context, state) {
+        return AppButton.primary(
+          text: state.isLoading ? "Memproses..." : "Kirim",
+          onPressed: state.isLoading ? null : _submit,
+          isLoading: state.isLoading,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final pwd = _newPasswordController.text;
 
-    return BlocListener<ForgotPasswordBloc, ForgotPasswordState>(
-      listenWhen: (prev, curr) =>
-          prev.resetPasswordSuccess != curr.resetPasswordSuccess ||
-          prev.errorMessage != curr.errorMessage,
-      listener: (context, state) {
-        if (state.resetPasswordSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            successSnackBar("Password berhasil diubah."),
-          );
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<ForgotPasswordResetBloc, ForgotPasswordResetState>(
+          listenWhen: (prev, curr) =>
+              widget.useResetPasswordDomain &&
+              (prev.resetPasswordSuccess != curr.resetPasswordSuccess ||
+                  prev.errorMessage != curr.errorMessage),
+          listener: (context, state) {
+            if (state.resetPasswordSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                successSnackBar("Password berhasil diubah."),
+              );
 
-          context
-              .read<ForgotPasswordBloc>()
-              .add(const ForgotPswdResetFlagsEvent());
-          context
-              .read<ForgotPasswordBloc>()
-              .add(const ForgotPswdClearMessageEvent());
+              context
+                  .read<ForgotPasswordResetBloc>()
+                  .add(const ForgotPasswordResetFlagsEvent());
+              context
+                  .read<ForgotPasswordResetBloc>()
+                  .add(const ForgotPasswordResetClearMessageEvent());
 
-          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (_) => const NewLoginClient(),
-            ),
-            (route) => false,
-          );
-          return;
-        }
+              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (_) => const NewLoginClient(),
+                ),
+                (route) => route.isFirst,
+              );
+              return;
+            }
 
-        if (state.errorMessage.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            errorSnackBar(state.errorMessage),
-          );
+            if (state.errorMessage.isNotEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(state.errorMessage),
+              );
 
-          context
-              .read<ForgotPasswordBloc>()
-              .add(const ForgotPswdClearMessageEvent());
-        }
-      },
+              context
+                  .read<ForgotPasswordResetBloc>()
+                  .add(const ForgotPasswordResetClearMessageEvent());
+            }
+          },
+        ),
+        BlocListener<ForgotPasswordBloc, ForgotPasswordState>(
+          listenWhen: (prev, curr) =>
+              !widget.useResetPasswordDomain &&
+              (prev.resetPasswordSuccess != curr.resetPasswordSuccess ||
+                  prev.errorMessage != curr.errorMessage),
+          listener: (context, state) {
+            if (state.resetPasswordSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                successSnackBar("Password berhasil diubah."),
+              );
+
+              context
+                  .read<ForgotPasswordBloc>()
+                  .add(const ForgotPswdResetFlagsEvent());
+              context
+                  .read<ForgotPasswordBloc>()
+                  .add(const ForgotPswdClearMessageEvent());
+
+              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (_) => const NewLoginClient(),
+                ),
+                (route) => route.isFirst,
+              );
+              return;
+            }
+
+            if (state.errorMessage.isNotEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(state.errorMessage),
+              );
+
+              context
+                  .read<ForgotPasswordBloc>()
+                  .add(const ForgotPswdClearMessageEvent());
+            }
+          },
+        ),
+      ],
       child: Scaffold(
         backgroundColor: secondaryBlackColor,
         appBar: AppBar(
@@ -310,16 +399,7 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  BlocBuilder<ForgotPasswordBloc, ForgotPasswordState>(
-                    buildWhen: (prev, curr) => prev.isLoading != curr.isLoading,
-                    builder: (context, state) {
-                      return AppButton.primary(
-                        text: state.isLoading ? "Memproses..." : "Kirim",
-                        onPressed: state.isLoading ? null : _submit,
-                        isLoading: state.isLoading,
-                      );
-                    },
-                  ),
+                  _buildSubmitButton(),
                 ],
               ),
             ),

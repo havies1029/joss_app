@@ -25,8 +25,7 @@ class InvoiceDownloadApi {
   Future<http.Response> downloadInvoice(String noInv) async {
     try {
       final uri = Uri.https(
-        // 'jossadminapi.smartsoft-id.com',
-        'eassisttoolsv2adminapi.smartsoft-id.com',
+        AppData.adminApiAuthority,
         '/api/inv/download',
         {
           'no_inv': noInv,

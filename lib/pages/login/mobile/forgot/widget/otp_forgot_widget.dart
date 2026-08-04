@@ -7,9 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
+import 'package:joss_app/blocs/login/forgot_password_reset_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/helper/indo_phone_result.dart';
 import 'package:joss_app/models/login/forgot_password_model.dart';
+import 'package:joss_app/models/login/forgot_password_reset_model.dart';
 import 'package:joss_app/pages/login/mobile/forgot/kata_sandi_baru_page.dart';
 import 'package:pinput/pinput.dart';
 
@@ -17,10 +19,12 @@ import '../../../../base/base_background_firstpage.dart';
 
 class OtpForgotWidget extends StatefulWidget {
   final String sentTo;
+  final bool useResetPasswordDomain;
 
   const OtpForgotWidget({
     super.key,
     required this.sentTo,
+    this.useResetPasswordDomain = false,
   });
 
   @override
@@ -145,6 +149,18 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
   }
 
   void _resendOtp() {
+    if (widget.useResetPasswordDomain) {
+      context.read<ForgotPasswordResetBloc>().add(
+            ForgotPasswordResetSendOtpEvent(
+              record: ForgotPasswordOtpSendModel(
+                target: widget.sentTo,
+                requestFrom: 'email',
+              ),
+            ),
+          );
+      return;
+    }
+
     final forgotPasswordBloc = context.read<ForgotPasswordBloc>();
     final existingRecord = forgotPasswordBloc.state.record;
 
@@ -170,6 +186,37 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
           backgroundColor: Colors.red,
         ),
       );
+      return;
+    }
+
+    if (widget.useResetPasswordDomain) {
+      final resetState = context.read<ForgotPasswordResetBloc>().state;
+      final requestId = resetState.requestId;
+      if (requestId.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Terjadi kesalahan, silakan coba lagi.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      setState(() {
+        _isVerifyingOtp = true;
+        _otpError = false;
+      });
+
+      context.read<ForgotPasswordResetBloc>().add(
+            ForgotPasswordResetValidateOtpEvent(
+              record: ForgotPasswordOtpValidateModel(
+                requestId: requestId,
+                target: widget.sentTo,
+                requestFrom: 'email',
+                pin: otp,
+              ),
+            ),
+          );
       return;
     }
 
@@ -214,6 +261,40 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
     );
   }
 
+  Widget _buildResendStatus() {
+    if (widget.useResetPasswordDomain) {
+      return BlocBuilder<ForgotPasswordResetBloc, ForgotPasswordResetState>(
+        buildWhen: (prev, curr) => prev.isSending != curr.isSending,
+        builder: (context, state) => _buildResendSwitcher(state.isSending),
+      );
+    }
+
+    return BlocBuilder<ForgotPasswordBloc, ForgotPasswordState>(
+      buildWhen: (prev, curr) => prev.isLoading != curr.isLoading,
+      builder: (context, state) => _buildResendSwitcher(state.isLoading),
+    );
+  }
+
+  Widget _buildResendSwitcher(bool isLoading) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: _isResendAvailable
+          ? GestureDetector(
+              onTap: isLoading ? null : _resendOtp,
+              child: Text(
+                isLoading ? 'Mengirim ulang...' : 'Kirim ulang kode',
+                style: bodyTextStyle(context).copyWith(
+                  color: isLoading ? hintGrey : primaryColor,
+                ),
+              ),
+            )
+          : Text(
+              _formatTime(_remainingTime),
+              style: bodyTextStyle(context).copyWith(color: pRed),
+            ),
+    );
+  }
+
   @override
   void dispose() {
     _shakeController.dispose();
@@ -225,92 +306,187 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ForgotPasswordBloc, ForgotPasswordState>(
-      listenWhen: (prev, curr) =>
-          prev.verificationPinSuccess != curr.verificationPinSuccess ||
-          prev.verificationPinFailed != curr.verificationPinFailed ||
-          prev.resendOtpSuccess != curr.resendOtpSuccess ||
-          prev.errorMessage != curr.errorMessage,
-      listener: (context, state) {
-        if (state.verificationPinSuccess ||
-            state.verificationPinFailed ||
-            state.errorMessage.isNotEmpty) {
-          if (mounted) {
-            setState(() {
-              _isVerifyingOtp = false;
-            });
-          }
-        }
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<ForgotPasswordResetBloc, ForgotPasswordResetState>(
+          listenWhen: (prev, curr) =>
+              widget.useResetPasswordDomain &&
+              (prev.validateOtpSuccess != curr.validateOtpSuccess ||
+                  prev.validateOtpFailed != curr.validateOtpFailed ||
+                  prev.sendOtpSuccess != curr.sendOtpSuccess ||
+                  prev.errorMessage != curr.errorMessage),
+          listener: (context, state) {
+            if (state.validateOtpSuccess ||
+                state.validateOtpFailed ||
+                state.errorMessage.isNotEmpty) {
+              if (mounted) {
+                setState(() {
+                  _isVerifyingOtp = false;
+                });
+              }
+            }
 
-        final messenger = ScaffoldMessenger.of(context);
-        messenger.hideCurrentSnackBar();
+            final messenger = ScaffoldMessenger.of(context);
+            messenger.hideCurrentSnackBar();
 
-        if (state.verificationPinSuccess) {
-          messenger.showSnackBar(
-            successSnackBar("Verifikasi OTP berhasil"),
-          );
-
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => KataSandiBaruPage(
-                email: widget.sentTo,
-                requestId: state.record?.requestOtpId ?? '',
-              ),
-            ),
-          );
-          return;
-        }
-
-        if (state.verificationPinFailed) {
-          _shakeOtpFields();
-          setState(() {
-            _otpError = true;
-          });
-
-          messenger.showSnackBar(
-            errorSnackBar(
-              state.errorMessage.isNotEmpty
-                  ? state.errorMessage
-                  : "Kode OTP salah / sudah kadaluarsa.",
-            ),
-          );
-
-          _resetOtpAndFocusFirst();
-
-          context.read<ForgotPasswordBloc>().add(
-                const ForgotPswdResetFlagsEvent(),
+            if (state.validateOtpSuccess) {
+              messenger.showSnackBar(
+                successSnackBar("Verifikasi OTP berhasil"),
               );
-          context.read<ForgotPasswordBloc>().add(
-                const ForgotPswdClearMessageEvent(),
-              );
-          return;
-        }
 
-        if (state.resendOtpSuccess) {
-          _handleResendSuccess();
-
-          context.read<ForgotPasswordBloc>().add(
-                const ForgotPswdResetFlagsEvent(),
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => KataSandiBaruPage(
+                    email: widget.sentTo,
+                    requestId: state.requestId,
+                    requestFrom: state.requestFrom,
+                    useResetPasswordDomain: true,
+                  ),
+                ),
               );
-          context.read<ForgotPasswordBloc>().add(
-                const ForgotPswdClearMessageEvent(),
-              );
-          return;
-        }
+              return;
+            }
 
-        if (state.errorMessage.isNotEmpty &&
-            !state.verificationPinFailed &&
-            !state.verificationPinSuccess &&
-            !state.resendOtpSuccess) {
-          messenger.showSnackBar(
-            errorSnackBar(state.errorMessage),
-          );
+            if (state.validateOtpFailed) {
+              _shakeOtpFields();
+              setState(() {
+                _otpError = true;
+              });
 
-          context.read<ForgotPasswordBloc>().add(
-                const ForgotPswdClearMessageEvent(),
+              messenger.showSnackBar(
+                errorSnackBar(
+                  state.errorMessage.isNotEmpty
+                      ? state.errorMessage
+                      : "Kode OTP salah / sudah kadaluarsa.",
+                ),
               );
-        }
-      },
+
+              _resetOtpAndFocusFirst();
+
+              context.read<ForgotPasswordResetBloc>().add(
+                    const ForgotPasswordResetFlagsEvent(),
+                  );
+              context.read<ForgotPasswordResetBloc>().add(
+                    const ForgotPasswordResetClearMessageEvent(),
+                  );
+              return;
+            }
+
+            if (state.sendOtpSuccess) {
+              _handleResendSuccess();
+
+              context.read<ForgotPasswordResetBloc>().add(
+                    const ForgotPasswordResetFlagsEvent(),
+                  );
+              context.read<ForgotPasswordResetBloc>().add(
+                    const ForgotPasswordResetClearMessageEvent(),
+                  );
+              return;
+            }
+
+            if (state.errorMessage.isNotEmpty &&
+                !state.validateOtpFailed &&
+                !state.validateOtpSuccess &&
+                !state.sendOtpSuccess) {
+              messenger.showSnackBar(
+                errorSnackBar(state.errorMessage),
+              );
+
+              context.read<ForgotPasswordResetBloc>().add(
+                    const ForgotPasswordResetClearMessageEvent(),
+                  );
+            }
+          },
+        ),
+        BlocListener<ForgotPasswordBloc, ForgotPasswordState>(
+          listenWhen: (prev, curr) =>
+              !widget.useResetPasswordDomain &&
+              (prev.verificationPinSuccess != curr.verificationPinSuccess ||
+                  prev.verificationPinFailed != curr.verificationPinFailed ||
+                  prev.resendOtpSuccess != curr.resendOtpSuccess ||
+                  prev.errorMessage != curr.errorMessage),
+          listener: (context, state) {
+            if (state.verificationPinSuccess ||
+                state.verificationPinFailed ||
+                state.errorMessage.isNotEmpty) {
+              if (mounted) {
+                setState(() {
+                  _isVerifyingOtp = false;
+                });
+              }
+            }
+
+            final messenger = ScaffoldMessenger.of(context);
+            messenger.hideCurrentSnackBar();
+
+            if (state.verificationPinSuccess) {
+              messenger.showSnackBar(
+                successSnackBar("Verifikasi OTP berhasil"),
+              );
+
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => KataSandiBaruPage(
+                    email: widget.sentTo,
+                    requestId: state.record?.requestOtpId ?? '',
+                  ),
+                ),
+              );
+              return;
+            }
+
+            if (state.verificationPinFailed) {
+              _shakeOtpFields();
+              setState(() {
+                _otpError = true;
+              });
+
+              messenger.showSnackBar(
+                errorSnackBar(
+                  state.errorMessage.isNotEmpty
+                      ? state.errorMessage
+                      : "Kode OTP salah / sudah kadaluarsa.",
+                ),
+              );
+
+              _resetOtpAndFocusFirst();
+
+              context.read<ForgotPasswordBloc>().add(
+                    const ForgotPswdResetFlagsEvent(),
+                  );
+              context.read<ForgotPasswordBloc>().add(
+                    const ForgotPswdClearMessageEvent(),
+                  );
+              return;
+            }
+
+            if (state.resendOtpSuccess) {
+              _handleResendSuccess();
+
+              context.read<ForgotPasswordBloc>().add(
+                    const ForgotPswdResetFlagsEvent(),
+                  );
+              context.read<ForgotPasswordBloc>().add(
+                    const ForgotPswdClearMessageEvent(),
+                  );
+              return;
+            }
+
+            if (state.errorMessage.isNotEmpty &&
+                !state.verificationPinFailed &&
+                !state.verificationPinSuccess &&
+                !state.resendOtpSuccess) {
+              messenger.showSnackBar(
+                errorSnackBar(state.errorMessage),
+              );
+
+              context.read<ForgotPasswordBloc>().add(
+                    const ForgotPswdClearMessageEvent(),
+                  );
+            }
+          },
+        ),
+      ],
       child: Scaffold(
         backgroundColor: secondaryBlackColor,
         body: SafeArea(
@@ -417,40 +593,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
                                   ],
                                 ),
                                 const SizedBox(height: 16),
-                                BlocBuilder<ForgotPasswordBloc,
-                                    ForgotPasswordState>(
-                                  buildWhen: (prev, curr) =>
-                                      prev.isLoading != curr.isLoading,
-                                  builder: (context, state) {
-                                    return AnimatedSwitcher(
-                                      duration: const Duration(
-                                        milliseconds: 300,
-                                      ),
-                                      child: _isResendAvailable
-                                          ? GestureDetector(
-                                              onTap: state.isLoading
-                                                  ? null
-                                                  : _resendOtp,
-                                              child: Text(
-                                                state.isLoading
-                                                    ? 'Mengirim ulang...'
-                                                    : 'Kirim ulang kode',
-                                                style: bodyTextStyle(context)
-                                                    .copyWith(
-                                                  color: state.isLoading
-                                                      ? hintGrey
-                                                      : primaryColor,
-                                                ),
-                                              ),
-                                            )
-                                          : Text(
-                                              _formatTime(_remainingTime),
-                                              style: bodyTextStyle(context)
-                                                  .copyWith(color: pRed),
-                                            ),
-                                    );
-                                  },
-                                ),
+                                _buildResendStatus(),
                                 const SizedBox(height: 16),
                                 TextSelectionTheme(
                                   data: TextSelectionThemeData(

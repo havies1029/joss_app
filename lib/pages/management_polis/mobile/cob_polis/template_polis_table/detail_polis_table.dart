@@ -22,8 +22,8 @@ class DetailPolisTable<T> extends StatefulWidget {
     this.isLoadingMore = false,
     this.emptyText = 'Data polis tidak ditemukan.',
     this.narrowBreakpoint = 900,
-    this.headerHeight = 48,
-    this.rowHeight = 48,
+    this.headerHeight = 52,
+    this.rowHeight = 52,
     this.maxVisibleRows = 6,
   });
 

@@ -9,6 +9,7 @@ import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import 'package:joss_app/models/reguser/reguser_otp_model.dart';
 import 'package:joss_app/pages/base/base_background_firstpage.dart';
 import 'package:joss_app/pages/login/mobile/client/new_login_client/new_login_client_page.dart';
+import 'package:joss_app/pages/login/mobile/client/verification_login_client/verification_login_client_page.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
 import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
 import 'package:joss_app/pages/register/mobile/client/widget/register_otp_popup_widget.dart';
@@ -125,13 +126,6 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
       return false;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      successSnackBar(
-        result.data.isNotEmpty
-            ? result.data
-            : 'Kata sandi berhasil dikirim ke WhatsApp.',
-      ),
-    );
     return true;
   }
 
@@ -160,7 +154,7 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
 
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => NewLoginClient(
+        builder: (_) => VerificationLoginClient(
           requestFrom: widget.requestFrom,
           initialUsername: target,
         ),
@@ -282,7 +276,7 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
 
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) => NewLoginClient(
+          builder: (_) => VerificationLoginClient(
             requestFrom: widget.requestFrom,
             initialUsername: target,
           ),
@@ -439,7 +433,9 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
     return Padding(
       padding: EdgeInsets.only(top: vPadding),
       child: AppButton.primary(
-        text: _isVerifiedRegistered ? 'Dapatkan Kata Sandi' : 'Lengkapi Data',
+        text: _isVerifiedRegistered
+            ? 'Dapatkan Kode Verifikasi'
+            : 'Lengkapi Data',
         isLoading: _isBottomActionLoading,
         backgroundColor:
             _isBottomActionLoading ? secondaryBlackColor : primaryColor,

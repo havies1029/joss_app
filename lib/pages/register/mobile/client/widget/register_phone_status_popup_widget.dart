@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
 
@@ -44,11 +44,11 @@ class _RegisterPhoneStatusPopupState extends State<_RegisterPhoneStatusPopup> {
       : 'Nomor telepon berhasil diverifikasi';
 
   String get _description => widget.isRegistered
-      ? 'Nomor telepon ini sudah terhubung dengan akun Proteksi Plus. Silahkan dapatkan kata sandi untuk melanjutkan.'
+      ? 'Nomor telepon ini sudah terhubung dengan akun Proteksi Plus. Silahkan dapatkan kode verifikasi untuk melanjutkan.'
       : 'Nomor telepon Anda berhasil diverifikasi. Silahkan lengkapi data diri untuk membuat akun Proteksi Plus.';
 
   String get _buttonText =>
-      widget.isRegistered ? 'Dapatkan Kata Sandi' : 'Lengkapi Data';
+      widget.isRegistered ? 'Dapatkan Kode Verifikasi' : 'Lengkapi Data';
 
   Future<void> _handlePressed() async {
     if (_isLoading) return;

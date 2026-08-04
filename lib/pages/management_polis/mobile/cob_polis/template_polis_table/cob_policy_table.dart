@@ -292,9 +292,17 @@ class _CobPolicyTableState<T> extends State<CobPolicyTable<T>> {
             style: bodyTextStyle(context, fontSize: 16),
           );
 
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
-            child: center ? Center(child: child) : child,
+          return SizedBox(
+            height: 52,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
+              child: center
+                  ? Center(child: child)
+                  : Align(
+                      alignment: Alignment.centerLeft,
+                      child: child,
+                    ),
+            ),
           );
         }),
       ],
@@ -323,24 +331,27 @@ class _CobPolicyTableState<T> extends State<CobPolicyTable<T>> {
       ),
       children: [
         if (!widget.readOnly)
-          Center(
-            child: CheckboxRadio(
-              value: isSelected,
-              onChanged: (checked) {
-                if (checked == true) {
-                  widget.onSelect(id);
-                  widget.onSelectItem?.call(item);
-                  widget.onSelectExtra?.call(item);
-                } else {
-                  widget.onUnselect(id);
-                  widget.onClearSelectedItem?.call();
-                  widget.onUnselectExtra?.call(item);
-                }
-              },
+          SizedBox(
+            height: 52,
+            child: Center(
+              child: CheckboxRadio(
+                value: isSelected,
+                onChanged: (checked) {
+                  if (checked == true) {
+                    widget.onSelect(id);
+                    widget.onSelectItem?.call(item);
+                    widget.onSelectExtra?.call(item);
+                  } else {
+                    widget.onUnselect(id);
+                    widget.onClearSelectedItem?.call();
+                    widget.onUnselectExtra?.call(item);
+                  }
+                },
+              ),
             ),
           )
         else
-          const SizedBox(),
+          const SizedBox(height: 52),
 
         _textCell(
           widget.nomorGetter?.call(item, index) ?? '${index + 1}',
@@ -400,9 +411,15 @@ class _CobPolicyTableState<T> extends State<CobPolicyTable<T>> {
   }
 
   Widget _cell({required Widget child}) {
-    return Padding(
-      padding: const EdgeInsets.all(6),
-      child: child,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 52),
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: child,
+        ),
+      ),
     );
   }
 

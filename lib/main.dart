@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 //import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
+import 'package:joss_app/blocs/login/forgot_password_reset_bloc.dart';
 import 'package:joss_app/blocs/hakakses/hakaksescrud_bloc.dart';
 import 'package:joss_app/pages/profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
 import 'package:joss_app/pages/profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
@@ -775,6 +776,7 @@ Future<void> main() async {
         BlocProvider(
             create: (context) =>
                 ForgotPasswordBloc(repository: ForgotPasswordRepository())),
+        BlocProvider(create: (context) => ForgotPasswordResetBloc()),
 
         //hakases list cob
         BlocProvider(

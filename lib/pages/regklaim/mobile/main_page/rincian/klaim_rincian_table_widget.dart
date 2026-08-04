@@ -460,7 +460,7 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
     required Widget child,
     double horizontal = 6,
     double vertical = 6,
-    double minHeight = 48,
+    double minHeight = 52,
   }) {
     return ConstrainedBox(
       constraints: BoxConstraints(minHeight: minHeight),

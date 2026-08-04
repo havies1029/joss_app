@@ -21,18 +21,31 @@ class AppData {
   // static String prefixEndPoint = "joss_api";
   // static String httpAuthority = "eassist-re.jpsre.co.id";
 
-
   // static bool useSSL = false;
   // static String apiDomain =
   //     "http${useSSL ? "s" : ""}://eassisttoolsapi.smartsoft-id.com/";
   // static String prefixEndPoint = "";a
   // static String httpAuthority = "eassisttoolsapi.smartsoft-id.com";
 
+  static const bool isProduction = false; //cukup ganti ke true jika ingin menggunakan production version
+  //production = true
+  //testing = false
+
   static bool useSSL = false;
-  static String apiDomain =
-      "http${useSSL ? "s" : ""}://eassisttoolsv2api.smartsoft-id.com/";
+
+  static String apiAuthority = isProduction
+      ? "eassisttoolsapi.smartsoft-id.com"
+      : "eassisttoolsv2api.smartsoft-id.com";
+
+  static String adminApiAuthority = isProduction
+      ? "jossadminapi.smartsoft-id.com"
+      : "eassisttoolsv2adminapi.smartsoft-id.com";
+
+  static String apiDomain = "http${useSSL ? "s" : ""}://$apiAuthority/";
+
   static String prefixEndPoint = "";
-  static String httpAuthority = "eassisttoolsv2api.smartsoft-id.com";
+
+  static String httpAuthority = apiAuthority;
 
   // static bool useSSL = false;
   // static String apiDomain =
