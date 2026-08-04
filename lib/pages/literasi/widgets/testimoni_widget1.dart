@@ -45,7 +45,7 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final content = Container(
       color: secondaryBlackColor,
       width: double.infinity,
       child: Align(
@@ -98,6 +98,15 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
           ),
         ),
       ),
+    );
+
+    if (widget.isPageMode) {
+      return content;
+    }
+
+    return SizedBox(
+      height: isMobile(context) ? 390 : 370,
+      child: content,
     );
   }
 

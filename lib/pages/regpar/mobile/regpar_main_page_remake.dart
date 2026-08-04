@@ -2677,9 +2677,9 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         compareItems: (a, b) => a.rkonstruksiojkId == b.rkonstruksiojkId,
         validatorCallback: (v) => v == null ? kStringNullError : null,
         errorText: err('form2.kelasKonstruksi'),
-        onChangedCallback: (item) async {
-          if (item == null) return;
-          final oldKonstruksi = previousKonstruksi;
+        onBeforeChangeCallback: (_, item) async {
+          if (item == null) return false;
+
           final subtitle = getKonstruksiSubtitle(item.kelasNama);
           final confirm = await showDialog<bool>(
             context: context,
@@ -2736,17 +2736,17 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               ),
             ),
           );
-          if (confirm == true) {
-            setState(() {
-              fieldComboRKonstruksiojk = item;
-              previousKonstruksi = item;
-              clearErr('form2.kelasKonstruksi');
-            });
-          } else {
-            setState(() {
-              fieldComboRKonstruksiojk = oldKonstruksi;
-            });
-          }
+
+          return confirm == true;
+        },
+        onChangedCallback: (item) {
+          if (item == null) return;
+
+          setState(() {
+            fieldComboRKonstruksiojk = item;
+            previousKonstruksi = item;
+            clearErr('form2.kelasKonstruksi');
+          });
         },
         onSaveCallback: (value) => fieldComboRKonstruksiojk = value,
       );

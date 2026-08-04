@@ -23,6 +23,7 @@ class ReusableComboBoxV2<T> extends StatefulWidget {
   final GlobalKey<DropdownSearchState<T>>? comboKey;
   final T? initItem;
   final Function(T?)? onChangedCallback;
+  final BeforeChange<T>? onBeforeChangeCallback;
   final Function(T?) onSaveCallback;
   final String? Function(T?)? validatorCallback;
 
@@ -66,6 +67,7 @@ class ReusableComboBoxV2<T> extends StatefulWidget {
     this.comboKey,
     this.initItem,
     this.onChangedCallback,
+    this.onBeforeChangeCallback,
     this.validatorCallback,
     this.customItemBuilder,
     this.params = const {},
@@ -292,7 +294,15 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
     }
   }
 
-  void _selectCustomItem(T item) {
+  Future<void> _selectCustomItem(T item) async {
+    if (widget.onBeforeChangeCallback != null) {
+      final canChange = await widget.onBeforeChangeCallback!(
+        widget.initItem,
+        item,
+      );
+      if (canChange != true) return;
+    }
+
     widget.onChangedCallback?.call(item);
     Navigator.of(context).maybePop();
   }
@@ -427,6 +437,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
       ),
       compareFn: widget.compareItems,
       itemAsString: widget.displayText,
+      onBeforeChange: widget.onBeforeChangeCallback,
       onChanged: widget.onChangedCallback,
       onSaved: widget.onSaveCallback,
       validator: (value) {

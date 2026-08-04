@@ -445,26 +445,45 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       return _buildEmailField(otpState);
     }
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          flex: 8,
-          child: _buildEmailField(otpState),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          flex: 2,
-          child: AppButton.primary(
-            text: 'Kirim OTP',
-            isLoading: otpState.isEmailSending,
-            backgroundColor:
-                otpState.isEmailSending ? secondaryBlackColor : primaryColor,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            onPressed: otpState.isEmailSending ? null : _sendEmailOtp,
-          ),
-        ),
-      ],
+    Widget buildButton() {
+      return AppButton.primary(
+        text: 'Kirim OTP',
+        isLoading: otpState.isEmailSending,
+        backgroundColor:
+            otpState.isEmailSending ? secondaryBlackColor : primaryColor,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        onPressed: otpState.isEmailSending ? null : _sendEmailOtp,
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 340) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildEmailField(otpState),
+              const SizedBox(height: 8),
+              buildButton(),
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 8,
+              child: _buildEmailField(otpState),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 2,
+              child: buildButton(),
+            ),
+          ],
+        );
+      },
     );
   }
 

@@ -71,7 +71,7 @@ class _ClientSectionState extends State<ClientSection> {
     _lastAutoSlideLength = length;
 
     _autoSlideTimer = Timer.periodic(_autoSlideInterval, (_) {
-      if (!mounted || !_pageController.hasClients) return;
+      if (!_canUsePageController) return;
 
       final nextPage = _currentVirtualPage + 1;
 
@@ -89,6 +89,13 @@ class _ClientSectionState extends State<ClientSection> {
     _lastAutoSlideLength = 0;
   }
 
+  bool get _canUsePageController {
+    if (!mounted || !_pageController.hasClients) return false;
+
+    final position = _pageController.position;
+    return position.hasViewportDimension && position.haveDimensions;
+  }
+
   int _initialLoopPage(int length) {
     return _loopStartPage - (_loopStartPage % length);
   }
@@ -96,12 +103,29 @@ class _ClientSectionState extends State<ClientSection> {
   void _ensureLoopPosition(int length) {
     if (_positionedLength == length) return;
 
-    _positionedLength = length;
-    _currentVirtualPage = _initialLoopPage(length);
+    final targetPage = _initialLoopPage(length);
+    _currentVirtualPage = targetPage;
 
+    _jumpToLoopPositionWhenReady(length, targetPage);
+  }
+
+  void _jumpToLoopPositionWhenReady(
+    int length,
+    int targetPage, [
+    int attempt = 0,
+  ]) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !_pageController.hasClients) return;
-      _pageController.jumpToPage(_currentVirtualPage);
+      if (!mounted || _positionedLength == length) return;
+
+      if (!_canUsePageController) {
+        if (attempt < 10) {
+          _jumpToLoopPositionWhenReady(length, targetPage, attempt + 1);
+        }
+        return;
+      }
+
+      _pageController.jumpToPage(targetPage);
+      _positionedLength = length;
     });
   }
 
@@ -223,8 +247,7 @@ class _ClientSectionState extends State<ClientSection> {
                   builder: (context, child) {
                     double scale = 1.0;
 
-                    if (_pageController.hasClients &&
-                        _pageController.position.haveDimensions) {
+                    if (_canUsePageController) {
                       final currentPage =
                           _pageController.page ??
                               _pageController.initialPage.toDouble();

@@ -1463,8 +1463,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         compareItems: (a, b) => a.rkonstruksiojkId == b.rkonstruksiojkId,
         validatorCallback: (v) => v == null ? kStringNullError : null,
         errorText: err('form1.rkonstruksiojkId'),
-        onChangedCallback: (item) async {
-          if (item == null) return;
+        onBeforeChangeCallback: (_, item) async {
+          if (item == null) return false;
 
           final subtitle = getKonstruksiSubtitle(item.kelasNama);
 
@@ -1524,18 +1524,16 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
             ),
           );
 
-          if (confirm == true) {
-            setState(() {
-              fieldComboRKonstruksiojk = item;
-              previousKonstruksi = item;
-              clearErr('form1.rkonstruksiojkId');
-            });
-          } else {
-            setState(() {
-              fieldComboRKonstruksiojk = null;
-              previousKonstruksi = null;
-            });
-          }
+          return confirm == true;
+        },
+        onChangedCallback: (item) {
+          if (item == null) return;
+
+          setState(() {
+            fieldComboRKonstruksiojk = item;
+            previousKonstruksi = item;
+            clearErr('form1.rkonstruksiojkId');
+          });
         },
         onSaveCallback: (value) => fieldComboRKonstruksiojk = value,
       );
