@@ -1644,14 +1644,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       regpar1Id: regpar1Id ?? "",
       currId: fieldComboRMatauang?.rmatauangKode,
       comboRMatauang: fieldComboRMatauang,
-      siBuilding:
-          double.parse(fieldSiBuildingController.text.replaceAll(',', '')),
-      siContent:
-          double.parse(fieldSiContentController.text.replaceAll(',', '')),
-      siMachinery:
-          double.parse(fieldSiMachineryController.text.replaceAll(',', '')),
-      siOther: double.parse(fieldSiOtherController.text.replaceAll(',', '')),
-      siStock: double.parse(fieldSiStockController.text.replaceAll(',', '')),
+      siBuilding: _parseMoney(fieldSiBuildingController.text),
+      siContent: _parseMoney(fieldSiContentController.text),
+      siMachinery: _parseMoney(fieldSiMachineryController.text),
+      siOther: _parseMoney(fieldSiOtherController.text),
+      siStock: _parseMoney(fieldSiStockController.text),
     );
 
     debugPrint("[draftForm4ToBloc] record => ${record.toJson()}");
@@ -2472,22 +2469,19 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       ok = false;
     }
 
-    double parseOrZeroAutoFill(TextEditingController controller) {
+    double parseOrZero(TextEditingController controller) {
       final raw = controller.text.trim();
-      if (raw.isEmpty) {
-        controller.text = '0';
-        return 0;
-      }
+      if (raw.isEmpty) return 0;
 
       final clean = raw.replaceAll(",", "");
       return double.tryParse(clean) ?? double.nan;
     }
 
-    bool optionalPositiveNumAutoZero({
+    bool optionalPositiveNumOrEmpty({
       required String key,
       required TextEditingController controller,
     }) {
-      final x = parseOrZeroAutoFill(controller);
+      final x = parseOrZero(controller);
 
       if (x.isNaN) {
         setErr(key, "Format tidak valid");
@@ -2508,35 +2502,35 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     }
 
     // SI fields are optional individually, but at least one must be > 0.
-    if (!optionalPositiveNumAutoZero(
+    if (!optionalPositiveNumOrEmpty(
       key: 'form4.siBuilding',
       controller: fieldSiBuildingController,
     )) {
       ok = false;
     }
 
-    if (!optionalPositiveNumAutoZero(
+    if (!optionalPositiveNumOrEmpty(
       key: 'form4.siContent',
       controller: fieldSiContentController,
     )) {
       ok = false;
     }
 
-    if (!optionalPositiveNumAutoZero(
+    if (!optionalPositiveNumOrEmpty(
       key: 'form4.siMachinery',
       controller: fieldSiMachineryController,
     )) {
       ok = false;
     }
 
-    if (!optionalPositiveNumAutoZero(
+    if (!optionalPositiveNumOrEmpty(
       key: 'form4.siOther',
       controller: fieldSiOtherController,
     )) {
       ok = false;
     }
 
-    if (!optionalPositiveNumAutoZero(
+    if (!optionalPositiveNumOrEmpty(
       key: 'form4.siStock',
       controller: fieldSiStockController,
     )) {
@@ -2544,11 +2538,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     }
 
     if (ok) {
-      final vBuilding = parseOrZeroAutoFill(fieldSiBuildingController);
-      final vContent = parseOrZeroAutoFill(fieldSiContentController);
-      final vMachinery = parseOrZeroAutoFill(fieldSiMachineryController);
-      final vOther = parseOrZeroAutoFill(fieldSiOtherController);
-      final vStock = parseOrZeroAutoFill(fieldSiStockController);
+      final vBuilding = parseOrZero(fieldSiBuildingController);
+      final vContent = parseOrZero(fieldSiContentController);
+      final vMachinery = parseOrZero(fieldSiMachineryController);
+      final vOther = parseOrZero(fieldSiOtherController);
+      final vStock = parseOrZero(fieldSiStockController);
 
       final anyGreaterThanZero = vBuilding > 0 ||
           vContent > 0 ||

@@ -356,10 +356,12 @@ class KlaimparklaimcrudFormPageFormState
   }
 
   Widget buildFieldDol() {
+    final today = DateTime.now();
+
     return AppDateField(
       label: 'Tanggal Kejadian',
       firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      lastDate: DateTime(today.year, today.month, today.day),
       enabled: !isPolisJps,
       initialValue: DateTime.tryParse(fieldDolController.text),
       validator: (_) => err('form.dol'),
