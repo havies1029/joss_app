@@ -48,7 +48,7 @@ import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
 import '../../profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
-import '../../register/mobile/client/register_client_page.dart';
+import '../../register/mobile/client/register_phone_gate_page.dart';
 import '../../regpar/mobile/regpar_main_page_remake.dart';
 import '../../../helper/cob_access_guard.dart';
 
@@ -74,6 +74,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   String? calpar2Id;
   String? calpar3Id;
   String? calpar4Id;
+  String? _lastCalculatedPremiKey;
 
   Calpar1CrudModel? form1Record;
   Calpar2FormModel? form2Record;
@@ -199,6 +200,25 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   final fieldPremiTsfwdController = TextEditingController();
   //form4
 
+  Iterable<TextEditingController> get _premiInputControllers =>
+      <TextEditingController>[
+        fieldCoverBulanController,
+        fieldBiIndexRateController,
+        fieldBiTotalController,
+        fieldSiBiController,
+        fieldSiBuildingController,
+        fieldSiContentController,
+        fieldSiMachineryController,
+        fieldSiOtherController,
+        fieldSiStockController,
+        fieldStockAdjustableController,
+        fieldIsEqController,
+        fieldIsTsfwdController,
+        fieldIsFlexasController,
+        fieldIsOtherController,
+        fieldIsRsmdccController,
+      ];
+
   void _initForm2DefaultZero() {
     fieldSiBuildingController.text = "0";
     fieldSiContentController.text = "0";
@@ -214,6 +234,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
     regUserBloc = context.read<RegUserBloc>();
     authenticationBloc = context.read<AuthenticationBloc>();
+
+    for (final controller in _premiInputControllers) {
+      controller.addListener(_refreshPremiSnapshotVisibility);
+    }
 
     final mjenisClient =
         context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
@@ -236,6 +260,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
   @override
   void dispose() {
+    for (final controller in _premiInputControllers) {
+      controller.removeListener(_refreshPremiSnapshotVisibility);
+    }
+
     //form1
     fieldCoverBulanController.dispose();
     //form1
@@ -577,6 +605,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                   setState(() {
                     _isHitungPremiLoading = false;
                     calpar4Id = record.calpar4Id;
+                    if (record.calpar4Id.isNotEmpty) {
+                      _lastCalculatedPremiKey = _currentPremiInputKey();
+                    }
                   });
                 }
 
@@ -593,6 +624,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                   setState(() {
                     _isHitungPremiLoading = false;
                     calpar4Id = record.calpar4Id;
+                    if (record.calpar4Id.isNotEmpty) {
+                      _lastCalculatedPremiKey = _currentPremiInputKey();
+                    }
                   });
                 }
 
@@ -609,6 +643,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   }
 
   Widget _buildForm() {
+    final canShowLanjutkan =
+        calpar4Id?.isNotEmpty == true && _isCalculatedPremiCurrent();
+
     return Scaffold(
       backgroundColor: secondaryBlackColor,
       body: SingleChildScrollView(
@@ -805,7 +842,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                         : const HitungPremiEmptyView(),
                   ),
                   const SizedBox(height: hPadding),
-                  if (calpar4Id?.isNotEmpty == true) ...[
+                  if (canShowLanjutkan) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: BlocBuilder<Calpar1ListBloc, Calpar1ListState>(
@@ -1028,7 +1065,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
               context,
               MaterialPageRoute(
                   builder: (context) =>
-                      RegisterClient(requestFrom: 'calpar_page')),
+                      RegisterPhoneGatePage(requestFrom: 'calpar_page')),
             );
           },
         ),
@@ -1797,8 +1834,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         },
         errorText: err('form3.kab2zonagempaId'),
         onChangedCallback: (v) {
-          fieldComboMKabZonaGempa = v;
-          if (v != null) clearErr('form3.kab2zonagempaId');
+          setState(() {
+            fieldComboMKabZonaGempa = v;
+            if (v != null) clearErr('form3.kab2zonagempaId');
+          });
         },
         onSaveCallback: (value) => fieldComboMKabZonaGempa = value,
       );
@@ -2066,6 +2105,54 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       fieldComboMJnscoverPar != null &&
       fieldComboMWilayah != null &&
       (!_showZonaGempa || fieldComboMKabZonaGempa != null);
+
+  bool _isCalculatedPremiCurrent() {
+    final calculatedKey = _lastCalculatedPremiKey;
+    return calculatedKey != null && calculatedKey == _currentPremiInputKey();
+  }
+
+  void _refreshPremiSnapshotVisibility() {
+    if (!mounted || _lastCalculatedPremiKey == null) return;
+    setState(() {});
+  }
+
+  String _currentPremiInputKey() {
+    final values = <String>[
+      calpar1Id ?? '',
+      fieldCoverBulanController.text.trim(),
+      fieldComboROkupasi?.rokupasiId ?? '',
+      fieldComboRKonstruksiojk?.rkonstruksiojkId ?? '',
+      fieldComboRMatauang?.rmatauangKode ?? '',
+      fieldComboMBiindemnityOjk?.mbiindemnityojkId ?? '',
+      _moneyKey(fieldBiIndexRateController),
+      _moneyKey(fieldBiTotalController),
+      _moneyKey(fieldSiBiController),
+      _moneyKey(fieldSiBuildingController),
+      _moneyKey(fieldSiContentController),
+      _moneyKey(fieldSiMachineryController),
+      _moneyKey(fieldSiOtherController),
+      _moneyKey(fieldSiStockController),
+      _moneyKey(fieldStockAdjustableController),
+      fieldComboMJnscoverPar?.mjnscoverparId ?? '',
+      fieldComboMWilayah?.mwilayahId ?? '',
+      _showZonaGempa.toString(),
+      fieldComboMKabZonaGempa?.mkabzonagempaId ?? '',
+      toBoolean(fieldIsEqController.text).toString(),
+      toBoolean(fieldIsTsfwdController.text).toString(),
+      toBoolean(fieldIsFlexasController.text).toString(),
+      toBoolean(fieldIsOtherController.text).toString(),
+      toBoolean(fieldIsRsmdccController.text).toString(),
+    ];
+
+    return values.map(_keyPart).join('|');
+  }
+
+  String _moneyKey(TextEditingController controller) =>
+      (double.tryParse(controller.text.replaceAll(',', '').trim()) ?? 0)
+          .toStringAsFixed(2);
+
+  String _keyPart(String value) =>
+      value.replaceAll('|', '/').replaceAll('\n', ' ').trim();
 
   bool isForm4Complete() => (calpar4Id?.isNotEmpty == true);
 }

@@ -22,13 +22,13 @@ DropdownSearch<ComboMKecamatanModel> buildFieldComboMKecamatan({
 			),
 		),
 			items: (filter, infiniteScrollProps) async {
-				return ComboMKecamatanRepository().getComboMKecamatan(kotaId);
+				return ComboMKecamatanRepository().getComboMKecamatan(kotaId, filter);
 			},
 			suffixProps: const DropdownSuffixProps(clearButtonProps: ClearButtonProps(isVisible: false)),
 			popupProps: const PopupPropsMultiSelection.modalBottomSheet(
 				disableFilter: false,
 				showSelectedItems: true,
-				showSearchBox: false,
+				showSearchBox: true,
 				itemBuilder: itemBuilderComboMKecamatan,
 			),
 			compareFn: (item, sItem) => item.mkecamatanId == sItem.mkecamatanId,

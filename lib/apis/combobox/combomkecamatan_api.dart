@@ -5,10 +5,13 @@ import 'package:joss_app/models/combobox/combomkecamatan_model.dart';
 
 class ComboMKecamatanAPI {
 
-	Future<List<ComboMKecamatanModel>> getComboMKecamatanAPI(String kotaId) async {
+	Future<List<ComboMKecamatanModel>> getComboMKecamatanAPI(String kotaId, [String searchText = '']) async {
 		String urlGetComboEndPoint = "${AppData.prefixEndPoint}/api/mkecamatancombobox/getlist";
 
-    Map<String, String> queryParams = {"kotaId": kotaId};
+    Map<String, String> queryParams = {
+			"kotaId": kotaId,
+			"searchText": searchText,
+		};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint, queryParams);
 		final http.Response response = await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',

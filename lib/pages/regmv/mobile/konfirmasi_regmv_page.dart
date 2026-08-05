@@ -68,6 +68,79 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
     return '${value.toStringAsFixed(2)}%';
   }
 
+  bool _hasRealText(String? value) {
+    final text = value?.trim() ?? "";
+    return text.isNotEmpty && text != "-";
+  }
+
+  String _firstRealText(List<String?> values, {String fallback = "-"}) {
+    for (final value in values) {
+      if (_hasRealText(value)) return value!.trim();
+    }
+    return fallback;
+  }
+
+  String _regmv2CurrencyName(Regmv2FormModel data) {
+    return _firstRealText([
+      data.comboRMatauang?.rmatauangNama,
+      data.comboRMatauang?.rmatauangSimbol,
+      data.currId,
+    ]);
+  }
+
+  String _regmv2CurrencySymbol(Regmv2FormModel data) {
+    return _firstRealText([
+      data.comboRMatauang?.rmatauangSimbol,
+      data.currId,
+      data.comboRMatauang?.rmatauangNama,
+    ]);
+  }
+
+  String _regmv2CoverName(Regmv2FormModel data) {
+    return _firstRealText([
+      data.comboMMvjnscover?.coverName,
+      data.mmvjnscoverId,
+    ]);
+  }
+
+  Regmv2FormModel _preserveRegmv2Combos(Regmv2FormModel next) {
+    final current = regmv2Record;
+    if (current == null) return next;
+
+    final hasNextCurrencyId = _hasRealText(next.currId);
+    final hasNextCoverId = _hasRealText(next.mmvjnscoverId);
+    final sameCurrency = hasNextCurrencyId &&
+        _hasRealText(current.currId) &&
+        next.currId == current.currId;
+    final sameCover = hasNextCoverId &&
+        _hasRealText(current.mmvjnscoverId) &&
+        next.mmvjnscoverId == current.mmvjnscoverId;
+
+    return next.copyWith(
+      currId: hasNextCurrencyId ? next.currId : current.currId,
+      comboRMatauang: next.comboRMatauang ??
+          (!hasNextCurrencyId || sameCurrency ? current.comboRMatauang : null),
+      mmvjnscoverId: hasNextCoverId ? next.mmvjnscoverId : current.mmvjnscoverId,
+      comboMMvjnscover: next.comboMMvjnscover ??
+          (!hasNextCoverId || sameCover ? current.comboMMvjnscover : null),
+    );
+  }
+
+  void _cachePaymentCurrency(Regmv2FormModel data) {
+    final curr = _regmv2CurrencySymbol(data);
+    if (_hasRealText(curr)) {
+      globalMataUang = curr;
+    }
+  }
+
+  String _paymentCurrency(String stateCurr) {
+    return _firstRealText([
+      stateCurr,
+      globalMataUang,
+      if (regmv2Record != null) _regmv2CurrencySymbol(regmv2Record!),
+    ], fallback: "");
+  }
+
   bool _isGlobalLoadingShown = false;
 
   void _showGlobalLoading() {
@@ -391,8 +464,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
             if (!state.isProcessed) return;
 
             if (state.paymentStatus == "20") {
-              final curr =
-                  (state.curr.isEmpty) ? globalMataUang ?? "" : state.curr;
+              final curr = _paymentCurrency(state.curr);
 
               onViewPaymentMethods(curr, state.totalBayar);
               _showSafeSnackBar(
@@ -661,7 +733,13 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
         ),
         _buildGenericListener<Regmv2FormBloc, Regmv2FormState, Regmv2FormModel>(
           onPayload: (record) {
-            setState(() => regmv2Record = record);
+            final pageRecordId = widget.recordId?.trim() ?? "";
+            if (record.regmv1Id.trim() != pageRecordId) return;
+
+            setState(() {
+              regmv2Record = _preserveRegmv2Combos(record);
+              _cachePaymentCurrency(regmv2Record!);
+            });
 
             // Form2 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Form3 (PAKAI record.regmv1Id)
           },
@@ -1002,9 +1080,6 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   }
 
   Widget _buildRegmv2Card(Regmv2FormModel data) {
-    final mataUang = data.comboRMatauang?.rmatauangSimbol ?? "-";
-    globalMataUang = mataUang;
-
     return Container(
       margin: EdgeInsets.symmetric(horizontal: hPadding * 1.5, vertical: 8),
       padding: const EdgeInsets.all(16),
@@ -1039,12 +1114,12 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
 
           _buildDetailRow(
             "Mata Uang:",
-            data.comboRMatauang?.rmatauangNama ?? "-",
+            _regmv2CurrencyName(data),
           ),
 
           _buildDetailRow(
             "Jenis Jaminan:",
-            data.comboMMvjnscover?.coverName ?? "-",
+            _regmv2CoverName(data),
           ),
           _buildDetailRowIcon("Gempa Bumi:", data.isEq),
           _buildDetailRowIcon("Banjir:", data.isFlood),

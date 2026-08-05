@@ -424,7 +424,7 @@ class MRekanContactCrudFormPageFormState
         loader: (q) {
           final mpropinsiId = q.get<String>("mpropinsiId") ?? "";
 
-          return ComboMKotaRepository().getComboMKota(mpropinsiId);
+          return ComboMKotaRepository().getComboMKota(mpropinsiId, q.searchText);
         },
         displayText: (item) => item.kotaDesc,
         compareItems: (a, b) => a.mkotaId == b.mkotaId,

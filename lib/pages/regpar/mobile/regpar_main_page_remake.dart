@@ -2837,7 +2837,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         },
         loader: (q) {
           final mpropinsiId = q.get<String>("mpropinsiId") ?? "";
-          return ComboMKotaRepository().getComboMKota(mpropinsiId);
+          return ComboMKotaRepository().getComboMKota(mpropinsiId, q.searchText);
         },
         displayText: (i) => i.kotaDesc,
         compareItems: (a, b) => a.mkotaId == b.mkotaId,
@@ -2875,7 +2875,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         },
         loader: (q) {
           final mkotaId = q.get<String>("mkotaId") ?? "";
-          return ComboMKecamatanRepository().getComboMKecamatan(mkotaId);
+          return ComboMKecamatanRepository()
+              .getComboMKecamatan(mkotaId, q.searchText);
         },
         displayText: (i) => i.kecamatanNama,
         compareItems: (a, b) => a.mkecamatanId == b.mkecamatanId,
@@ -2911,7 +2912,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         },
         loader: (q) {
           final mkecamatanId = q.get<String>("mkecamatanId") ?? "";
-          return ComboMKelurahanRepository().getComboMKelurahan(mkecamatanId);
+          return ComboMKelurahanRepository()
+              .getComboMKelurahan(mkecamatanId, q.searchText);
         },
         displayText: (i) => i.kelurahanNama,
         compareItems: (a, b) => a.mkelurahanId == b.mkelurahanId,

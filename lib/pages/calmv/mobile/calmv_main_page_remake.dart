@@ -43,7 +43,7 @@ import '../../base/base_background_sidepage.dart';
 import '../../regmv/mobile/regmv_main_page_remake.dart';
 import '../../profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
 import '../../profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
-import '../../register/mobile/client/register_client_page.dart';
+import '../../register/mobile/client/register_phone_gate_page.dart';
 import '../../../helper/cob_access_guard.dart';
 
 class CalmvMainPageRemake extends StatefulWidget {
@@ -64,6 +64,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   String? calmv1Id;
   String? calmv2Id;
   String? calmv3Id;
+  String? _lastCalculatedPremiKey;
 
   Calmv2FormModel? form2Record;
   Calmv3FormModel? form3Record;
@@ -110,6 +111,23 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   final fieldCalmv1IdController = TextEditingController();
   //form3
 
+  Iterable<TextEditingController> get _premiInputControllers =>
+      <TextEditingController>[
+        fieldCoverBulanController,
+        fieldHargaController,
+        fieldCurrIdController,
+        fieldPadController,
+        fieldPapController,
+        fieldPllController,
+        fieldTplController,
+        fieldIsEqController,
+        fieldIsFloodController,
+        fieldIsSrccController,
+        fieldIsTbodController,
+        fieldIsTerrorismController,
+        fieldIsAwController,
+      ];
+
   String cleanNum(num value) {
     final f = NumberFormat("#,###", "en_US");
     return f.format(value);
@@ -122,6 +140,10 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
     regUserBloc = context.read<RegUserBloc>();
     authenticationBloc = context.read<AuthenticationBloc>();
+
+    for (final controller in _premiInputControllers) {
+      controller.addListener(_refreshPremiSnapshotVisibility);
+    }
 
     final mjenisClient =
         context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
@@ -140,6 +162,10 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
   @override
   void dispose() {
+    for (final controller in _premiInputControllers) {
+      controller.removeListener(_refreshPremiSnapshotVisibility);
+    }
+
     //form1
     fieldCoverBulanController.dispose();
     fieldHargaController.dispose();
@@ -430,6 +456,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                   setState(() {
                     _isHitungPremiLoading = false;
                     calmv3Id = record.calmv3Id;
+                    if (record.calmv3Id.isNotEmpty) {
+                      _lastCalculatedPremiKey = _currentPremiInputKey();
+                    }
                   });
                 }
 
@@ -446,6 +475,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                   setState(() {
                     _isHitungPremiLoading = false;
                     calmv3Id = record.calmv3Id;
+                    if (record.calmv3Id.isNotEmpty) {
+                      _lastCalculatedPremiKey = _currentPremiInputKey();
+                    }
                   });
                 }
 
@@ -462,6 +494,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   Widget _buildForm() {
+    final canShowLanjutkan =
+        calmv3Id?.isNotEmpty == true && _isCalculatedPremiCurrent();
+
     return Scaffold(
       backgroundColor: secondaryBlackColor,
       body: SingleChildScrollView(
@@ -648,7 +683,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                         : const HitungPremiEmptyView(),
                   ),
                   const SizedBox(height: hPadding),
-                  if (calmv3Id?.isNotEmpty == true) ...[
+                  if (canShowLanjutkan) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: BlocBuilder<Calmv1ListBloc, Calmv1ListState>(
@@ -1059,7 +1094,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
               context,
               MaterialPageRoute(
                   builder: (context) =>
-                      RegisterClient(requestFrom: 'calmv_page')),
+                      RegisterPhoneGatePage(requestFrom: 'calmv_page')),
             );
           },
         ),
@@ -1701,6 +1736,49 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
     return (tpl > 0) || (pad > 0) || (pap > 0) || (pll > 0);
   }
+
+  bool _isCalculatedPremiCurrent() {
+    final calculatedKey = _lastCalculatedPremiKey;
+    return calculatedKey != null && calculatedKey == _currentPremiInputKey();
+  }
+
+  void _refreshPremiSnapshotVisibility() {
+    if (!mounted || _lastCalculatedPremiKey == null) return;
+    setState(() {});
+  }
+
+  String _currentPremiInputKey() {
+    final values = <String>[
+      calmv1Id ?? '',
+      fieldCoverBulanController.text.trim(),
+      _moneyKey(fieldHargaController),
+      fieldComboMMvgrupOjk?.mmvgrupojkId ?? '',
+      fieldComboMMvjnscover?.mmvjnscoverId ?? '',
+      fieldComboUang?.rmatauangKode ?? '',
+      fieldComboMMvpakai?.mmvpakaiId ?? '',
+      fieldComboMWilayah?.mwilayahId ?? '',
+      selectedYearform1.trim(),
+      selectedPassengerCount.trim(),
+      _moneyKey(fieldTplController),
+      _moneyKey(fieldPadController),
+      _moneyKey(fieldPapController),
+      _moneyKey(fieldPllController),
+      toBoolean(fieldIsEqController.text).toString(),
+      toBoolean(fieldIsFloodController.text).toString(),
+      toBoolean(fieldIsSrccController.text).toString(),
+      toBoolean(fieldIsTerrorismController.text).toString(),
+      toBoolean(fieldIsAwController.text).toString(),
+    ];
+
+    return values.map(_keyPart).join('|');
+  }
+
+  String _moneyKey(TextEditingController controller) =>
+      (double.tryParse(controller.text.replaceAll(',', '').trim()) ?? 0)
+          .toStringAsFixed(2);
+
+  String _keyPart(String value) =>
+      value.replaceAll('|', '/').replaceAll('\n', ' ').trim();
 
   double getProgressValue() {
     final f1 = isForm1Complete();

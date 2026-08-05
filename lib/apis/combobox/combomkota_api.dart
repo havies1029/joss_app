@@ -5,11 +5,14 @@ import 'package:joss_app/models/combobox/combomkota_model.dart';
 
 class ComboMKotaAPI {
 
-	Future<List<ComboMKotaModel>> getComboMKotaAPI(String propinsiId) async {
+	Future<List<ComboMKotaModel>> getComboMKotaAPI(String propinsiId, [String searchText = '']) async {
 		String urlGetComboEndPoint = "${AppData.prefixEndPoint}/api/mkotacombobox/getlist";
 
     
-    Map<String, String> queryParams = {"propinsiId": propinsiId};
+    Map<String, String> queryParams = {
+			"propinsiId": propinsiId,
+			"searchText": searchText,
+		};
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint, queryParams);
 		final http.Response response = await http.get(uri, headers: <String, String>{

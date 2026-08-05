@@ -3,8 +3,8 @@ import 'package:joss_app/models/combobox/combomkelurahan_model.dart';
 
 class ComboMKelurahanRepository {
 
-	Future<List<ComboMKelurahanModel>> getComboMKelurahan(String kecamatanId) async {
+	Future<List<ComboMKelurahanModel>> getComboMKelurahan(String kecamatanId, [String searchText = '']) async {
 		ComboMKelurahanAPI api = ComboMKelurahanAPI();
-		return await api.getComboMKelurahanAPI(kecamatanId);
+		return await api.getComboMKelurahanAPI(kecamatanId, searchText);
 	}
 }

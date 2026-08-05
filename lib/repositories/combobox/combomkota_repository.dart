@@ -3,8 +3,8 @@ import 'package:joss_app/models/combobox/combomkota_model.dart';
 
 class ComboMKotaRepository {
 
-	Future<List<ComboMKotaModel>> getComboMKota(String propinsiId) async {
+	Future<List<ComboMKotaModel>> getComboMKota(String propinsiId, [String searchText = '']) async {
 		ComboMKotaAPI api = ComboMKotaAPI();
-		return await api.getComboMKotaAPI(propinsiId);
+		return await api.getComboMKotaAPI(propinsiId, searchText);
 	}
 }

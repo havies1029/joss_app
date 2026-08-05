@@ -24,7 +24,7 @@ DropdownSearch<ComboMKotaModel> buildFieldComboMKota({
 			),
 		),
 			items: (filter, infiniteScrollProps) async {
-				return ComboMKotaRepository().getComboMKota(propinsiId);
+				return ComboMKotaRepository().getComboMKota(propinsiId, filter);
 			},
 			suffixProps: const DropdownSuffixProps(clearButtonProps: ClearButtonProps(isVisible: false)),
 		popupProps: PopupPropsMultiSelection.modalBottomSheet(

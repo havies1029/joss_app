@@ -22,13 +22,13 @@ DropdownSearch<ComboMKelurahanModel> buildFieldComboMKelurahan({
 			),
 		),
 			items: (filter, infiniteScrollProps) async {
-				return ComboMKelurahanRepository().getComboMKelurahan(kecamatanId);
+				return ComboMKelurahanRepository().getComboMKelurahan(kecamatanId, filter);
 			},
 			suffixProps: const DropdownSuffixProps(clearButtonProps: ClearButtonProps(isVisible: false)),
 			popupProps: const PopupPropsMultiSelection.modalBottomSheet(
 				disableFilter: false,
 				showSelectedItems: true,
-				showSearchBox: false,
+				showSearchBox: true,
 				itemBuilder: itemBuilderComboMKelurahan,
 			),
 			compareFn: (item, sItem) => item.mkelurahanId == sItem.mkelurahanId,

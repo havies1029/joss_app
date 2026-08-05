@@ -5,10 +5,13 @@ import 'package:joss_app/models/combobox/combomkelurahan_model.dart';
 
 class ComboMKelurahanAPI {
 
-	Future<List<ComboMKelurahanModel>> getComboMKelurahanAPI(String kecamatanId) async {
+	Future<List<ComboMKelurahanModel>> getComboMKelurahanAPI(String kecamatanId, [String searchText = '']) async {
 		String urlGetComboEndPoint = "${AppData.prefixEndPoint}/api/mkelurahancombobox/getlist";
 
-    Map<String, String> queryParams = {"kecamatanId": kecamatanId};
+    Map<String, String> queryParams = {
+			"kecamatanId": kecamatanId,
+			"searchText": searchText,
+		};
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint, queryParams);
 		final http.Response response = await http.get(uri, headers: <String, String>{

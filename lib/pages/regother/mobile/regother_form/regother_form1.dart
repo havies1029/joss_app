@@ -25,7 +25,7 @@ import '../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
 import '../../../profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
-import '../../../register/mobile/client/register_client_page.dart';
+import '../../../register/mobile/client/register_phone_gate_page.dart';
 
 class Regother1CrudFormPage extends StatefulWidget {
   final String viewMode;
@@ -465,7 +465,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
             Navigator.push(
               pageContext,
               MaterialPageRoute(
-                builder: (context) => RegisterClient(
+                builder: (context) => RegisterPhoneGatePage(
                   requestFrom: 'regother_page',
                 ),
               ),
