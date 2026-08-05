@@ -704,7 +704,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                                     ? "Memproses..."
                                     : "Lanjutkan",
                                 isLoading: state.isProcessing,
-                                backgroundColor : pBlue,
+                                backgroundColor: pBlue,
                                 onPressed: state.isProcessing
                                     ? null
                                     : () {
@@ -888,8 +888,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
         child: AppButton.primary(
           text: _isHitungPremiLoading ? "Memproses..." : "Hitung Premi",
           isLoading: _isHitungPremiLoading,
-          backgroundColor:
-              _isHitungPremiLoading ? secondaryBlackColor : pBlue,
+          backgroundColor: _isHitungPremiLoading ? secondaryBlackColor : pBlue,
           onPressed: _isHitungPremiLoading
               ? null
               : () async {
@@ -1090,6 +1089,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
               'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
           buttonText: 'Daftar Klien',
           onPressed: () {
+            _pendingAutoConfirm = true;
             Navigator.push(
               context,
               MaterialPageRoute(
