@@ -182,6 +182,10 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                         Klaimparaccordioncard(
                           title: 'Data Klaim',
                           isOpen: acc.openedIndex == 0,
+                          isLoading: context
+                              .watch<KlaimparklaimcrudBloc>()
+                              .state
+                              .isLoading,
                           onTap: () => _handleAccordionTap(0, acc),
                           child: KlaimparklaimcrudFormPage(
                             key: klaimPageKey,

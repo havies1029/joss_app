@@ -6,8 +6,8 @@ import 'package:joss_app/models/klaimbatal/klaimbatalcrud_model.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 
 import '../../../blocs/klaimrinci/mstatusrincicari_bloc.dart';
-import '../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../perbaruiklaimpar/mobile/perbaruisuccess_page.dart';
+import '../../regklaim/mobile/main_page/klaim_main_page.dart';
 
 class KlaimbatalcrudFormPage extends StatefulWidget {
   final String klaim1Id;
@@ -60,21 +60,22 @@ class _KlaimbatalcrudFormPageState extends State<KlaimbatalcrudFormPage> {
 
         if (!state.hasFailure) {
           context.read<MstatusrinciCariBloc>().add(
-            SelectedIdChanged("30"),
-          );
+                SelectedIdChanged("30"),
+              );
 
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => PerbaruiSuccessPage(
                 display: "Klaim Kamu Berhasil Dibatalkan",
-                description: "Permintaan pembatalan klaim kamu telah kami terima.",
+                description:
+                    "Permintaan pembatalan klaim kamu telah kami terima.",
                 displayButton: "Kembali",
                 onButtonPressed: () {
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
-                      builder: (_) => const KlaimMainPage(),
+                      builder: (_) => const KlaimMainPage(initialTab: 1),
                     ),
-                        (route) => route.isFirst,
+                    (route) => route.isFirst,
                   );
                 },
               ),

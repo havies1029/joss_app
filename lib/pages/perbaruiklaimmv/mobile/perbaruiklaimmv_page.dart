@@ -18,6 +18,12 @@ import 'klaimmvpoliscrud_form.dart';
 import 'klaimmvstatuscari_list.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 
+enum KlaimMvInitialSection {
+  polis,
+  klaim,
+  bengkel,
+}
+
 class PerbaruiKlaimMvPage extends StatefulWidget {
   final String cobGroupNama;
   final String klaim1Id;
@@ -35,6 +41,11 @@ class PerbaruiKlaimMvPage extends StatefulWidget {
 class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
   bool _submitInProgress = false;
   bool _successShown = false;
+  final Set<KlaimMvInitialSection> _initialLoadingSections = {
+    KlaimMvInitialSection.polis,
+    KlaimMvInitialSection.klaim,
+    KlaimMvInitialSection.bengkel,
+  };
 
   final GlobalKey<FormState> polisFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> klaimFormKey = GlobalKey<FormState>();
@@ -48,6 +59,18 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
 
   final GlobalKey<KlaimmvbengkelcrudFormPageFormState> bengkelPageKey =
       GlobalKey<KlaimmvbengkelcrudFormPageFormState>();
+
+  bool _isInitialSectionLoading(KlaimMvInitialSection section) {
+    return _initialLoadingSections.contains(section);
+  }
+
+  void _stopInitialSectionLoading(KlaimMvInitialSection section) {
+    if (!_initialLoadingSections.contains(section) || !mounted) return;
+
+    setState(() {
+      _initialLoadingSections.remove(section);
+    });
+  }
 
   @override
   void initState() {
@@ -79,6 +102,10 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
       listeners: [
         BlocListener<KlaimmvpoliscrudBloc, KlaimmvpoliscrudState>(
           listener: (context, state) {
+            if (state.isLoaded || state.hasFailure) {
+              _stopInitialSectionLoading(KlaimMvInitialSection.polis);
+            }
+
             if (_submitInProgress && state.hasFailure) {
               _submitInProgress = false;
               ScaffoldMessenger.of(context).showSnackBar(
@@ -91,6 +118,10 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
         ),
         BlocListener<KlaimmvklaimcrudBloc, KlaimmvklaimcrudState>(
           listener: (context, state) {
+            if (state.isLoaded || state.hasFailure) {
+              _stopInitialSectionLoading(KlaimMvInitialSection.klaim);
+            }
+
             if (_submitInProgress && state.hasFailure) {
               _submitInProgress = false;
               ScaffoldMessenger.of(context).showSnackBar(
@@ -103,6 +134,10 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
         ),
         BlocListener<KlaimmvbengkelcrudBloc, KlaimmvbengkelcrudState>(
           listener: (context, state) {
+            if (state.isLoaded || state.hasFailure) {
+              _stopInitialSectionLoading(KlaimMvInitialSection.bengkel);
+            }
+
             if (_submitInProgress &&
                 state.hasFailure &&
                 _shouldBlockOnBengkelFailure(state)) {
@@ -168,6 +203,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                     Klaimmvaccordioncard(
                       title: 'Data Polis',
                       isOpen: acc.openedIndex == 0,
+                      isLoading: _isInitialSectionLoading(
+                        KlaimMvInitialSection.polis,
+                      ),
                       onTap: () {
                         context.read<KlaimmvaccordionBloc>().add(
                               KlaimmvaccordionToggleEvent(index: 0),
@@ -183,6 +221,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                     Klaimmvaccordioncard(
                       title: 'Data Klaim',
                       isOpen: acc.openedIndex == 1,
+                      isLoading: _isInitialSectionLoading(
+                        KlaimMvInitialSection.klaim,
+                      ),
                       onTap: () {
                         context.read<KlaimmvaccordionBloc>().add(
                               KlaimmvaccordionToggleEvent(index: 1),
@@ -219,6 +260,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                     Klaimmvaccordioncard(
                       title: 'Bengkel yang dipilih',
                       isOpen: acc.openedIndex == 4,
+                      isLoading: _isInitialSectionLoading(
+                        KlaimMvInitialSection.bengkel,
+                      ),
                       onTap: () {
                         context.read<KlaimmvaccordionBloc>().add(
                               KlaimmvaccordionToggleEvent(index: 4),
@@ -339,8 +383,8 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
         "BENGKEL saving:${bengkelState.isSaving}, dirty:${bengkelState.isDirty}, failure:${bengkelState.hasFailure}");
     debugPrint("========================");
 
-    final bengkelFailureBlocks = bengkelState.hasFailure &&
-        _shouldBlockOnBengkelFailure(bengkelState);
+    final bengkelFailureBlocks =
+        bengkelState.hasFailure && _shouldBlockOnBengkelFailure(bengkelState);
 
     final allDone = !polisState.isSaving &&
         !klaimState.isSaving &&

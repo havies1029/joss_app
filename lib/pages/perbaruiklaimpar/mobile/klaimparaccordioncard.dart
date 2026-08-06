@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 import 'package:joss_app/common/constants.dart';
 
 class Klaimparaccordioncard extends StatelessWidget {
   final String title;
   final bool isOpen;
+  final bool isLoading;
   final VoidCallback onTap;
   final Widget child;
 
@@ -12,6 +14,7 @@ class Klaimparaccordioncard extends StatelessWidget {
     super.key,
     required this.title,
     required this.isOpen,
+    this.isLoading = false,
     required this.onTap,
     required this.child,
   });
@@ -35,7 +38,6 @@ class Klaimparaccordioncard extends StatelessWidget {
             ),
             onTap: onTap,
           ),
-
           ClipRect(
             child: AnimatedAlign(
               alignment: Alignment.topCenter,
@@ -44,7 +46,22 @@ class Klaimparaccordioncard extends StatelessWidget {
               curve: Curves.easeInOut,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                child: child,
+                child: Stack(
+                  children: [
+                    child,
+                    if (isLoading)
+                      Positioned.fill(
+                        child: Container(
+                          color: pGrey,
+                          alignment: Alignment.topCenter,
+                          child: const Padding(
+                            padding: EdgeInsets.only(top: 32),
+                            child: LoadingIndicator(),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),

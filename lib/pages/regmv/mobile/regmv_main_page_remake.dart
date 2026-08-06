@@ -105,6 +105,7 @@ class RegmvFormMainRemake extends StatefulWidget {
 class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   bool _accessDeniedDialogShown = false;
   List<bool> expanded = List.filled(RegmvFormSection.values.length, false);
+  final Set<RegmvFormSection> _sectionLoadings = <RegmvFormSection>{};
 
   int getOpenedIndex() => expanded.indexWhere((e) => e);
 
@@ -399,6 +400,93 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     context.read<Regmv7CariBloc>().add(
           RefreshRegmv7CariEvent(regmv1Id: recordId),
         );
+  }
+
+  bool _isSectionLoading(RegmvFormSection section) =>
+      _sectionLoadings.contains(section);
+
+  void _stopSectionLoading(RegmvFormSection section) {
+    if (!_sectionLoadings.contains(section) || !mounted) return;
+    setState(() {
+      _sectionLoadings.remove(section);
+    });
+  }
+
+  void _clearLoadedErrors(RegmvFormSection section) {
+    bool hasText(TextEditingController controller) =>
+        controller.text.trim().isNotEmpty;
+
+    bool hasValidOptionalNumber(TextEditingController controller) {
+      final raw = controller.text.trim();
+      if (raw.isEmpty) return false;
+      final clean = raw.replaceAll(',', '');
+      final value = double.tryParse(clean);
+      return value != null && value >= 0 && !hasLeadingZero(clean);
+    }
+
+    bool hasPositiveNumber(TextEditingController controller) {
+      final raw = controller.text.trim();
+      if (raw.isEmpty) return false;
+      final value = double.tryParse(raw.replaceAll(',', ''));
+      return value != null && value > 0;
+    }
+
+    final keys = <String>[];
+
+    switch (section) {
+      case RegmvFormSection.form1:
+        if (hasText(fieldTtgNamaController)) keys.add('form1.namaTertanggung');
+        if (hasText(fieldTtgAlamatController)) {
+          keys.add('form1.alamatTertanggung');
+        }
+        break;
+      case RegmvFormSection.form2:
+        keys.add('form2.general');
+        if (fieldComboRMatauang != null) keys.add('form2.mataUang');
+        if (fieldComboMMvjnscover != null) keys.add('form2.jenisCover');
+        if (selectedPassengerCount.trim().isNotEmpty) {
+          keys.add('form2.passengerCount');
+        }
+        if (hasValidOptionalNumber(fieldTplController)) keys.add('form2.tpl');
+        if (hasValidOptionalNumber(fieldPadController)) keys.add('form2.pad');
+        if (hasValidOptionalNumber(fieldPapController)) keys.add('form2.pap');
+        if (hasValidOptionalNumber(fieldPllController)) keys.add('form2.pll');
+        break;
+      case RegmvFormSection.form3:
+        keys.add('form3.general');
+        if (selectedYearform3.trim().isNotEmpty) keys.add('form3.tahun');
+        if (hasPositiveNumber(fieldHargaController)) {
+          keys.add('form3.hargaMobil');
+        }
+        if (fieldComboMWilayah != null) keys.add('form3.wilayah');
+        if (_isValidPlatNomor(fieldPlatNoController.text)) {
+          keys.add('form3.platNo');
+        }
+        if (fieldRangkaNoController.text.trim().length >= 5) {
+          keys.add('form3.rangkaNo');
+        }
+        if (fieldMesinNoController.text.trim().length >= 5) {
+          keys.add('form3.mesinNo');
+        }
+        if (fieldComboMMvmerk != null) keys.add('form3.merek');
+        if (fieldComboMMvtipe != null) keys.add('form3.model');
+        if (fieldComboMMvmodel != null) keys.add('form3.subModel');
+        if (fieldComboMMvpakai != null) keys.add('form3.penggunaan');
+        if (fieldComboMWarna != null) keys.add('form3.warna');
+        break;
+      case RegmvFormSection.form4:
+      case RegmvFormSection.form5:
+      case RegmvFormSection.form7:
+      case RegmvFormSection.form6:
+        break;
+    }
+
+    if (keys.isEmpty || !mounted) return;
+    setState(() {
+      for (final key in keys) {
+        fieldErrors.remove(key);
+      }
+    });
   }
 
   void _payloadform1(Regmv1CrudModel record) {
@@ -836,11 +924,19 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     !state.hasFailure &&
                     state.record != null) {
                   _payloadform1(state.record!);
+                  _clearLoadedErrors(RegmvFormSection.form1);
+                }
+                if (state.isLoaded || state.hasFailure) {
+                  _stopSectionLoading(RegmvFormSection.form1);
                 }
               },
             ),
             BlocListener<Regmv2FormBloc, Regmv2FormState>(
               listener: (context, state) {
+                if (state.isLoaded || state.hasFailure) {
+                  _stopSectionLoading(RegmvFormSection.form2);
+                }
+
                 if (state.hasFailure) {
                   _handleBackendSaveFailure(
                     source: 'regmv2',
@@ -861,11 +957,16 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     !state.hasFailure &&
                     state.record != null) {
                   _payloadform2(state.record!);
+                  _clearLoadedErrors(RegmvFormSection.form2);
                 }
               },
             ),
             BlocListener<Regmv3FormBloc, Regmv3FormState>(
               listener: (context, state) {
+                if (state.isLoaded || state.hasFailure) {
+                  _stopSectionLoading(RegmvFormSection.form3);
+                }
+
                 if (state.hasFailure) {
                   _handleBackendSaveFailure(
                     source: 'regmv3',
@@ -886,6 +987,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     !state.hasFailure &&
                     state.record != null) {
                   _payloadform3(state.record!);
+                  _clearLoadedErrors(RegmvFormSection.form3);
                 }
               },
             ),
@@ -906,8 +1008,39 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               listenWhen: (prev, curr) => prev.items != curr.items,
               listener: (_, __) => _refreshPremiSnapshotVisibility(),
             ),
+            BlocListener<Regmv4CariBloc, Regmv4CariState>(
+              listenWhen: (prev, curr) => prev.status != curr.status,
+              listener: (context, state) {
+                if (state.status == ListStatus.success ||
+                    state.status == ListStatus.failure) {
+                  _stopSectionLoading(RegmvFormSection.form4);
+                }
+              },
+            ),
+            BlocListener<Regmv5CariBloc, Regmv5CariState>(
+              listenWhen: (prev, curr) => prev.status != curr.status,
+              listener: (context, state) {
+                if (state.status == ListStatus.success ||
+                    state.status == ListStatus.failure) {
+                  _stopSectionLoading(RegmvFormSection.form5);
+                }
+              },
+            ),
+            BlocListener<Regmv7CariBloc, Regmv7CariState>(
+              listenWhen: (prev, curr) => prev.status != curr.status,
+              listener: (context, state) {
+                if (state.status == ListStatus.success ||
+                    state.status == ListStatus.failure) {
+                  _stopSectionLoading(RegmvFormSection.form7);
+                }
+              },
+            ),
             BlocListener<Regmv6FormBloc, Regmv6FormState>(
               listener: (context, state) {
+                if (state.isLoaded || state.hasFailure) {
+                  _stopSectionLoading(RegmvFormSection.form6);
+                }
+
                 if (state.hasFailure) {
                   if (mounted) {
                     setState(() {
@@ -919,6 +1052,10 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                 final record = state.record;
                 if (record == null) return;
+
+                if (state.isLoaded) {
+                  _payloadform6(record);
+                }
 
                 if (state.isCalculated) {
                   if (mounted) {
@@ -993,6 +1130,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                         context: context,
                         title: "Data Tertanggung",
                         isExpanded: expanded[0],
+                        isLoading: _isSectionLoading(RegmvFormSection.form1),
+                        showLoadingOnRefresh: _canRefreshRecord(regmv1Id),
                         onToggle: (v) => setState(() => expanded[0] = v),
                         onRefresh: () {
                           debugPrint(
@@ -1017,6 +1156,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                         context: context,
                         title: "Data Polis",
                         isExpanded: expanded[1],
+                        isLoading: _isSectionLoading(RegmvFormSection.form2),
+                        showLoadingOnRefresh: _canRefreshRecord(regmv1Id),
                         onToggle: (v) => setState(() => expanded[1] = v),
                         onRefresh: () {
                           if (regmv1Id != null && regmv1Id!.isNotEmpty) {
@@ -1101,6 +1242,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                         context: context,
                         title: "Data Kendaraan",
                         isExpanded: expanded[2],
+                        isLoading: _isSectionLoading(RegmvFormSection.form3),
+                        showLoadingOnRefresh: _canRefreshRecord(regmv1Id),
                         onToggle: (v) => setState(() => expanded[2] = v),
                         onRefresh: () {
                           if (regmv1Id != null && regmv1Id!.isNotEmpty) {
@@ -1152,6 +1295,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                         context: context,
                         title: "Foto STNK",
                         isExpanded: expanded[3],
+                        isLoading: _isSectionLoading(RegmvFormSection.form4),
+                        showLoadingOnRefresh: _canRefreshRecord(regmv1Id),
                         onToggle: (v) => setState(() => expanded[3] = v),
                         onRefresh: () {
                           if (regmv1Id != null && regmv1Id!.isNotEmpty) {
@@ -1187,6 +1332,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                         context: context,
                         title: "Foto Kendaraan",
                         isExpanded: expanded[4],
+                        isLoading: _isSectionLoading(RegmvFormSection.form5),
+                        showLoadingOnRefresh: _canRefreshRecord(regmv1Id),
                         onToggle: (v) => setState(() => expanded[4] = v),
                         onRefresh: () {
                           if (regmv1Id != null && regmv1Id!.isNotEmpty) {
@@ -1222,6 +1369,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                         context: context,
                         title: "Foto Aksesoris",
                         isExpanded: expanded[5],
+                        isLoading: _isSectionLoading(RegmvFormSection.form7),
+                        showLoadingOnRefresh: _canRefreshRecord(regmv1Id),
                         onToggle: (v) => setState(() => expanded[5] = v),
                         onRefresh: () {
                           if (regmv1Id != null && regmv1Id!.isNotEmpty) {
@@ -1259,6 +1408,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                         context: context,
                         title: "Premi",
                         isExpanded: expanded[6],
+                        isLoading: _isSectionLoading(RegmvFormSection.form6),
                         onToggle: (v) => setState(() => expanded[6] = v),
                         child: (hasForm6Record)
                             ? Column(
@@ -1554,12 +1704,41 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         f3.regmv3Id.trim().isNotEmpty;
   }
 
+  Widget _buildSectionContent({
+    required Widget child,
+    required bool isLoading,
+    EdgeInsetsGeometry padding =
+        const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+  }) {
+    return Padding(
+      padding: padding,
+      child: Stack(
+        children: [
+          child,
+          if (isLoading)
+            Positioned.fill(
+              child: Container(
+                color: pGrey,
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 32),
+                  child: LoadingIndicator(),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget Form1Page({
     required BuildContext context,
     required bool isExpanded,
+    required bool isLoading,
     required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
+    bool showLoadingOnRefresh = false,
     String title = "Form 1",
   }) {
     return Card(
@@ -1575,12 +1754,16 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              tryOpenSection(RegmvFormSection.form1, onRefresh: onRefresh);
+              tryOpenSection(
+                RegmvFormSection.form1,
+                onRefresh: onRefresh,
+                showLoading: showLoadingOnRefresh,
+              );
             },
           ),
           if (isExpanded)
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+            _buildSectionContent(
+              isLoading: isLoading,
               child: child,
             ),
         ],
@@ -1591,9 +1774,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   Widget Form2Page({
     required BuildContext context,
     required bool isExpanded,
+    required bool isLoading,
     required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
+    bool showLoadingOnRefresh = false,
     String title = "Form 2",
   }) {
     return Card(
@@ -1609,13 +1794,16 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              tryOpenSection(RegmvFormSection.form2,
-                  onRefresh: onRefresh); // untuk Form2
+              tryOpenSection(
+                RegmvFormSection.form2,
+                onRefresh: onRefresh,
+                showLoading: showLoadingOnRefresh,
+              ); // untuk Form2
             },
           ),
           if (isExpanded)
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+            _buildSectionContent(
+              isLoading: isLoading,
               child: child,
             ),
         ],
@@ -1626,9 +1814,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   Widget Form3Page({
     required BuildContext context,
     required bool isExpanded,
+    required bool isLoading,
     required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
+    bool showLoadingOnRefresh = false,
     String title = "Form 3",
   }) {
     return Card(
@@ -1644,13 +1834,16 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              tryOpenSection(RegmvFormSection.form3,
-                  onRefresh: onRefresh); // untuk Form3
+              tryOpenSection(
+                RegmvFormSection.form3,
+                onRefresh: onRefresh,
+                showLoading: showLoadingOnRefresh,
+              ); // untuk Form3
             },
           ),
           if (isExpanded)
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+            _buildSectionContent(
+              isLoading: isLoading,
               child: child,
             ),
         ],
@@ -1661,9 +1854,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   Widget Form4Page({
     required BuildContext context,
     required bool isExpanded,
+    required bool isLoading,
     required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
+    bool showLoadingOnRefresh = false,
     String title = "Form 4",
   }) {
     return Card(
@@ -1679,13 +1874,17 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              tryOpenSection(RegmvFormSection.form4,
-                  onRefresh: onRefresh); // untuk Form4
+              tryOpenSection(
+                RegmvFormSection.form4,
+                onRefresh: onRefresh,
+                showLoading: showLoadingOnRefresh,
+              ); // untuk Form4
             },
           ),
           if (isExpanded)
-            Padding(
+            _buildSectionContent(
               padding: const EdgeInsets.only(bottom: 15),
+              isLoading: isLoading,
               child: child,
             ),
         ],
@@ -1696,9 +1895,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   Widget Form5Page({
     required BuildContext context,
     required bool isExpanded,
+    required bool isLoading,
     required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
+    bool showLoadingOnRefresh = false,
     String title = "Form 5",
   }) {
     return Card(
@@ -1714,13 +1915,17 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              tryOpenSection(RegmvFormSection.form5,
-                  onRefresh: onRefresh); // untuk Form5
+              tryOpenSection(
+                RegmvFormSection.form5,
+                onRefresh: onRefresh,
+                showLoading: showLoadingOnRefresh,
+              ); // untuk Form5
             },
           ),
           if (isExpanded)
-            Padding(
+            _buildSectionContent(
               padding: const EdgeInsets.only(bottom: 15),
+              isLoading: isLoading,
               child: child,
             ),
         ],
@@ -1731,9 +1936,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   Widget Form6Page({
     required BuildContext context,
     required bool isExpanded,
+    required bool isLoading,
     required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
+    bool showLoadingOnRefresh = false,
     String title = "Form 6",
   }) {
     return Card(
@@ -1749,13 +1956,16 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              tryOpenSection(RegmvFormSection.form6,
-                  onRefresh: onRefresh); // untuk Form6
+              tryOpenSection(
+                RegmvFormSection.form6,
+                onRefresh: onRefresh,
+                showLoading: showLoadingOnRefresh,
+              ); // untuk Form6
             },
           ),
           if (isExpanded)
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+            _buildSectionContent(
+              isLoading: isLoading,
               child: child,
             ),
         ],
@@ -1766,9 +1976,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   Widget Form7Page({
     required BuildContext context,
     required bool isExpanded,
+    required bool isLoading,
     required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
+    bool showLoadingOnRefresh = false,
     String title = "Form 7",
   }) {
     return Card(
@@ -1784,13 +1996,17 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              tryOpenSection(RegmvFormSection.form7,
-                  onRefresh: onRefresh); // untuk Form7
+              tryOpenSection(
+                RegmvFormSection.form7,
+                onRefresh: onRefresh,
+                showLoading: showLoadingOnRefresh,
+              ); // untuk Form7
             },
           ),
           if (isExpanded)
-            Padding(
+            _buildSectionContent(
               padding: const EdgeInsets.only(bottom: 15),
+              isLoading: isLoading,
               child: child,
             ),
         ],
@@ -2980,38 +3196,49 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     _lastBackendValidationAffectedFieldKeys = const [];
   }
 
-  void openForm1({required String? recordId}) {
-    openSection(RegmvFormSection.form1);
-    refreshForm1(recordId: recordId);
-  }
+  bool _canRefreshRecord(String? recordId) =>
+      recordId != null && recordId.isNotEmpty;
 
-  void openForm2({required String? recordId}) {
-    openSection(RegmvFormSection.form2);
-    refreshForm2(recordId: recordId);
-  }
+  void openForm1({required String? recordId}) => openSection(
+        RegmvFormSection.form1,
+        showLoading: _canRefreshRecord(recordId),
+        onRefresh: () => refreshForm1(recordId: recordId),
+      );
 
-  void openForm3({required String? recordId}) {
-    openSection(RegmvFormSection.form3);
-    refreshForm3(recordId: recordId);
-  }
+  void openForm2({required String? recordId}) => openSection(
+        RegmvFormSection.form2,
+        showLoading: _canRefreshRecord(recordId),
+        onRefresh: () => refreshForm2(recordId: recordId),
+      );
 
-  void openForm4({required String? recordId}) {
-    openSection(RegmvFormSection.form4);
-    refreshForm4(recordId: recordId);
-  }
+  void openForm3({required String? recordId}) => openSection(
+        RegmvFormSection.form3,
+        showLoading: _canRefreshRecord(recordId),
+        onRefresh: () => refreshForm3(recordId: recordId),
+      );
 
-  void openForm5({required String? recordId}) {
-    openSection(RegmvFormSection.form5);
-    refreshForm5(recordId: recordId);
-  }
+  void openForm4({required String? recordId}) => openSection(
+        RegmvFormSection.form4,
+        showLoading: _canRefreshRecord(recordId),
+        onRefresh: () => refreshForm4(recordId: recordId),
+      );
 
-  void openForm6({required String? recordId}) {
-    openSection(RegmvFormSection.form6);
-    refreshForm6(recordId: recordId);
-  }
+  void openForm5({required String? recordId}) => openSection(
+        RegmvFormSection.form5,
+        showLoading: _canRefreshRecord(recordId),
+        onRefresh: () => refreshForm5(recordId: recordId),
+      );
+
+  void openForm6({required String? recordId}) => openSection(
+        RegmvFormSection.form6,
+        showLoading: _canRefreshRecord(recordId),
+        onRefresh: () => refreshForm6(recordId: recordId),
+      );
 
   void openPremiSection({required String? recordId}) => openSection(
         RegmvFormSection.form6,
+        showLoading: _canRefreshRecord(recordId) &&
+            context.read<Regmv6FormBloc>().state.record == null,
         onRefresh: () {
           final st = context.read<Regmv6FormBloc>().state;
           if (st.record == null) {
@@ -3020,10 +3247,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         },
       );
 
-  void openForm7({required String? recordId}) {
-    openSection(RegmvFormSection.form7);
-    refreshForm7(recordId: recordId);
-  }
+  void openForm7({required String? recordId}) => openSection(
+        RegmvFormSection.form7,
+        showLoading: _canRefreshRecord(recordId),
+        onRefresh: () => refreshForm7(recordId: recordId),
+      );
 
   bool validateForm1() {
     clearErrsByPrefix('form1.');
@@ -4261,18 +4489,29 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     }
   }
 
-  void openSection(RegmvFormSection section, {VoidCallback? onRefresh}) {
+  void openSection(
+    RegmvFormSection section, {
+    VoidCallback? onRefresh,
+    bool showLoading = false,
+  }) {
     final idx = sectionIndex(section);
 
     setState(() {
       expanded = List<bool>.filled(expanded.length, false);
       expanded[idx] = true;
+      if (showLoading) {
+        _sectionLoadings.add(section);
+      }
     });
 
     onRefresh?.call();
   }
 
-  void tryOpenSection(RegmvFormSection section, {VoidCallback? onRefresh}) {
+  void tryOpenSection(
+    RegmvFormSection section, {
+    VoidCallback? onRefresh,
+    bool showLoading = false,
+  }) {
     final targetIdx = sectionIndex(section);
     final opened = getOpenedIndex();
 
@@ -4281,7 +4520,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     final ok = validateOpenedForm();
     if (!ok) return;
 
-    openSection(section, onRefresh: onRefresh);
+    openSection(section, onRefresh: onRefresh, showLoading: showLoading);
   }
 
   int sectionIndex(RegmvFormSection s) => RegmvFormSection.values.indexOf(s);
