@@ -210,11 +210,14 @@ class MRekanGeneralCmpPopUpPageFormState
                                     .read<MRekan1CrudBloc>()
                                     .add(MRekan1CrudReloadEvent());
 
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  successSnackBar(
-                                    "Informasi klien berhasil disimpan!",
-                                  ),
-                                );
+                                if (regUserBloc.state.requestFrom ==
+                                    'daftarclient_page') {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    successSnackBar(
+                                      "Informasi klien berhasil disimpan!",
+                                    ),
+                                  );
+                                }
 
                                 mRekanGeneralCmpCrudBloc.add(
                                   MRekanGeneralCmpCrudResetStatusEvent(),

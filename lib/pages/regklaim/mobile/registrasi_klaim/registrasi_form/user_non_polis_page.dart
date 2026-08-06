@@ -11,6 +11,7 @@ import '../../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../../../blocs/regklaim/attach_bloc.dart';
 import '../../../../../blocs/regklaim/regklaim1crud_bloc.dart';
+import '../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../common/app_data.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../common/loading_indicator.dart';
@@ -489,9 +490,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
             MaterialPageRoute(
               builder: (_) => MRekanGeneralIdvPopUpPage(),
             ),
-          ).then((_) {
-            _pendingAutoConfirm = false;
-          });
+          );
         },
       ),
     );
@@ -514,9 +513,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
             MaterialPageRoute(
               builder: (_) => MRekanGeneralCmpPopUpPage(),
             ),
-          ).then((_) {
-            _pendingAutoConfirm = false;
-          });
+          );
         },
       ),
     );
@@ -543,9 +540,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                 requestFrom: 'regisnonpolis_page',
               ),
             ),
-          ).then((_) {
-            _pendingAutoConfirm = false;
-          });
+          );
         },
       ),
     );
@@ -568,7 +563,11 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   }
 
   void _tryAutoConfirm() {
-    if (!_pendingAutoConfirm || !_isFormFilledSilently()) return;
+    final requestFrom = context.read<RegUserBloc>().state.requestFrom;
+    final shouldAutoConfirm =
+        _pendingAutoConfirm || requestFrom == 'regisnonpolis_page';
+
+    if (!shouldAutoConfirm || !_isFormFilledSilently()) return;
 
     final authState = context.read<AuthenticationBloc>().state;
     if (authState is! AuthenticationAuthenticated) return;
@@ -596,6 +595,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     if (mjenisClient != "10" && mjenisClient != "20") return;
 
     _pendingAutoConfirm = false;
+    context.read<RegUserBloc>().add(const ClearRequestFromEvent());
     if (mounted) {
       setState(() {
         _isCariPolisLoading = true;

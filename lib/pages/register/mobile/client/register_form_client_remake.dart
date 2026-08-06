@@ -697,11 +697,13 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
                     isSubmitting = false;
                   });
                 }
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    successSnackBar('Registrasi berhasil.'),
-                  );
+                if (widget.requestFrom == 'daftarclient_page') {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      successSnackBar('Registrasi berhasil.'),
+                    );
+                }
                 context
                     .read<RegUserOtpBloc>()
                     .add(const RegUserOtpClearEvent());

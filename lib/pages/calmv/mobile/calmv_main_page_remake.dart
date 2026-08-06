@@ -1090,6 +1090,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
           buttonText: 'Daftar Klien',
           onPressed: () {
             _pendingAutoConfirm = true;
+            debugPrint(
+              "[CalMV RegisterFlow] start register from calmv_page; pendingAutoConfirm=$_pendingAutoConfirm",
+            );
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -1166,9 +1169,15 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   void _continueToRegMv() {
     if (calmv1Id == null || calmv1Id!.isEmpty) {
       _hideGlobalLoading();
+      debugPrint(
+        "[CalMV RegisterFlow] stop continueToRegMv: calmv1Id is empty",
+      );
       return;
     }
 
+    debugPrint(
+      "[CalMV RegisterFlow] continueToRegMv: calmv1Id=$calmv1Id",
+    );
     context.read<Calmv1ListBloc>().add(
           CalMv2RegMvEvent(calmv1Id: calmv1Id!),
         );
@@ -1184,6 +1193,18 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     final requestFrom = regUserBloc.state.requestFrom;
     final shouldAutoConfirm =
         _pendingAutoConfirm || requestFrom == 'calmv_page';
+
+    debugPrint(
+      "[CalMV RegisterFlow] tryAutoConfirm "
+      "pendingAutoConfirm=$_pendingAutoConfirm "
+      "requestFrom=$requestFrom "
+      "shouldAutoConfirm=$shouldAutoConfirm "
+      "isProcessing=$isProcessing "
+      "auth=${authState.runtimeType} "
+      "mjenisClient=$mjenisClient "
+      "idvLoaded=${idvState.isLoaded} idvComplete=${idvState.isDataComplete} "
+      "cmpLoaded=${cmpState.isLoaded} cmpComplete=${cmpState.isDataComplete}",
+    );
 
     if (!shouldAutoConfirm) {
       return;

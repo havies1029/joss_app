@@ -213,7 +213,14 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     if (targetStatus == ListStatus.success &&
         targetEmpty &&
         shouldBlockInitialTarget) {
-      return _fullState(EmptyStateWidget(statusId: statusId));
+      return _contentState(
+        context,
+        cobState,
+        body: SizedBox(
+          height: 400,
+          child: EmptyStateWidget(statusId: statusId),
+        ),
+      );
     }
 
     return _contentState(context, cobState);

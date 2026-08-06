@@ -469,9 +469,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
                   requestFrom: 'regother_page',
                 ),
               ),
-            ).then((_) {
-              _pendingAutoConfirm = false;
-            });
+            );
           },
         ),
       );
@@ -683,7 +681,11 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   }
 
   void _tryAutoConfirm() {
-    if (!_pendingAutoConfirm || !_isFormFilledSilently()) return;
+    final requestFrom = regUserBloc.state.requestFrom;
+    final shouldAutoConfirm =
+        _pendingAutoConfirm || requestFrom == 'regother_page';
+
+    if (!shouldAutoConfirm || !_isFormFilledSilently()) return;
 
     final mjenisClient =
         context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
@@ -707,6 +709,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     if (mjenisClient != "10" && mjenisClient != "20") return;
 
     _pendingAutoConfirm = false;
+    regUserBloc.add(const ClearRequestFromEvent());
     if (mounted) {
       setState(() {
         _isKonfirmasiLoading = true;

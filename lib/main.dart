@@ -825,11 +825,18 @@ Future<void> main() async {
               }
 
               final mjenisClient = record?.mjnsclientId.trim();
+              debugPrint(
+                "[RegisterFlow] MRekan1 loaded: "
+                "mrekan1Id=$mrekan1Id "
+                "mjnsclientId=$mjenisClient",
+              );
               if (mjenisClient == '10') {
+                debugPrint("[RegisterFlow] load general IDV from MRekan1");
                 context
                     .read<MRekanGeneralIdvCrudBloc>()
                     .add(MRekanGeneralIdvCrudLihatEvent());
               } else if (mjenisClient == '20') {
+                debugPrint("[RegisterFlow] load general CMP from MRekan1");
                 context
                     .read<MRekanGeneralCmpCrudBloc>()
                     .add(MRekanGeneralCmpCrudLihatEvent());
@@ -855,6 +862,10 @@ Future<void> main() async {
               }
 
               if (s.user.userType == 'C') {
+                debugPrint(
+                  "[RegisterFlow] authenticated client; load MRekan1 "
+                  "authenticatedFrom=${s.authenticatedFrom}",
+                );
                 context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());
                 context.read<HakaksesCrudBloc>().add(HakaksesCrudLihatEvent());
               }
@@ -936,6 +947,9 @@ class _AppState extends State<_App> {
     if (!_isContinuationFlow(requestFrom)) return;
 
     _pendingFlowRequestFrom = requestFrom;
+    debugPrint(
+      "[RegisterFlow] mark pending continuation: requestFrom=$requestFrom",
+    );
     if (_regUserBloc.state.requestFrom != requestFrom) {
       _regUserBloc.add(SetRequestFromEvent(requestFrom));
     }
@@ -955,7 +969,7 @@ class _AppState extends State<_App> {
   }
 
   void _handlePendingGeneralDataLoaded({
-    required String mjenisClient,
+    required String loadedMjenisClient,
     required bool isDataComplete,
   }) {
     if (_pendingFlowRequestFrom.isEmpty) return;
@@ -963,12 +977,42 @@ class _AppState extends State<_App> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _pendingFlowRequestFrom.isEmpty) return;
 
+      final rootContext = _navigatorKey.currentContext;
+      if (rootContext == null) {
+        debugPrint(
+          "[RegisterFlow] ignore general loaded: root context is null",
+        );
+        return;
+      }
+
+      final currentMjenisClient =
+          rootContext.read<MRekan1CrudBloc>().state.record?.mjnsclientId.trim();
+
+      if (currentMjenisClient != loadedMjenisClient) {
+        debugPrint(
+          "[RegisterFlow] ignore stale general loaded: "
+          "requestFrom=$_pendingFlowRequestFrom "
+          "currentMjenisClient=$currentMjenisClient "
+          "loadedMjenisClient=$loadedMjenisClient",
+        );
+        return;
+      }
+
+      debugPrint(
+        "[RegisterFlow] general loaded after pending flow: "
+        "requestFrom=$_pendingFlowRequestFrom "
+        "mjenisClient=$loadedMjenisClient "
+        "isDataComplete=$isDataComplete",
+      );
+
       if (isDataComplete) {
+        debugPrint("[RegisterFlow] general complete; pop pending route");
         _popPendingContinuationRoute();
         return;
       }
 
-      _showGeneralDataPopup(mjenisClient);
+      debugPrint("[RegisterFlow] general incomplete; show popup");
+      _showGeneralDataPopup(loadedMjenisClient);
       _pendingFlowRequestFrom = '';
     });
   }
@@ -978,12 +1022,14 @@ class _AppState extends State<_App> {
     if (popupContext == null) return;
 
     if (mjenisClient == '10') {
+      debugPrint("[RegisterFlow] show general IDV popup");
       showDialog(
         context: popupContext,
         useRootNavigator: true,
         builder: (_) => const MRekanGeneralIdvPopUpPage(),
       );
     } else if (mjenisClient == '20') {
+      debugPrint("[RegisterFlow] show general CMP popup");
       showDialog(
         context: popupContext,
         useRootNavigator: true,
@@ -1031,6 +1077,11 @@ class _AppState extends State<_App> {
                   return;
                 }
                 if (singlePopPages.contains(state.authenticatedFrom)) {
+                  debugPrint(
+                    "[RegisterFlow] authenticated continuation: "
+                    "authenticatedFrom=${state.authenticatedFrom} "
+                    "userType=${state.user.userType}",
+                  );
                   _markPendingContinuationFlow(state.authenticatedFrom);
                 } else {
                   while (nav.canPop()) {
@@ -1046,7 +1097,7 @@ class _AppState extends State<_App> {
               previous.isLoaded != current.isLoaded && current.isLoaded,
           listener: (_, state) {
             _handlePendingGeneralDataLoaded(
-              mjenisClient: '10',
+              loadedMjenisClient: '10',
               isDataComplete: state.isDataComplete,
             );
           },
@@ -1056,7 +1107,7 @@ class _AppState extends State<_App> {
               previous.isLoaded != current.isLoaded && current.isLoaded,
           listener: (_, state) {
             _handlePendingGeneralDataLoaded(
-              mjenisClient: '20',
+              loadedMjenisClient: '20',
               isDataComplete: state.isDataComplete,
             );
           },
