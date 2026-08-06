@@ -130,6 +130,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   Regmv5FormModel? form5Record;
   Regmv6FormModel? form6Record;
   Regmv7FormModel? form7Record;
+  bool _defaultCurrencyApplied = false;
 
   String cleanNum(num value) {
     final f = NumberFormat("#,###", "en_US");
@@ -248,6 +249,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
     final regmv1 = context.read<Regmv1CrudBloc>().state.record?.regmv1Id ?? "";
     regmv1Id = widget.regmv1Id ?? regmv1;
+    _loadDefaultCurrency();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -257,6 +259,28 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
       context.read<PolisTanggalBloc>().add(PolisMulaiChanged(today));
+    });
+  }
+
+  Future<void> _loadDefaultCurrency() async {
+    final currencies = await ComboRMatauangRepository().getComboRMatauang();
+
+    if (!mounted || fieldComboRMatauang != null) return;
+
+    ComboRMatauangModel? defaultCurrency;
+    for (final currency in currencies) {
+      if (currency.rmatauangKode == '001') {
+        defaultCurrency = currency;
+        break;
+      }
+    }
+
+    if (defaultCurrency == null) return;
+
+    setState(() {
+      fieldComboRMatauang = defaultCurrency;
+      _defaultCurrencyApplied = true;
+      fieldErrors.remove('form2.mataUang');
     });
   }
 
@@ -456,8 +480,10 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         if (v.isNotEmpty) selectedPassengerCount = v;
       }
 
-      if (fieldComboRMatauang == null && record.comboRMatauang != null) {
+      if ((fieldComboRMatauang == null || _defaultCurrencyApplied) &&
+          record.comboRMatauang != null) {
         fieldComboRMatauang = record.comboRMatauang;
+        _defaultCurrencyApplied = false;
       }
 
       if (fieldComboMMvjnscover == null && record.comboMMvjnscover != null) {
@@ -3433,6 +3459,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboRMatauang = v;
+            _defaultCurrencyApplied = false;
             _clearValidationPreviewChangedFields(['form2.mataUang']);
             _clearBackendValidationCacheIfAffected('form2.mataUang');
             if (v != null) clearErr('form2.mataUang');

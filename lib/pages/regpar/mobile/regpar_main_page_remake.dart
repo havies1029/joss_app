@@ -108,6 +108,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
   bool _showZonaGempa = true;
   bool _lockCheckboxes = false;
+  bool _defaultCurrencyApplied = false;
 
   void _setBool(TextEditingController c, bool v) {
     c.text = v.toString();
@@ -281,6 +282,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     final regpar1 =
         context.read<Regpar1CrudBloc>().state.record?.regpar1Id ?? "";
     regpar1Id = widget.regpar1Id ?? regpar1;
+    _loadDefaultCurrency();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final now = DateTime.now();
@@ -290,6 +292,28 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
     //reset foto dari record lama
     context.read<RegparUploadFotoObjectBloc>().add(RegparUploadReset());
+  }
+
+  Future<void> _loadDefaultCurrency() async {
+    final currencies = await ComboRMatauangRepository().getComboRMatauang();
+
+    if (!mounted || fieldComboRMatauang != null) return;
+
+    ComboRMatauangModel? defaultCurrency;
+    for (final currency in currencies) {
+      if (currency.rmatauangKode == '001') {
+        defaultCurrency = currency;
+        break;
+      }
+    }
+
+    if (defaultCurrency == null) return;
+
+    setState(() {
+      fieldComboRMatauang = defaultCurrency;
+      _defaultCurrencyApplied = true;
+      fieldErrors.remove('form4.mataUang');
+    });
   }
 
   @override
@@ -519,8 +543,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     }
 
     setState(() {
-      if (fieldComboRMatauang == null && record.comboRMatauang != null) {
+      if ((fieldComboRMatauang == null || _defaultCurrencyApplied) &&
+          record.comboRMatauang != null) {
         fieldComboRMatauang = record.comboRMatauang;
+        _defaultCurrencyApplied = false;
       }
     });
   }
@@ -2837,7 +2863,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         },
         loader: (q) {
           final mpropinsiId = q.get<String>("mpropinsiId") ?? "";
-          return ComboMKotaRepository().getComboMKota(mpropinsiId, q.searchText);
+          return ComboMKotaRepository()
+              .getComboMKota(mpropinsiId, q.searchText);
         },
         displayText: (i) => i.kotaDesc,
         compareItems: (a, b) => a.mkotaId == b.mkotaId,
@@ -3070,6 +3097,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboRMatauang = v;
+            _defaultCurrencyApplied = false;
             _clearValidationPreviewChangedFields(['form4.mataUang']);
             if (v != null) {
               clearErr('form4.mataUang');

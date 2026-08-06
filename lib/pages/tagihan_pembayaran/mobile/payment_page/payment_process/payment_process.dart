@@ -715,7 +715,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                curr.isEmpty ? "-" : curr,
+                curr.isEmpty ? "" : curr,
                 style: headingStyle(context, fontSize: 24),
               ),
               const SizedBox(width: 2),

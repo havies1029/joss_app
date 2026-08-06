@@ -155,9 +155,32 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
       }
     });
 
+    _loadDefaultCurrency();
+
     // default passenger count = 1
     selectedPassengerCount =
         selectedPassengerCount.trim().isEmpty ? "1" : selectedPassengerCount;
+  }
+
+  Future<void> _loadDefaultCurrency() async {
+    final currencies = await ComboRMatauangRepository().getComboRMatauang();
+
+    if (!mounted || fieldComboUang != null) return;
+
+    ComboRMatauangModel? defaultCurrency;
+    for (final currency in currencies) {
+      if (currency.rmatauangKode == '001') {
+        defaultCurrency = currency;
+        break;
+      }
+    }
+
+    if (defaultCurrency == null) return;
+
+    setState(() {
+      fieldComboUang = defaultCurrency;
+      fieldErrors.remove('form1.mataUang');
+    });
   }
 
   @override

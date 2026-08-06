@@ -87,6 +87,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   late RegUserBloc regUserBloc;
   late AuthenticationBloc authenticationBloc;
   bool _pendingAutoConfirm = false;
+  bool _defaultCurrencyApplied = false;
 
   bool _lockCheckboxes = true;
   bool _showZonaGempa = true;
@@ -252,10 +253,33 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
     fieldCoverBulanController.text = "12";
 
+    _loadDefaultCurrency();
     _initForm2DefaultZero();
 
     expanded = List.filled(CalparFormSection.values.length, false);
     expanded[sectionIndex(CalparFormSection.form1)] = true;
+  }
+
+  Future<void> _loadDefaultCurrency() async {
+    final currencies = await ComboRMatauangRepository().getComboRMatauang();
+
+    if (!mounted || fieldComboRMatauang != null) return;
+
+    ComboRMatauangModel? defaultCurrency;
+    for (final currency in currencies) {
+      if (currency.rmatauangKode == '001') {
+        defaultCurrency = currency;
+        break;
+      }
+    }
+
+    if (defaultCurrency == null) return;
+
+    setState(() {
+      fieldComboRMatauang = defaultCurrency;
+      _defaultCurrencyApplied = true;
+      fieldErrors.remove('form2.mataUang');
+    });
   }
 
   @override
@@ -389,8 +413,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       }
 
       final mataUang = record.comboRMatauang;
-      if (fieldComboRMatauang == null && mataUang != null) {
+      if ((fieldComboRMatauang == null || _defaultCurrencyApplied) &&
+          mataUang != null) {
         fieldComboRMatauang = mataUang;
+        _defaultCurrencyApplied = false;
       }
     });
   }
@@ -1610,6 +1636,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboRMatauang = v;
+            _defaultCurrencyApplied = false;
             if (v != null) {
               clearErr('form2.mataUang');
             }
