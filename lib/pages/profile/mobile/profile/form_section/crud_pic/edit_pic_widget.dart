@@ -16,6 +16,7 @@ import '../../../../../../models/gen_profile/mrekanpiccrud_model.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
 import '../../../../../../repositories/combobox/combomjabatan_repository.dart';
 import '../../../../../../repositories/gen_profile/rekanpiccobcari_repository.dart';
+import '../../../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../../../widgets/apptheme/phone_number_field.dart';
 import '../../../../../base/base_background_sidepage.dart';
 import 'list_pic_widget.dart';
@@ -671,11 +672,12 @@ class _EditPicWidgetState extends State<EditPicWidget> {
   }
 
   Widget buildFieldJabatan() {
-    return ReusableComboBox<ComboMJabatanModel>(
+    return ReusableComboBoxV2<ComboMJabatanModel>(
       hintText: "Peran",
       comboKey: _comboKey,
       initItem: _jabatan,
-      dataLoader: () => ComboMJabatanRepository().getComboMJabatan(),
+      loader: (q) => ComboMJabatanRepository().getComboMJabatan(),
+      clientSideSearch: true,
       displayText: (i) => i.jabatanDesc,
       compareItems: (a, b) => a.mjabatanId == b.mjabatanId,
       onChangedCallback: (value) {

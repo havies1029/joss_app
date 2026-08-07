@@ -273,6 +273,7 @@ class _ComproContactDialogState extends State<ComproContactDialog> {
         }
       },
       child: Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
         backgroundColor: pGrey,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(cardBorderRadius),

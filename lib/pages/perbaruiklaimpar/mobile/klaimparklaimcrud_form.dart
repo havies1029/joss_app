@@ -512,6 +512,9 @@ class KlaimparklaimcrudFormPageFormState
       controller: fieldPicJabatanController,
       errorText: err('form.picJabatan'),
       validator: (_) => err('form.picJabatan'),
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'[!@#$%^&*]')),
+      ],
       onChanged: (value) {
         if (value.trim().isNotEmpty) {
           clearErr('form.picJabatan');

@@ -95,15 +95,24 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
   }
 
   Future<void> _submit() async {
-    final ok = _formKey.currentState?.validate() ?? false;
-    if (!ok) return;
-
     final email = _emailController.text.trim();
 
-    final success = await (widget.onSubmit?.call(email) ?? Future.value(true));
+    bool success = true;
+    try {
+      success = await (widget.onSubmit?.call(email) ?? Future.value(true));
+    } catch (_) {
+      success = false;
+    }
+
     if (!mounted) return;
 
     if (!success) {
+      _hideGlobalLoading();
+
+      setState(() {
+        isSubmitting = false;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar("Gagal mengirim OTP, coba lagi."),
       );
@@ -154,6 +163,9 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
           onPressed: isSubmitting
               ? null
               : () async {
+                  final ok = _formKey.currentState?.validate() ?? false;
+                  if (!ok) return;
+
                   setState(() {
                     isSubmitting = true;
                   });
