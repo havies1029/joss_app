@@ -3258,10 +3258,10 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
     bool ok = true;
 
-    // No SPPA (meskipun disabled, tetap wajib ada value)
+    // No Registrasi (meskipun disabled, tetap wajib ada value)
     // final sppa = fieldCalmv1IdController.text.trim();
     // if (sppa.isEmpty) {
-    //   setErr('form1.noSppa', kStringNullError);
+    //   setErr('form1.noRegistrasi', kStringNullError);
     //   ok = false;
     // }
 
@@ -3591,15 +3591,15 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   //form1
   Widget buildFieldCalmv1Id() => appTextField(
-        label: "No SPPA",
+        label: "No Registrasi",
         controller: fieldCalmv1IdController,
         keyboardType: TextInputType.text,
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
         ],
         enabled: false,
-        errorText: err('form1.noSppa'),
-        validator: (_) => err('form1.noSppa'),
+        errorText: err('form1.noRegistrasi'),
+        validator: (_) => err('form1.noRegistrasi'),
       );
 
   Widget buildFieldTtgAlamat() => appTextField(

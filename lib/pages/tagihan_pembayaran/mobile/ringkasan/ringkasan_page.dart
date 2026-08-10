@@ -52,10 +52,12 @@ class RingkasanPageState extends State<RingkasanPage> {
       listener: (BuildContext context, DnRekap2invState state) {
         if (state.isProcessed) {
           if (state.paymentStatus == "20") {
+            final curr = state.curr;
+
             ScaffoldMessenger.of(context).showSnackBar(
               successSnackBar('Silakan lanjutkan ke metode pembayaran.'),
             );
-            onViewPaymentMethods(state.curr, state.totalBayar);
+            onViewPaymentMethods(curr, state.totalBayar);
           } else if (state.paymentStatus == "30") {
             ScaffoldMessenger.of(context).showSnackBar(
               infoSnackBar('Silakan lakukan pembayaran.'),

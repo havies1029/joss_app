@@ -164,6 +164,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   }
 
   //form1
+  final fieldRegpar1IdController = TextEditingController();
   final fieldTtgAlamatController = TextEditingController();
   final fieldTtgNamaController = TextEditingController();
   //form1
@@ -250,6 +251,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
   Iterable<TextEditingController> get _premiInputControllers =>
       <TextEditingController>[
+        fieldRegpar1IdController,
         fieldTtgAlamatController,
         fieldTtgNamaController,
         fieldObjectAlamatController,
@@ -324,6 +326,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     }
 
     // form1
+    fieldRegpar1IdController.dispose();
     fieldTtgAlamatController.dispose();
     fieldTtgNamaController.dispose();
 
@@ -501,6 +504,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   }
 
   void _payloadform1(Regpar1CrudModel record) {
+    if (fieldRegpar1IdController.text.trim().isEmpty) {
+      fieldRegpar1IdController.text = record.regpar1Id.toString();
+    }
+
     if (fieldTtgNamaController.text.trim().isEmpty) {
       fieldTtgNamaController.text = record.ttgNama.toString();
     }
@@ -1112,6 +1119,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                         },
                         child: Column(
                           children: [
+                            buildFieldRegpar1Id(),
+                            const SizedBox(height: hPadding),
                             buildFieldTtgNama(),
                             const SizedBox(height: hPadding),
                             buildFieldTtgAlamat(),
@@ -2796,6 +2805,16 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   }
 
   //form1
+  Widget buildFieldRegpar1Id() => appTextField(
+        label: "No Registrasi",
+        controller: fieldRegpar1IdController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
+        ],
+        enabled: false,
+      );
+
   Widget buildFieldTtgNama() => appTextField(
         label: "Nama Tertanggung",
         controller: fieldTtgNamaController,

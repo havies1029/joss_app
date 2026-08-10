@@ -524,12 +524,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                 prev.isSaved != curr.isSaved ||
                                 prev.hasFailure != curr.hasFailure,
                             listener: (context, state) {
-                              if (state.isSaved && state.message.isNotEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  successSnackBar(state.message),
-                                );
-                              }
-
                               if (state.hasFailure &&
                                   state.message.isNotEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -544,17 +538,15 @@ class _SettingsPageState extends State<SettingsPage> {
                                     svgAsset: 'assets/icons/notification.svg',
                                     title: 'Email Notifikasi',
                                     value: state.isNotifEmail,
-                                    onChanged: state.isSaving
-                                        ? (_) {}
-                                        : (value) {
-                                            context
-                                                .read<NotifEmailSettingBloc>()
-                                                .add(
-                                                  NotifEmailSettingUbahEvent(
-                                                    value,
-                                                  ),
-                                                );
-                                          },
+                                    onChanged: (value) {
+                                      context
+                                          .read<NotifEmailSettingBloc>()
+                                          .add(
+                                            NotifEmailSettingUbahEvent(
+                                              value,
+                                            ),
+                                          );
+                                    },
                                   ),
                                   sDivider,
                                 ],

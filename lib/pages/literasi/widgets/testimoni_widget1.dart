@@ -7,18 +7,33 @@ import 'package:joss_app/common/loading_indicator.dart';
 import '../../../blocs/gen_review/reviewcari_bloc.dart';
 import '../../../models/gen_review/reviewcari_model.dart';
 
-class TestimonialWidget1 extends StatefulWidget {
+class TestimonialWidget extends StatefulWidget {
   final bool isPageMode;
+
+  const TestimonialWidget({
+    super.key,
+    this.isPageMode = false,
+  });
+
+  @override
+  State<TestimonialWidget> createState() => TestimonialWidgetState();
+}
+
+class TestimonialWidget1 extends StatelessWidget {
+  final bool isPageMode;
+
   const TestimonialWidget1({
     super.key,
     this.isPageMode = false,
   });
 
   @override
-  State<TestimonialWidget1> createState() => TestimonialWidget1State();
+  Widget build(BuildContext context) {
+    return TestimonialWidget(isPageMode: isPageMode);
+  }
 }
 
-class TestimonialWidget1State extends State<TestimonialWidget1> {
+class TestimonialWidgetState extends State<TestimonialWidget> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   int _displayedItems = 10;
@@ -84,6 +99,7 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
                         ),
                       )
                     : Column(
+                        mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           _buildHeader(context),
@@ -100,14 +116,7 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
       ),
     );
 
-    if (widget.isPageMode) {
-      return content;
-    }
-
-    return SizedBox(
-      height: isMobile(context) ? 390 : 370,
-      child: content,
-    );
+    return content;
   }
 
   Widget _buildHeader(BuildContext context) {

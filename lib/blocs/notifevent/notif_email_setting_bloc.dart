@@ -8,6 +8,9 @@ part 'notif_email_setting_state.dart';
 class NotifEmailSettingBloc
     extends Bloc<NotifEmailSettingEvent, NotifEmailSettingState> {
   final NotifEmailSettingRepository repository;
+  bool _isUpdateInFlight = false;
+  bool _confirmedNotifEmail = true;
+  bool? _queuedNotifEmail;
 
   NotifEmailSettingBloc({NotifEmailSettingRepository? repository})
       : repository = repository ?? NotifEmailSettingRepository(),
@@ -24,6 +27,7 @@ class NotifEmailSettingBloc
 
     try {
       final record = await repository.read();
+      _confirmedNotifEmail = record.isNotifEmail;
 
       emit(
         state.copyWith(
@@ -48,41 +52,82 @@ class NotifEmailSettingBloc
     NotifEmailSettingUbahEvent event,
     Emitter<NotifEmailSettingState> emit,
   ) async {
-    final previousValue = state.isNotifEmail;
+    if (_isUpdateInFlight) {
+      _queuedNotifEmail = event.isNotifEmail;
 
-    emit(
-      state.copyWith(
-        isNotifEmail: event.isNotifEmail,
-        isSaving: true,
-        hasFailure: false,
-        isSaved: false,
-        message: '',
-      ),
-    );
+      emit(
+        state.copyWith(
+          isNotifEmail: event.isNotifEmail,
+          isSaving: true,
+          isSaved: false,
+          hasFailure: false,
+          message: '',
+        ),
+      );
+      return;
+    }
+
+    _isUpdateInFlight = true;
+    var targetValue = event.isNotifEmail;
 
     try {
-      final success = await repository.update(event.isNotifEmail);
+      while (true) {
+        final previousValue = _confirmedNotifEmail;
 
-      emit(
-        state.copyWith(
-          isSaving: false,
-          isSaved: success,
-          hasFailure: !success,
-          isNotifEmail: success ? event.isNotifEmail : previousValue,
-          message: success
-              ? "Email Notifikasi ${event.isNotifEmail ? 'diaktifkan' : 'dinonaktifkan'}"
-              : "Gagal menyimpan pengaturan email notifikasi.",
-        ),
-      );
-    } catch (_) {
-      emit(
-        state.copyWith(
-          isSaving: false,
-          hasFailure: true,
-          isNotifEmail: previousValue,
-          message: "Gagal menyimpan pengaturan email notifikasi.",
-        ),
-      );
+        emit(
+          state.copyWith(
+            isNotifEmail: targetValue,
+            isSaving: true,
+            isSaved: false,
+            hasFailure: false,
+            message: '',
+          ),
+        );
+
+        bool success;
+        try {
+          success = await repository.update(targetValue);
+        } catch (_) {
+          success = false;
+        }
+
+        if (!success) {
+          _queuedNotifEmail = null;
+
+          emit(
+            state.copyWith(
+              isSaving: false,
+              isSaved: false,
+              hasFailure: true,
+              isNotifEmail: previousValue,
+              message: "Gagal menyimpan pengaturan email notifikasi.",
+            ),
+          );
+          return;
+        }
+
+        _confirmedNotifEmail = targetValue;
+
+        final queuedValue = _queuedNotifEmail;
+        _queuedNotifEmail = null;
+
+        if (queuedValue == null || queuedValue == _confirmedNotifEmail) {
+          emit(
+            state.copyWith(
+              isSaving: false,
+              isSaved: true,
+              hasFailure: false,
+              isNotifEmail: _confirmedNotifEmail,
+              message: '',
+            ),
+          );
+          return;
+        }
+
+        targetValue = queuedValue;
+      }
+    } finally {
+      _isUpdateInFlight = false;
     }
   }
 }

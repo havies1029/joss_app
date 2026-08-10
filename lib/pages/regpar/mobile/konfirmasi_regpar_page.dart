@@ -377,9 +377,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
             if (!state.isProcessed) return;
 
             if (state.paymentStatus == "20") {
-              final curr =
-                  (state.curr.isEmpty) ? globalMataUang ?? "" : state.curr;
-              onViewPaymentMethods(curr, state.totalBayar);
+              onViewPaymentMethods(state.curr, state.totalBayar);
               _showSafeSnackBar(
                 successSnackBar(
                   "Invoice berhasil dibuat. Silakan lanjut ke metode pembayaran.",

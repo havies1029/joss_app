@@ -134,11 +134,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   }
 
   String _paymentCurrency(String stateCurr) {
-    return _firstRealText([
-      stateCurr,
-      globalMataUang,
-      if (regmv2Record != null) _regmv2CurrencySymbol(regmv2Record!),
-    ], fallback: "");
+    return _firstRealText([stateCurr], fallback: "");
   }
 
   bool _isGlobalLoadingShown = false;
