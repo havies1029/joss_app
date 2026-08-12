@@ -1,5 +1,6 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/pages/profile/mobile/profile/form_section/rekan_pic_widget.dart';
@@ -660,6 +661,9 @@ class _EditPicWidgetState extends State<EditPicWidget> {
   Widget buildFieldjabatanDesc() {
     return appTextField(
       label: 'Jabatan',
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'[!@#$%^&*]')),
+      ],
       controller: _jabatanDesc,
       keyboardType: TextInputType.text,
       validator: (value) {
