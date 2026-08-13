@@ -64,6 +64,9 @@ class CalparMainPageRemake extends StatefulWidget {
 }
 
 class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
+  static const double _maxSumInsuredValue = 999000000000;
+  static const String _maxSumInsuredLabel = '999,000,000,000';
+
   bool _accessDeniedDialogShown = false;
   List<bool> expanded = List.filled(CalparFormSection.values.length, false);
 
@@ -1398,6 +1401,11 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         return false;
       }
 
+      if (angka > _maxSumInsuredValue) {
+        setErr(key, "Maksimal $_maxSumInsuredLabel");
+        return false;
+      }
+
       final clean = c.text.trim().replaceAll(",", "");
       if (hasLeadingZero(clean)) {
         setErr(key, "Format tidak disarankan (diawali 0)");
@@ -1658,11 +1666,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         ],
         errorText: err('form2.siBuilding'),
         validator: (_) => err('form2.siBuilding'),
-        onChanged: (v) {
-          final clean = v.replaceAll(",", "").trim();
-          final angka = double.tryParse(clean);
-          if (angka != null && angka > 0) clearErr('form2.siBuilding');
-        },
+        onChanged: (v) => _clearIfValidSumInsuredNumber(
+          'form2.siBuilding',
+          v,
+        ),
       );
 
   Widget buildFieldSiContent() => appTextField(
@@ -1678,11 +1685,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         ],
         errorText: err('form2.siContent'),
         validator: (_) => err('form2.siContent'),
-        onChanged: (v) {
-          final clean = v.replaceAll(",", "").trim();
-          final angka = double.tryParse(clean);
-          if (angka != null && angka > 0) clearErr('form2.siContent');
-        },
+        onChanged: (v) => _clearIfValidSumInsuredNumber(
+          'form2.siContent',
+          v,
+        ),
       );
 
   Widget buildFieldSiMachinery() => appTextField(
@@ -1698,11 +1704,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         ],
         errorText: err('form2.siMachinery'),
         validator: (_) => err('form2.siMachinery'),
-        onChanged: (v) {
-          final clean = v.replaceAll(",", "").trim();
-          final angka = double.tryParse(clean);
-          if (angka != null && angka > 0) clearErr('form2.siMachinery');
-        },
+        onChanged: (v) => _clearIfValidSumInsuredNumber(
+          'form2.siMachinery',
+          v,
+        ),
       );
 
   Widget buildFieldSiOther() => appTextField(
@@ -1718,11 +1723,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         ],
         errorText: err('form2.siOther'),
         validator: (_) => err('form2.siOther'),
-        onChanged: (v) {
-          final clean = v.replaceAll(",", "").trim();
-          final angka = double.tryParse(clean);
-          if (angka != null && angka > 0) clearErr('form2.siOther');
-        },
+        onChanged: (v) => _clearIfValidSumInsuredNumber(
+          'form2.siOther',
+          v,
+        ),
       );
 
   Widget buildFieldSiStock() => appTextField(
@@ -1738,11 +1742,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         ],
         errorText: err('form2.siStock'),
         validator: (_) => err('form2.siStock'),
-        onChanged: (v) {
-          final clean = v.replaceAll(",", "").trim();
-          final angka = double.tryParse(clean);
-          if (angka != null && angka > 0) clearErr('form2.siStock');
-        },
+        onChanged: (v) => _clearIfValidSumInsuredNumber(
+          'form2.siStock',
+          v,
+        ),
       );
   //form2
 
@@ -2032,6 +2035,14 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       );
 
   //form4
+
+  void _clearIfValidSumInsuredNumber(String key, String value) {
+    final clean = value.replaceAll(",", "").trim();
+    final angka = double.tryParse(clean);
+    if (angka != null && angka >= 0 && angka <= _maxSumInsuredValue) {
+      clearErr(key);
+    }
+  }
 
   final Map<String, String?> fieldErrors = {};
   String? err(String key) => fieldErrors[key];

@@ -81,6 +81,9 @@ class RegparFormMainRemake extends StatefulWidget {
 }
 
 class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
+  static const double _maxSumInsuredValue = 999000000000;
+  static const String _maxSumInsuredLabel = '999,000,000,000';
+
   bool _accessDeniedDialogShown = false;
   late List<bool> expanded;
   final Set<RegparSection> _sectionLoadings = <RegparSection>{};
@@ -2733,6 +2736,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         return false;
       }
 
+      if (x > _maxSumInsuredValue) {
+        setErr(key, "Maksimal $_maxSumInsuredLabel");
+        return false;
+      }
+
       final clean = controller.text.trim().replaceAll(",", "");
       if (hasLeadingZero(clean)) {
         setErr(key, "Format tidak disarankan (diawali 0)");
@@ -3568,7 +3576,9 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   void _clearIfNonNegativeNumber(String key, String v) {
     final clean = v.replaceAll(",", "").trim();
     final angka = double.tryParse(clean);
-    if (angka != null && angka >= 0) clearErr(key);
+    if (angka != null && angka >= 0 && angka <= _maxSumInsuredValue) {
+      clearErr(key);
+    }
     _clearValidationPreviewForChangedFields([key, 'form4.siOther']);
   }
 
