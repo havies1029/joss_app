@@ -2,6 +2,7 @@ part of 'reguser_otp_bloc.dart';
 
 class RegUserHpRegistrationStatus {
   static const registered = 'REGISTERED';
+  static const registeredLogin = 'REGISTERED_LOGIN';
   static const registeredPic = 'REGISTERED_PIC';
   static const notRegistered = 'NOT_REGISTERED';
 

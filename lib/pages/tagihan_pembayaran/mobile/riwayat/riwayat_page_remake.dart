@@ -108,7 +108,8 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
             } else if (state.paymentStatus == "91" && state.isProcessed) {
               if (state.statusCheckSource ==
                   InvoiceStatusCheckSource.riwayatContinuePayment) {
-                if (Navigator.of(context).canPop()) {
+                if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
+                  _isCardWebViewOpen = false;
                   Navigator.of(context).pop();
                 }
 
@@ -120,14 +121,14 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => PaymentSuccess(
+                    builder: (paymentResultContext) => PaymentSuccess(
                       display: "Invoice Tidak Dapat Dilanjutkan",
                       description:
                           "Invoice ini telah dibatalkan atau masa pembayarannya telah berakhir. Silakan buat pengajuan atau pembayaran baru.",
                       displayButton: "Kembali",
                       assetPath: "assets/icons/Logo_Gagal1.svg",
                       onButtonPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
+                        Navigator.of(paymentResultContext).pushAndRemoveUntil(
                           MaterialPageRoute(
                             builder: (_) => const TransaksiPage(),
                           ),
@@ -148,14 +149,14 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => PaymentSuccess(
+                  builder: (paymentResultContext) => PaymentSuccess(
                     display: "Invoice Tidak Dapat Dilanjutkan",
                     description:
                         "Invoice ini telah dibatalkan atau masa pembayarannya telah berakhir. Silakan buat pengajuan atau pembayaran baru.",
                     displayButton: "Kembali",
                     assetPath: "assets/icons/Logo_Gagal1.svg",
                     onButtonPressed: () {
-                      Navigator.of(context).pushAndRemoveUntil(
+                      Navigator.of(paymentResultContext).pushAndRemoveUntil(
                         MaterialPageRoute(
                           builder: (_) => const TransaksiPage(),
                         ),

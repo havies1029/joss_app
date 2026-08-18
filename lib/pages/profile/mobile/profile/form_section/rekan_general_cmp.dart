@@ -1,7 +1,6 @@
-import 'dart:typed_data';
-
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -19,6 +18,14 @@ import '../../../../../repositories/combobox/combombentukcst_repository.dart';
 import '../../../../../repositories/combobox/combombidang_repository.dart';
 import '../../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../base/base_background_sidepage.dart';
+
+final List<TextInputFormatter> _xenditDisplayNameInputFormatters = [
+  FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z0-9 .,']")),
+  TextInputFormatter.withFunction((oldValue, newValue) {
+    if (newValue.text.startsWith(' ')) return oldValue;
+    return newValue;
+  }),
+];
 
 class MRekanGeneralCmpCrudFormPage extends StatefulWidget {
   const MRekanGeneralCmpCrudFormPage({super.key});
@@ -90,55 +97,51 @@ class MRekanGeneralCmpCrudFormPageFormState
                   prev.isSaved != curr.isSaved,
               listener: (context, state) {
                 if (state.isLoaded && _isFirstLoad) {
-                        final rec = state.record;
+                  final rec = state.record;
 
-                        final formName = (rec?.rekanNama ?? '').trim();
-                        final fallbackName = (context
-                                    .read<MRekan1CrudBloc>()
-                                    .state
-                                    .record
-                                    ?.rekanNama ??
-                                '')
-                            .trim();
+                  final formName = (rec?.rekanNama ?? '').trim();
+                  final fallbackName = (context
+                              .read<MRekan1CrudBloc>()
+                              .state
+                              .record
+                              ?.rekanNama ??
+                          '')
+                      .trim();
 
-                        final mjenisClient = context
-                            .read<MRekan1CrudBloc>()
-                            .state
-                            .record
-                            ?.mjnsclientId;
+                  final mjenisClient = context
+                      .read<MRekan1CrudBloc>()
+                      .state
+                      .record
+                      ?.mjnsclientId;
 
-                        final idKlien = context
-                            .read<MRekan1CrudBloc>()
-                            .state
-                            .record
-                            ?.mrekan1Id;
+                  final idKlien =
+                      context.read<MRekan1CrudBloc>().state.record?.mrekan1Id;
 
-                        if (fieldRekanNamaController.text.trim().isEmpty) {
-                          if (formName.isNotEmpty) {
-                            fieldRekanNamaController.text = formName;
-                          }
-                          // else if (fallbackName.isNotEmpty) {
-                          //   fieldRekanNamaController.text = fallbackName;
-                          // }
-                        }
+                  if (fieldRekanNamaController.text.trim().isEmpty) {
+                    if (formName.isNotEmpty) {
+                      fieldRekanNamaController.text = formName;
+                    }
+                    // else if (fallbackName.isNotEmpty) {
+                    //   fieldRekanNamaController.text = fallbackName;
+                    // }
+                  }
 
-                        // if (fieldNamaBadanUsahaController.text.trim().isEmpty) {
-                        //   if (mjenisClient == '10') {
-                        //     fieldNamaBadanUsahaController.text = "Individu";
-                        //   } else if (mjenisClient == '20') {
-                        //     fieldNamaBadanUsahaController.text = "Perusahaan";
-                        //   }
-                        // }
-                        fieldNamaBadanUsahaController.text = "Perusahaan";
+                  // if (fieldNamaBadanUsahaController.text.trim().isEmpty) {
+                  //   if (mjenisClient == '10') {
+                  //     fieldNamaBadanUsahaController.text = "Individu";
+                  //   } else if (mjenisClient == '20') {
+                  //     fieldNamaBadanUsahaController.text = "Perusahaan";
+                  //   }
+                  // }
+                  fieldNamaBadanUsahaController.text = "Perusahaan";
 
-                        if (fieldIdKlienController.text.trim().isEmpty) {
-                          fieldIdKlienController.text = idKlien ?? "";
-                        }
+                  if (fieldIdKlienController.text.trim().isEmpty) {
+                    fieldIdKlienController.text = idKlien ?? "";
+                  }
 
-                        fieldComboMBentukCst ??=
-                            rec?.comboMBentukCst ?? state.comboMBentukCst;
-                        fieldComboMBidang ??=
-                            rec?.comboMBidang ?? state.comboMBidang;
+                  fieldComboMBentukCst ??=
+                      rec?.comboMBentukCst ?? state.comboMBentukCst;
+                  fieldComboMBidang ??= rec?.comboMBidang ?? state.comboMBidang;
 
                   if (mounted) {
                     setState(() {
@@ -474,6 +477,7 @@ class MRekanGeneralCmpCrudFormPageFormState
       label: "Nama Perusahaan",
       controller: fieldRekanNamaController,
       keyboardType: TextInputType.text,
+      inputFormatters: _xenditDisplayNameInputFormatters,
       errorText: err('namaPerusahaan'),
       validator: (_) => err('namaPerusahaan'),
       onChanged: (value) {

@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/forgot_password_reset_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/common/loading_indicator.dart';
+import 'package:joss_app/helper/indo_phone_result.dart';
 import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import 'package:joss_app/models/login/forgot_password_reset_model.dart';
 import 'package:joss_app/pages/base/base_background_firstpage.dart';
@@ -94,12 +94,29 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
     );
   }
 
+  String? _normalizedPhoneTarget() {
+    final phoneRes = IndoPhoneHelper.normalize(
+      _emailController.text.trim(),
+      emptyMessage: 'Mohon isi nomor HP',
+    );
+
+    return phoneRes.phone62;
+  }
+
   Future<void> _submit() async {
-    final email = _emailController.text.trim();
+    final target = _normalizedPhoneTarget();
+    if (target == null) {
+      _hideGlobalLoading();
+
+      setState(() {
+        isSubmitting = false;
+      });
+      return;
+    }
 
     bool success = true;
     try {
-      success = await (widget.onSubmit?.call(email) ?? Future.value(true));
+      success = await (widget.onSubmit?.call(target) ?? Future.value(true));
     } catch (_) {
       success = false;
     }
@@ -120,8 +137,8 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
     }
 
     final record = ForgotPasswordOtpSendModel(
-      target: email,
-      requestFrom: 'email',
+      target: target,
+      requestFrom: 'hp',
     );
 
     context.read<ForgotPasswordResetBloc>().add(
@@ -129,21 +146,20 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
         );
   }
 
-  Widget _buildEmailField() {
+  Widget _buildPhoneField() {
     return appTextField(
-      label: "Email",
-      hint: "Masukkan email kamu",
+      label: "No. Handphone",
+      hint: "Masukkan nomor HP kamu",
       controller: _emailController,
-      keyboardType: TextInputType.emailAddress,
+      keyboardType: TextInputType.phone,
       validator: (value) {
-        final v = (value ?? "").trim();
+        final phoneRes = IndoPhoneHelper.normalize(
+          (value ?? "").trim(),
+          emptyMessage: 'Mohon isi nomor HP',
+        );
 
-        if (v.isEmpty) {
-          return "Mohon isi email";
-        }
-
-        if (!EmailValidator.validate(v)) {
-          return "Masukkan format email yang valid";
+        if (!phoneRes.isValid) {
+          return phoneRes.error ?? "Masukkan nomor HP yang valid";
         }
 
         return null;
@@ -157,7 +173,7 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
       buildWhen: (prev, curr) => prev.isSending != curr.isSending,
       builder: (context, state) {
         return AppButton.primary(
-          text: "Kirim",
+          text: "Verifikasi",
           isLoading: isSubmitting,
           backgroundColor: isSubmitting ? secondaryBlackColor : primaryColor,
           onPressed: isSubmitting
@@ -212,7 +228,9 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
                   builder: (_) => OtpForgotWidget(
                     sentTo: state.target.isNotEmpty
                         ? state.target
-                        : _emailController.text.trim(),
+                        : (_normalizedPhoneTarget() ??
+                            _emailController.text.trim()),
+                    requestFrom: 'hp',
                     useResetPasswordDomain: true,
                   ),
                 ),
@@ -320,7 +338,7 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
                                           style: headingStyle(context),
                                         ),
                                         Text(
-                                          "Masukkan email terdaftar untuk mengatur ulang kata sandi.",
+                                          "Masukkan nomor HP terdaftar untuk mengatur ulang kata sandi.",
                                           style:
                                               bodyTextStyle(context).copyWith(
                                             color: hintGrey,
@@ -361,7 +379,7 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
                                       padding: const EdgeInsets.all(20),
                                       child: Column(
                                         children: [
-                                          _buildEmailField(),
+                                          _buildPhoneField(),
                                           const SizedBox(height: 10),
                                           _buildSubmitButton(),
                                           const Spacer(),

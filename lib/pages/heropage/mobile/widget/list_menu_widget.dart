@@ -7,7 +7,7 @@ import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../widgets/apptheme/example_nested_scrollable_table_page.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page2.dart';
 import '../../../klaim/mobile/klaimlacak/klaimlacak_page.dart';
-import '../../../login/mobile/client/new_login_client/new_login_client_page.dart';
+import '../../../register/mobile/client/register_phone_gate_page.dart';
 import '../../../management_polis/mobile/management_polis_page.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 import 'package:confetti/confetti.dart';
@@ -193,7 +193,7 @@ class ListMenuWidget extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => const NewLoginClient(),
+              builder: (_) => const RegisterPhoneGatePage(),
             ),
           );
           /*

@@ -127,19 +127,7 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
     _isPhoneStatusPopupOpen = false;
     if (!mounted || !shouldNavigate) return;
 
-    context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
-    _phoneController.clear();
-
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => KataSandiBaruPage(
-          email: target,
-          requestId: requestId,
-          requestFrom: 'hp',
-          useResetPasswordDomain: true,
-        ),
-      ),
-    );
+    _openResetPasswordForRegisteredPhone(state);
   }
 
   Future<void> _showNotRegisteredPopup(RegUserOtpState state) async {
@@ -173,6 +161,43 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
     );
   }
 
+  void _openResetPasswordForRegisteredPhone(RegUserOtpState state) {
+    final target = state.hpStatusTarget;
+    final requestId = state.hpStatusRequestId;
+    if (target.isEmpty || requestId.isEmpty) return;
+
+    context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
+    _phoneController.clear();
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => KataSandiBaruPage(
+          email: target,
+          requestId: requestId,
+          requestFrom: 'hp',
+          useResetPasswordDomain: true,
+        ),
+      ),
+    );
+  }
+
+  void _openLoginForRegisteredPhone(RegUserOtpState state) {
+    final target = state.hpStatusTarget;
+    if (target.isEmpty) return;
+
+    context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
+    _phoneController.clear();
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => NewLoginClient(
+          requestFrom: widget.requestFrom,
+          initialUsername: target,
+        ),
+      ),
+    );
+  }
+
   void _handleHpStatus(BuildContext context, RegUserOtpState state) {
     if (!state.isHpVerified || state.isHpStatusChecking) return;
     if (state.hpRegistrationStatus.isEmpty) return;
@@ -197,13 +222,22 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
       );
     });
 
-    if (RegUserHpRegistrationStatus.isRegisteredStatus(
-      state.hpRegistrationStatus,
-    )) {
+    if (state.hpRegistrationStatus ==
+        RegUserHpRegistrationStatus.registeredLogin) {
+      _openLoginForRegisteredPhone(state);
+      return;
+    }
+
+    if (state.hpRegistrationStatus == RegUserHpRegistrationStatus.registered) {
       _showRegisteredPopup(state);
       return;
     }
 
+    if (state.hpRegistrationStatus ==
+        RegUserHpRegistrationStatus.registeredPic) {
+      _showRegisteredPopup(state);
+      return;
+    }
     if (state.hpRegistrationStatus ==
         RegUserHpRegistrationStatus.notRegistered) {
       _showNotRegisteredPopup(state);
@@ -238,10 +272,30 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
     );
   }
 
+  bool get _isVerifiedRegisteredLogin {
+    return _verifiedRegistrationStatus ==
+        RegUserHpRegistrationStatus.registeredLogin;
+  }
+
   Future<void> _handleVerifiedAction() async {
     final target = _verifiedTarget;
     final requestId = _verifiedRequestId;
     if (target.isEmpty || requestId.isEmpty) return;
+
+    if (_isVerifiedRegisteredLogin) {
+      context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
+      _phoneController.clear();
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => NewLoginClient(
+            requestFrom: widget.requestFrom,
+            initialUsername: target,
+          ),
+        ),
+      );
+      return;
+    }
 
     if (_isVerifiedRegistered) {
       if (_isBottomActionLoading) return;
@@ -264,7 +318,6 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
       );
       return;
     }
-
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => RegisterClient(
@@ -372,38 +425,15 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
       );
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < 340) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildPhoneField(otpState),
-              if (!isVerified) ...[
-                const SizedBox(height: 8),
-                buildButton(),
-              ],
-            ],
-          );
-        }
-
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 8,
-              child: _buildPhoneField(otpState),
-            ),
-            if (!isVerified) ...[
-              const SizedBox(width: 8),
-              Expanded(
-                flex: 2,
-                child: buildButton(),
-              ),
-            ],
-          ],
-        );
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildPhoneField(otpState),
+        if (!isVerified) ...[
+          const SizedBox(height: 8),
+          buildButton(),
+        ],
+      ],
     );
   }
 
@@ -413,7 +443,11 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
     return Padding(
       padding: EdgeInsets.only(top: vPadding),
       child: AppButton.primary(
-        text: _isVerifiedRegistered ? 'Atur Kata Sandi' : 'Lengkapi Data',
+        text: _isVerifiedRegisteredLogin
+            ? 'Masuk'
+            : _isVerifiedRegistered
+                ? 'Atur Kata Sandi'
+                : 'Lengkapi Data',
         isLoading: _isBottomActionLoading,
         backgroundColor:
             _isBottomActionLoading ? secondaryBlackColor : primaryColor,

@@ -19,11 +19,13 @@ import '../../../../base/base_background_firstpage.dart';
 
 class OtpForgotWidget extends StatefulWidget {
   final String sentTo;
+  final String requestFrom;
   final bool useResetPasswordDomain;
 
   const OtpForgotWidget({
     super.key,
     required this.sentTo,
+    this.requestFrom = 'email',
     this.useResetPasswordDomain = false,
   });
 
@@ -154,7 +156,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
             ForgotPasswordResetSendOtpEvent(
               record: ForgotPasswordOtpSendModel(
                 target: widget.sentTo,
-                requestFrom: 'email',
+                requestFrom: widget.requestFrom,
               ),
             ),
           );
@@ -212,7 +214,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
               record: ForgotPasswordOtpValidateModel(
                 requestId: requestId,
                 target: widget.sentTo,
-                requestFrom: 'email',
+                requestFrom: widget.requestFrom,
                 pin: otp,
               ),
             ),

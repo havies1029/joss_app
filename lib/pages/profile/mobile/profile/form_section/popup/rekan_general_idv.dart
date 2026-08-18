@@ -1,6 +1,5 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter_svg/svg.dart';
@@ -21,6 +20,14 @@ import '../../../../../../repositories/combobox/combomjnskel_repository.dart';
 import '../../../../../../repositories/combobox/combompekerjaan_repository.dart';
 import '../../../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../../base/base_background_sidepage.dart';
+
+final List<TextInputFormatter> _xenditDisplayNameInputFormatters = [
+  FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z0-9 .,']")),
+  TextInputFormatter.withFunction((oldValue, newValue) {
+    if (newValue.text.startsWith(' ')) return oldValue;
+    return newValue;
+  }),
+];
 
 class MRekanGeneralIdvPopUpPage extends StatefulWidget {
   const MRekanGeneralIdvPopUpPage({
@@ -574,6 +581,7 @@ class MRekanGeneralIdvPopUpPageFormState
       label: "Nama",
       controller: fieldRekanNamaController,
       keyboardType: TextInputType.text,
+      inputFormatters: _xenditDisplayNameInputFormatters,
       errorText: err('nama'),
       validator: (_) => err('nama'),
       onChanged: (value) {

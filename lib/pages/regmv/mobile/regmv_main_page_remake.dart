@@ -1259,6 +1259,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                                 const SizedBox(width: 8),
                                 Flexible(child: _buildHargaMobil()),
                               ],
+
                             ),
                             const SizedBox(height: hPadding),
                             _buildComboMWilayah(),

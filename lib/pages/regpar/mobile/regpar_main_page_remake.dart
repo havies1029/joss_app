@@ -294,6 +294,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
       context.read<PolisTanggalBloc>().add(PolisMulaiChanged(today));
+
+      if (regpar1Id != null && regpar1Id!.isNotEmpty) {
+        refreshForm1(recordId: regpar1Id);
+      }
     });
 
     //reset foto dari record lama
