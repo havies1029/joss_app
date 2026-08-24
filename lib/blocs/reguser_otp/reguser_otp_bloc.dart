@@ -83,6 +83,21 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
     return parts[1].trim().toUpperCase();
   }
 
+  String _parseDirectHpRegistrationStatus(String data) {
+    final trimmed = data.trim().toUpperCase();
+    if (trimmed == RegUserHpRegistrationStatus.registeredLogin) {
+      return trimmed;
+    }
+
+    final parts = trimmed.split(';');
+    if (parts.length >= 2 &&
+        parts[1].trim() == RegUserHpRegistrationStatus.registeredLogin) {
+      return RegUserHpRegistrationStatus.registeredLogin;
+    }
+
+    return '';
+  }
+
   Future<void> _onKirim(
     RegUserOtpKirimEvent event,
     Emitter<RegUserOtpState> emit,
@@ -115,6 +130,30 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
     );
 
     if (result.success) {
+      final directHpRegistrationStatus =
+          isEmail ? '' : _parseDirectHpRegistrationStatus(result.data);
+
+      if (directHpRegistrationStatus.isNotEmpty) {
+        emit(
+          state.copyWith(
+            hpRequestId: '',
+            isHpSending: false,
+            isHpValidating: false,
+            isHpStatusChecking: false,
+            isHpVerified: true,
+            hpError: '',
+            hpRegistrationStatus: directHpRegistrationStatus,
+            hpStatusRequestId: '',
+            hpStatusTarget: event.target,
+            activeTarget: event.target,
+            activeRequestFrom: requestFrom,
+            message: directHpRegistrationStatus,
+            hasFailure: false,
+          ),
+        );
+        return;
+      }
+
       emit(
         state.copyWith(
           emailRequestId: isEmail ? result.data : state.emailRequestId,

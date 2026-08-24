@@ -216,6 +216,7 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
       _verifiedTarget = state.hpStatusTarget;
       _verifiedRequestId = state.hpStatusRequestId;
       _verifiedRegistrationStatus = state.hpRegistrationStatus;
+      _pendingOpenOtpFor = '';
       _verifiedPhoneCache[state.hpStatusTarget] = _VerifiedPhoneGateInfo(
         requestId: state.hpStatusRequestId,
         registrationStatus: state.hpRegistrationStatus,

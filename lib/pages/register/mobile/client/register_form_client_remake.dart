@@ -991,6 +991,23 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     if (key == _lastHandledHpStatusKey) return;
     _lastHandledHpStatusKey = key;
 
+    if (state.hpRegistrationStatus ==
+        RegUserHpRegistrationStatus.registeredLogin) {
+      _registeredHpTargets.add(target);
+      _pendingOpenOtpFor = '';
+      setErr('form1.telepon', 'No. HP sudah terdaftar.');
+      context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => NewLoginClient(
+            requestFrom: widget.requestFrom,
+            initialUsername: target,
+          ),
+        ),
+      );
+      return;
+    }
+
     if (RegUserHpRegistrationStatus.isRegisteredStatus(
       state.hpRegistrationStatus,
     )) {

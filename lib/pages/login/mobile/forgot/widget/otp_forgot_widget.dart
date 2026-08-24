@@ -47,6 +47,10 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
   int _remainingTime = 59;
   bool _isResendAvailable = false;
   bool _isVerifyingOtp = false;
+  ScaffoldMessengerState? _scaffoldMessenger;
+  NavigatorState? _navigator;
+  ForgotPasswordResetBloc? _forgotPasswordResetBloc;
+  ForgotPasswordBloc? _forgotPasswordBloc;
 
   @override
   void initState() {
@@ -75,6 +79,15 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
       ),
     );
     _startTimer();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _scaffoldMessenger = ScaffoldMessenger.of(context);
+    _navigator = Navigator.of(context);
+    _forgotPasswordResetBloc = context.read<ForgotPasswordResetBloc>();
+    _forgotPasswordBloc = context.read<ForgotPasswordBloc>();
   }
 
   bool _isEmail(String input) => EmailValidator.validate(input);
@@ -135,6 +148,8 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
 
   void _resetOtpAndFocusFirst() {
     _pinController.clear();
+    if (!mounted) return;
+
     setState(() {
       _otpError = false;
     });
@@ -150,9 +165,27 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
     _shakeController.forward(from: 0);
   }
 
+  void _hideCurrentSnackBar() {
+    if (!mounted) return;
+
+    try {
+      _scaffoldMessenger?.hideCurrentSnackBar();
+    } catch (_) {}
+  }
+
+  void _showSnackBar(SnackBar snackBar) {
+    if (!mounted) return;
+
+    try {
+      _scaffoldMessenger
+        ?..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+    } catch (_) {}
+  }
+
   void _resendOtp() {
     if (widget.useResetPasswordDomain) {
-      context.read<ForgotPasswordResetBloc>().add(
+      _forgotPasswordResetBloc?.add(
             ForgotPasswordResetSendOtpEvent(
               record: ForgotPasswordOtpSendModel(
                 target: widget.sentTo,
@@ -163,7 +196,9 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
       return;
     }
 
-    final forgotPasswordBloc = context.read<ForgotPasswordBloc>();
+    final forgotPasswordBloc = _forgotPasswordBloc;
+    if (forgotPasswordBloc == null) return;
+
     final existingRecord = forgotPasswordBloc.state.record;
 
     final record = existingRecord ??
@@ -182,7 +217,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
     final otp = (otpOverride ?? _pinController.text).trim();
 
     if (otp.length != 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      _showSnackBar(
         const SnackBar(
           content: Text('Mohon isi semua kode OTP'),
           backgroundColor: Colors.red,
@@ -192,10 +227,13 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
     }
 
     if (widget.useResetPasswordDomain) {
-      final resetState = context.read<ForgotPasswordResetBloc>().state;
+      final forgotPasswordResetBloc = _forgotPasswordResetBloc;
+      if (forgotPasswordResetBloc == null) return;
+
+      final resetState = forgotPasswordResetBloc.state;
       final requestId = resetState.requestId;
       if (requestId.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        _showSnackBar(
           const SnackBar(
             content: Text('Terjadi kesalahan, silakan coba lagi.'),
             backgroundColor: Colors.red,
@@ -209,7 +247,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
         _otpError = false;
       });
 
-      context.read<ForgotPasswordResetBloc>().add(
+      forgotPasswordResetBloc.add(
             ForgotPasswordResetValidateOtpEvent(
               record: ForgotPasswordOtpValidateModel(
                 requestId: requestId,
@@ -222,9 +260,12 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
       return;
     }
 
-    final record = context.read<ForgotPasswordBloc>().state.record;
+    final forgotPasswordBloc = _forgotPasswordBloc;
+    if (forgotPasswordBloc == null) return;
+
+    final record = forgotPasswordBloc.state.record;
     if (record == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      _showSnackBar(
         const SnackBar(
           content: Text('Terjadi kesalahan, silakan coba lagi.'),
           backgroundColor: Colors.red,
@@ -240,7 +281,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
 
     record.kodePin = otp;
 
-    context.read<ForgotPasswordBloc>().add(
+    forgotPasswordBloc.add(
           ForgotPswdValidasiPinEmailEvent(
             record: record,
             requestAt: DateTime.now(),
@@ -258,9 +299,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
 
     _startTimer();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      successSnackBar("Kode OTP berhasil dikirim ulang."),
-    );
+    _showSnackBar(successSnackBar("Kode OTP berhasil dikirim ulang."));
   }
 
   Widget _buildResendStatus() {
@@ -318,6 +357,8 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
                   prev.sendOtpSuccess != curr.sendOtpSuccess ||
                   prev.errorMessage != curr.errorMessage),
           listener: (context, state) {
+            if (!mounted) return;
+
             if (state.validateOtpSuccess ||
                 state.validateOtpFailed ||
                 state.errorMessage.isNotEmpty) {
@@ -328,15 +369,14 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
               }
             }
 
-            final messenger = ScaffoldMessenger.of(context);
-            messenger.hideCurrentSnackBar();
+            _hideCurrentSnackBar();
 
             if (state.validateOtpSuccess) {
-              messenger.showSnackBar(
+              _showSnackBar(
                 successSnackBar("Verifikasi OTP berhasil"),
               );
 
-              Navigator.of(context).pushReplacement(
+              _navigator?.pushReplacement(
                 MaterialPageRoute(
                   builder: (_) => KataSandiBaruPage(
                     email: widget.sentTo,
@@ -355,7 +395,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
                 _otpError = true;
               });
 
-              messenger.showSnackBar(
+              _showSnackBar(
                 errorSnackBar(
                   state.errorMessage.isNotEmpty
                       ? state.errorMessage
@@ -365,10 +405,10 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
 
               _resetOtpAndFocusFirst();
 
-              context.read<ForgotPasswordResetBloc>().add(
+              _forgotPasswordResetBloc?.add(
                     const ForgotPasswordResetFlagsEvent(),
                   );
-              context.read<ForgotPasswordResetBloc>().add(
+              _forgotPasswordResetBloc?.add(
                     const ForgotPasswordResetClearMessageEvent(),
                   );
               return;
@@ -377,10 +417,10 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
             if (state.sendOtpSuccess) {
               _handleResendSuccess();
 
-              context.read<ForgotPasswordResetBloc>().add(
+              _forgotPasswordResetBloc?.add(
                     const ForgotPasswordResetFlagsEvent(),
                   );
-              context.read<ForgotPasswordResetBloc>().add(
+              _forgotPasswordResetBloc?.add(
                     const ForgotPasswordResetClearMessageEvent(),
                   );
               return;
@@ -390,11 +430,11 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
                 !state.validateOtpFailed &&
                 !state.validateOtpSuccess &&
                 !state.sendOtpSuccess) {
-              messenger.showSnackBar(
+              _showSnackBar(
                 errorSnackBar(state.errorMessage),
               );
 
-              context.read<ForgotPasswordResetBloc>().add(
+              _forgotPasswordResetBloc?.add(
                     const ForgotPasswordResetClearMessageEvent(),
                   );
             }
@@ -408,6 +448,8 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
                   prev.resendOtpSuccess != curr.resendOtpSuccess ||
                   prev.errorMessage != curr.errorMessage),
           listener: (context, state) {
+            if (!mounted) return;
+
             if (state.verificationPinSuccess ||
                 state.verificationPinFailed ||
                 state.errorMessage.isNotEmpty) {
@@ -418,15 +460,14 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
               }
             }
 
-            final messenger = ScaffoldMessenger.of(context);
-            messenger.hideCurrentSnackBar();
+            _hideCurrentSnackBar();
 
             if (state.verificationPinSuccess) {
-              messenger.showSnackBar(
+              _showSnackBar(
                 successSnackBar("Verifikasi OTP berhasil"),
               );
 
-              Navigator.of(context).pushReplacement(
+              _navigator?.pushReplacement(
                 MaterialPageRoute(
                   builder: (_) => KataSandiBaruPage(
                     email: widget.sentTo,
@@ -443,7 +484,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
                 _otpError = true;
               });
 
-              messenger.showSnackBar(
+              _showSnackBar(
                 errorSnackBar(
                   state.errorMessage.isNotEmpty
                       ? state.errorMessage
@@ -453,10 +494,10 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
 
               _resetOtpAndFocusFirst();
 
-              context.read<ForgotPasswordBloc>().add(
+              _forgotPasswordBloc?.add(
                     const ForgotPswdResetFlagsEvent(),
                   );
-              context.read<ForgotPasswordBloc>().add(
+              _forgotPasswordBloc?.add(
                     const ForgotPswdClearMessageEvent(),
                   );
               return;
@@ -465,10 +506,10 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
             if (state.resendOtpSuccess) {
               _handleResendSuccess();
 
-              context.read<ForgotPasswordBloc>().add(
+              _forgotPasswordBloc?.add(
                     const ForgotPswdResetFlagsEvent(),
                   );
-              context.read<ForgotPasswordBloc>().add(
+              _forgotPasswordBloc?.add(
                     const ForgotPswdClearMessageEvent(),
                   );
               return;
@@ -478,11 +519,11 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
                 !state.verificationPinFailed &&
                 !state.verificationPinSuccess &&
                 !state.resendOtpSuccess) {
-              messenger.showSnackBar(
+              _showSnackBar(
                 errorSnackBar(state.errorMessage),
               );
 
-              context.read<ForgotPasswordBloc>().add(
+              _forgotPasswordBloc?.add(
                     const ForgotPswdClearMessageEvent(),
                   );
             }

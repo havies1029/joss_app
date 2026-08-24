@@ -132,6 +132,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   Regmv6FormModel? form6Record;
   Regmv7FormModel? form7Record;
   bool _defaultCurrencyApplied = false;
+  static const double _maxHargaKendaraanValue = 999000000000;
+  static const String _maxHargaKendaraanLabel = '999,000,000,000';
 
   String cleanNum(num value) {
     final f = NumberFormat("#,###", "en_US");
@@ -455,7 +457,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       case RegmvFormSection.form3:
         keys.add('form3.general');
         if (selectedYearform3.trim().isNotEmpty) keys.add('form3.tahun');
-        if (hasPositiveNumber(fieldHargaController)) {
+        if (hasPositiveNumber(fieldHargaController) &&
+            _isValidHargaKendaraan(fieldHargaController.text)) {
           keys.add('form3.hargaMobil');
         }
         if (fieldComboMWilayah != null) keys.add('form3.wilayah');
@@ -2122,7 +2125,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
     final okForm3 = validateForm3();
     if (!okForm3) {
-      openForm3(recordId: regmv1Id);
       return;
     }
 
@@ -3175,6 +3177,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   String _cleanNumberText(String value) => value.replaceAll(',', '').trim();
 
+  bool _isValidHargaKendaraan(String value) {
+    final harga = double.tryParse(_cleanNumberText(value));
+    return harga != null && harga > 0 && harga <= _maxHargaKendaraanValue;
+  }
+
   void _clearBackendValidationForChangedField(String fieldKey) {
     if (!_lastBackendValidationAffectedFieldKeys.contains(fieldKey)) return;
     setState(() {
@@ -3402,6 +3409,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       final angka = double.tryParse(clean);
       if (angka == null || angka <= 0) {
         setErr('form3.hargaMobil', kString0);
+        ok = false;
+      } else if (angka > _maxHargaKendaraanValue) {
+        setErr('form3.hargaMobil', "Maksimal $_maxHargaKendaraanLabel");
         ok = false;
       }
     }
@@ -3992,7 +4002,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChanged: (v) {
           final clean = v.replaceAll(",", "").trim();
           final angka = double.tryParse(clean);
-          if (angka != null && angka > 0) clearErr('form3.hargaMobil');
+          if (angka != null &&
+              angka > 0 &&
+              angka <= _maxHargaKendaraanValue) {
+            clearErr('form3.hargaMobil');
+          }
           _clearBackendValidationForChangedField('form3.hargaMobil');
           _clearValidationPreviewForChangedField('form3.hargaMobil');
         },

@@ -56,6 +56,9 @@ class CalmvMainPageRemake extends StatefulWidget {
 }
 
 class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
+  static const double _maxHargaKendaraanValue = 999000000000;
+  static const String _maxHargaKendaraanLabel = '999,000,000,000';
+
   bool _accessDeniedDialogShown = false;
   List<bool> expanded = [true, false, false];
   int? lastOpenedIndex;
@@ -988,6 +991,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
       if (angka == null || angka <= 0) {
         setErr('form1.hargaKendaraan', "Harga harus lebih dari 0");
         ok = false;
+      } else if (angka > _maxHargaKendaraanValue) {
+        setErr('form1.hargaKendaraan', "Maksimal $_maxHargaKendaraanLabel");
+        ok = false;
       } else {
         fieldHargaController.text = angka.toInt().toString();
       }
@@ -1432,7 +1438,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
         onChanged: (v) {
           final clean = v.replaceAll(",", "").trim();
           final angka = double.tryParse(clean);
-          if (angka != null && angka > 0) {
+          if (angka != null &&
+              angka > 0 &&
+              angka <= _maxHargaKendaraanValue) {
             clearErr('form1.hargaKendaraan');
           }
         },
