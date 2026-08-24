@@ -33,6 +33,10 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
   late final TextEditingController _emailController;
   bool isSubmitting = false;
   bool _isDialogLoadingShown = false;
+  ScaffoldMessengerState? _scaffoldMessenger;
+  NavigatorState? _navigator;
+  NavigatorState? _rootNavigator;
+  ForgotPasswordResetBloc? _forgotPasswordResetBloc;
 
   @override
   void initState() {
@@ -44,6 +48,15 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
   void dispose() {
     _emailController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _scaffoldMessenger = ScaffoldMessenger.of(context);
+    _navigator = Navigator.of(context);
+    _rootNavigator = Navigator.of(context, rootNavigator: true);
+    _forgotPasswordResetBloc = context.read<ForgotPasswordResetBloc>();
   }
 
   void _showGlobalLoading() {
@@ -71,7 +84,7 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
 
     _isDialogLoadingShown = false;
 
-    Navigator.of(context, rootNavigator: true).pop();
+    _rootNavigator?.pop();
   }
 
   void _handleBack() {
@@ -108,9 +121,11 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
     if (target == null) {
       _hideGlobalLoading();
 
-      setState(() {
-        isSubmitting = false;
-      });
+      if (mounted) {
+        setState(() {
+          isSubmitting = false;
+        });
+      }
       return;
     }
 
@@ -124,13 +139,17 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
     if (!mounted) return;
 
     if (!success) {
+      final messenger = _scaffoldMessenger;
+
       _hideGlobalLoading();
 
-      setState(() {
-        isSubmitting = false;
-      });
+      if (mounted) {
+        setState(() {
+          isSubmitting = false;
+        });
+      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger?.showSnackBar(
         errorSnackBar("Gagal mengirim OTP, coba lagi."),
       );
       return;
@@ -214,7 +233,15 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
               prev.sendOtpSuccess != curr.sendOtpSuccess ||
               prev.errorMessage != curr.errorMessage,
           listener: (context, state) {
+            final messenger = _scaffoldMessenger;
+            final navigator = _navigator;
+            final forgotPasswordResetBloc = _forgotPasswordResetBloc;
+
             if (state.sendOtpSuccess) {
+              final sentTo = state.target.isNotEmpty
+                  ? state.target
+                  : (_normalizedPhoneTarget() ?? _emailController.text.trim());
+
               _hideGlobalLoading();
 
               if (mounted) {
@@ -223,26 +250,25 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
                 });
               }
 
-              Navigator.of(context).push(
+              navigator?.push(
                 MaterialPageRoute(
                   builder: (_) => OtpForgotWidget(
-                    sentTo: state.target.isNotEmpty
-                        ? state.target
-                        : (_normalizedPhoneTarget() ??
-                            _emailController.text.trim()),
+                    sentTo: sentTo,
                     requestFrom: 'hp',
                     useResetPasswordDomain: true,
                   ),
                 ),
               );
 
-              context
-                  .read<ForgotPasswordResetBloc>()
-                  .add(const ForgotPasswordResetFlagsEvent());
+              forgotPasswordResetBloc?.add(
+                const ForgotPasswordResetFlagsEvent(),
+              );
               return;
             }
 
             if (state.errorMessage.isNotEmpty) {
+              final errorMessage = state.errorMessage;
+
               _hideGlobalLoading();
 
               if (mounted) {
@@ -251,13 +277,12 @@ class _NewForgotPasswordPageState extends State<NewForgotPasswordPage> {
                 });
               }
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar(state.errorMessage),
-              );
+              messenger?.hideCurrentSnackBar();
+              messenger?.showSnackBar(errorSnackBar(errorMessage));
 
-              context
-                  .read<ForgotPasswordResetBloc>()
-                  .add(const ForgotPasswordResetClearMessageEvent());
+              forgotPasswordResetBloc?.add(
+                const ForgotPasswordResetClearMessageEvent(),
+              );
             }
           },
           child: Scaffold(

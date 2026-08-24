@@ -447,6 +447,13 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       return value != null && value >= 0;
     }
 
+    bool hasValidSumInsuredNumber(TextEditingController controller) {
+      final raw = controller.text.trim();
+      if (raw.isEmpty) return false;
+      final value = double.tryParse(raw.replaceAll(',', ''));
+      return value != null && value >= 0 && value <= _maxSumInsuredValue;
+    }
+
     final keys = <String>[];
 
     switch (section) {
@@ -491,7 +498,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         });
 
         for (final entry in siControllers.entries) {
-          if (hasNonNegativeNumber(entry.value) && hasPositiveSi) {
+          if (hasValidSumInsuredNumber(entry.value) && hasPositiveSi) {
             keys.add(entry.key);
           }
         }
@@ -1935,7 +1942,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
     final okForm4 = validateForm4();
     if (!okForm4) {
-      openForm4(recordId: regpar1Id);
       return;
     }
 
