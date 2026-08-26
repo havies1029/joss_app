@@ -56,10 +56,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _pinFocusNode.requestFocus();
-    });
+    _focusOtpField(delay: const Duration(milliseconds: 300));
 
     _pinFocusNode.addListener(() {
       if (mounted) setState(() {});
@@ -154,10 +151,22 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
       _otpError = false;
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    _focusOtpField(delay: const Duration(milliseconds: 300));
+  }
+
+  void _focusOtpField({Duration delay = Duration.zero}) {
+    void requestKeyboard() {
       if (!mounted) return;
       _pinFocusNode.requestFocus();
-    });
+      SystemChannels.textInput.invokeMethod<void>('TextInput.show');
+    }
+
+    if (delay == Duration.zero) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => requestKeyboard());
+      return;
+    }
+
+    Timer(delay, requestKeyboard);
   }
 
   void _shakeOtpFields() {
@@ -186,13 +195,13 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
   void _resendOtp() {
     if (widget.useResetPasswordDomain) {
       _forgotPasswordResetBloc?.add(
-            ForgotPasswordResetSendOtpEvent(
-              record: ForgotPasswordOtpSendModel(
-                target: widget.sentTo,
-                requestFrom: widget.requestFrom,
-              ),
-            ),
-          );
+        ForgotPasswordResetSendOtpEvent(
+          record: ForgotPasswordOtpSendModel(
+            target: widget.sentTo,
+            requestFrom: widget.requestFrom,
+          ),
+        ),
+      );
       return;
     }
 
@@ -248,15 +257,15 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
       });
 
       forgotPasswordResetBloc.add(
-            ForgotPasswordResetValidateOtpEvent(
-              record: ForgotPasswordOtpValidateModel(
-                requestId: requestId,
-                target: widget.sentTo,
-                requestFrom: widget.requestFrom,
-                pin: otp,
-              ),
-            ),
-          );
+        ForgotPasswordResetValidateOtpEvent(
+          record: ForgotPasswordOtpValidateModel(
+            requestId: requestId,
+            target: widget.sentTo,
+            requestFrom: widget.requestFrom,
+            pin: otp,
+          ),
+        ),
+      );
       return;
     }
 
@@ -282,11 +291,11 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
     record.kodePin = otp;
 
     forgotPasswordBloc.add(
-          ForgotPswdValidasiPinEmailEvent(
-            record: record,
-            requestAt: DateTime.now(),
-          ),
-        );
+      ForgotPswdValidasiPinEmailEvent(
+        record: record,
+        requestAt: DateTime.now(),
+      ),
+    );
   }
 
   void _handleResendSuccess() {
@@ -406,11 +415,11 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
               _resetOtpAndFocusFirst();
 
               _forgotPasswordResetBloc?.add(
-                    const ForgotPasswordResetFlagsEvent(),
-                  );
+                const ForgotPasswordResetFlagsEvent(),
+              );
               _forgotPasswordResetBloc?.add(
-                    const ForgotPasswordResetClearMessageEvent(),
-                  );
+                const ForgotPasswordResetClearMessageEvent(),
+              );
               return;
             }
 
@@ -418,11 +427,11 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
               _handleResendSuccess();
 
               _forgotPasswordResetBloc?.add(
-                    const ForgotPasswordResetFlagsEvent(),
-                  );
+                const ForgotPasswordResetFlagsEvent(),
+              );
               _forgotPasswordResetBloc?.add(
-                    const ForgotPasswordResetClearMessageEvent(),
-                  );
+                const ForgotPasswordResetClearMessageEvent(),
+              );
               return;
             }
 
@@ -435,8 +444,8 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
               );
 
               _forgotPasswordResetBloc?.add(
-                    const ForgotPasswordResetClearMessageEvent(),
-                  );
+                const ForgotPasswordResetClearMessageEvent(),
+              );
             }
           },
         ),
@@ -495,11 +504,11 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
               _resetOtpAndFocusFirst();
 
               _forgotPasswordBloc?.add(
-                    const ForgotPswdResetFlagsEvent(),
-                  );
+                const ForgotPswdResetFlagsEvent(),
+              );
               _forgotPasswordBloc?.add(
-                    const ForgotPswdClearMessageEvent(),
-                  );
+                const ForgotPswdClearMessageEvent(),
+              );
               return;
             }
 
@@ -507,11 +516,11 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
               _handleResendSuccess();
 
               _forgotPasswordBloc?.add(
-                    const ForgotPswdResetFlagsEvent(),
-                  );
+                const ForgotPswdResetFlagsEvent(),
+              );
               _forgotPasswordBloc?.add(
-                    const ForgotPswdClearMessageEvent(),
-                  );
+                const ForgotPswdClearMessageEvent(),
+              );
               return;
             }
 
@@ -524,8 +533,8 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
               );
 
               _forgotPasswordBloc?.add(
-                    const ForgotPswdClearMessageEvent(),
-                  );
+                const ForgotPswdClearMessageEvent(),
+              );
             }
           },
         ),
@@ -661,6 +670,9 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
                                       controller: _pinController,
                                       focusNode: _pinFocusNode,
                                       keyboardType: TextInputType.number,
+                                      textInputAction: TextInputAction.done,
+                                      autofocus: true,
+                                      useNativeKeyboard: true,
                                       inputFormatters: [
                                         FilteringTextInputFormatter.digitsOnly,
                                       ],
@@ -736,8 +748,10 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
                                       ),
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceEvenly,
-                                      onTap: () =>
-                                          HapticFeedback.selectionClick(),
+                                      onTap: () {
+                                        HapticFeedback.selectionClick();
+                                        _focusOtpField();
+                                      },
                                       onChanged: (v) {
                                         if (_otpError) {
                                           setState(() {
@@ -779,7 +793,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
                                             setState(() {
                                               _otpError = true;
                                             });
-                                            _pinFocusNode.requestFocus();
+                                            _focusOtpField();
                                           }
                                         },
                                 ),

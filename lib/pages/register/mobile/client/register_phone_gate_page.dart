@@ -19,10 +19,12 @@ const _phoneGateEmptyError = 'No. Handphone belum valid';
 
 class RegisterPhoneGatePage extends StatefulWidget {
   final String requestFrom;
+  final String initialPhone;
 
   const RegisterPhoneGatePage({
     super.key,
     this.requestFrom = 'daftarclient_page',
+    this.initialPhone = '',
   });
 
   @override
@@ -46,6 +48,14 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
   @override
   void initState() {
     super.initState();
+    final initialPhone = widget.initialPhone.trim();
+    if (initialPhone.isNotEmpty) {
+      _phoneController.text = InternationalPhoneHelper.toNationalInput(
+        initialPhone,
+        countryCode: _countryCode,
+      );
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());

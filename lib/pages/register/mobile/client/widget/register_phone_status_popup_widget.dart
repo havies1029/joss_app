@@ -8,6 +8,9 @@ Future<bool?> showRegisterPhoneStatusPopup(
   BuildContext context, {
   required bool isRegistered,
   required RegisterPhoneStatusAction onPressed,
+  String? titleOverride,
+  String? descriptionOverride,
+  String? buttonTextOverride,
 }) {
   return showDialog<bool>(
     context: context,
@@ -17,6 +20,9 @@ Future<bool?> showRegisterPhoneStatusPopup(
       return _RegisterPhoneStatusPopup(
         isRegistered: isRegistered,
         onPressed: onPressed,
+        titleOverride: titleOverride,
+        descriptionOverride: descriptionOverride,
+        buttonTextOverride: buttonTextOverride,
       );
     },
   );
@@ -25,10 +31,16 @@ Future<bool?> showRegisterPhoneStatusPopup(
 class _RegisterPhoneStatusPopup extends StatefulWidget {
   final bool isRegistered;
   final RegisterPhoneStatusAction onPressed;
+  final String? titleOverride;
+  final String? descriptionOverride;
+  final String? buttonTextOverride;
 
   const _RegisterPhoneStatusPopup({
     required this.isRegistered,
     required this.onPressed,
+    this.titleOverride,
+    this.descriptionOverride,
+    this.buttonTextOverride,
   });
 
   @override
@@ -39,16 +51,21 @@ class _RegisterPhoneStatusPopup extends StatefulWidget {
 class _RegisterPhoneStatusPopupState extends State<_RegisterPhoneStatusPopup> {
   bool _isLoading = false;
 
-  String get _title => widget.isRegistered
-      ? 'Nomor telepon telah terdaftar'
-      : 'Nomor telepon berhasil diverifikasi';
+  String get _title =>
+      widget.titleOverride ??
+      (widget.isRegistered
+          ? 'Nomor telepon telah terdaftar'
+          : 'Nomor telepon berhasil diverifikasi');
 
-  String get _description => widget.isRegistered
-      ? 'Akun Anda telah terdaftar. Silahkan atur kata sandi baru untuk mengakses akun tersebut.'
-      : 'Nomor telepon Anda berhasil diverifikasi. Silahkan lengkapi data diri untuk membuat akun Proteksi Plus.';
+  String get _description =>
+      widget.descriptionOverride ??
+      (widget.isRegistered
+          ? 'Akun Anda telah terdaftar. Silahkan atur kata sandi baru untuk mengakses akun tersebut.'
+          : 'Nomor telepon Anda berhasil diverifikasi. Silahkan lengkapi data diri untuk membuat akun Proteksi Plus.');
 
   String get _buttonText =>
-      widget.isRegistered ? 'Atur Kata Sandi' : 'Lengkapi Data';
+      widget.buttonTextOverride ??
+      (widget.isRegistered ? 'Atur Kata Sandi' : 'Lengkapi Data');
 
   Future<void> _handlePressed() async {
     if (_isLoading) return;

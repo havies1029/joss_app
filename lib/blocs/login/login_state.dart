@@ -25,3 +25,12 @@ class LoginFailure extends LoginState {
   @override
   String toString() => ' LoginFailure { error: $error }';
 }
+
+class LoginUnverifiedRegister extends LoginState {
+  final String initialPhone;
+
+  const LoginUnverifiedRegister({this.initialPhone = ''});
+
+  @override
+  List<Object> get props => [initialPhone];
+}

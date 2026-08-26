@@ -13,6 +13,7 @@ import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import 'package:joss_app/pages/login/mobile/forgot/new_forgot_page/new_forgot_password_page.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
 import 'package:joss_app/pages/register/mobile/client/register_phone_gate_page.dart';
+import 'package:joss_app/pages/register/mobile/client/widget/register_phone_status_popup_widget.dart';
 
 class NewLoginFormClient extends StatefulWidget {
   final String requestFrom;
@@ -313,6 +314,45 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
     return "No Handphone atau Kata Sandi Anda salah!";
   }
 
+  Future<void> _handleUnverifiedRegister(
+    LoginUnverifiedRegister state,
+  ) async {
+    _hideGlobalLoading();
+
+    if (mounted) {
+      setState(() {
+        isSubmitting = false;
+      });
+    }
+
+    bool shouldNavigate = false;
+    await showRegisterPhoneStatusPopup(
+      context,
+      isRegistered: true,
+      titleOverride: 'Verifikasi Diperlukan',
+      descriptionOverride:
+          'Nomor telepon atau email Anda belum terverifikasi, silakan lakukan verifikasi terlebih dahulu.',
+      buttonTextOverride: 'Verifikasi',
+      onPressed: () async {
+        shouldNavigate = true;
+        return true;
+      },
+    );
+
+    if (!mounted || !shouldNavigate) return;
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => RegisterPhoneGatePage(
+          requestFrom: widget.requestFrom.isEmpty
+              ? 'daftarclient_page'
+              : widget.requestFrom,
+          initialPhone: state.initialPhone,
+        ),
+      ),
+    );
+  }
+
   void onLoginButtonPressed() {
     BlocProvider.of<LoginBloc>(context).add(
       LoginButtonPressed(
@@ -342,6 +382,11 @@ class _NewLoginFormClientState extends State<NewLoginFormClient>
           listeners: [
             BlocListener<LoginBloc, LoginState>(
               listener: (context, state) {
+                if (state is LoginUnverifiedRegister) {
+                  _handleUnverifiedRegister(state);
+                  return;
+                }
+
                 if (state is LoginFailure) {
                   _hideGlobalLoading();
 

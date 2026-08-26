@@ -7,6 +7,41 @@ import 'package:joss_app/models/authentication/auth_model.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/models/user/user_model.dart';
 
+class LoginUnverifiedRegisterException implements Exception {
+  final String rawData;
+  final String userId;
+  final String phone;
+  final String email;
+
+  const LoginUnverifiedRegisterException({
+    required this.rawData,
+    required this.userId,
+    required this.phone,
+    required this.email,
+  });
+
+  factory LoginUnverifiedRegisterException.fromResponseBody(String body) {
+    String data = body;
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is String) {
+        data = decoded;
+      }
+    } catch (_) {}
+
+    final parts = data.split(';');
+    return LoginUnverifiedRegisterException(
+      rawData: data,
+      userId: parts.length > 1 ? parts[1] : '',
+      phone: parts.length > 2 ? parts[2] : '',
+      email: parts.length > 3 ? parts[3] : '',
+    );
+  }
+
+  @override
+  String toString() => rawData;
+}
+
 class LoginApi {
   final _base = AppData.apiDomain;
 
@@ -46,6 +81,13 @@ class LoginApi {
         //debugPrint("Error : ${e.toString()}");
         rethrow;
       }
+    } else if (response.statusCode == 409) {
+      final error =
+          LoginUnverifiedRegisterException.fromResponseBody(response.body);
+      if (error.rawData.startsWith('UNVERIFIED_REGISTER')) {
+        throw error;
+      }
+      throw Exception(error.rawData);
     } else {
       //debugPrint("validateUserLogin #25");
       //debugPrint(jsonDecode(response.body));

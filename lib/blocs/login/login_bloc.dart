@@ -1,4 +1,6 @@
 import 'dart:async';
+
+import 'package:joss_app/apis/login/login_api.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/authentication/authentication_bloc.dart';
 import 'package:joss_app/common/app_data.dart';
@@ -66,6 +68,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         ),
       );
       emit(LoginPostAuthenticate());
+    } on LoginUnverifiedRegisterException catch (error) {
+      final input = event.email.trim();
+      final initialPhone = input.contains('@')
+          ? ''
+          : (error.phone.isNotEmpty ? error.phone : input);
+
+      emit(LoginUnverifiedRegister(initialPhone: initialPhone));
     } catch (error) {
       emit(LoginFailure(error: "username atau password salah"));
     }
