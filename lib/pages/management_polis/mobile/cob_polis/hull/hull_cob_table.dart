@@ -76,22 +76,18 @@ class _HullCobTableState extends State<HullCobTable> {
       selectedIds: widget.selectedIds,
       idGetter: _selectionId,
       nomorGetter: (d, index) => (index + 1).toString(),
-
       title: widget.title,
       readOnly: widget.readOnly,
       showFooter: widget.showFooter,
-
       hasReachedMax: context.watch<AsethullCariBloc>().state.hasReachedMax,
       isFetching: context.watch<AsethullCariBloc>().state.isFetching,
       onLoadMore: () {
         context.read<AsethullCariBloc>().add(FetchAsethullCariEvent());
       },
-
       onSelect: widget.onSelect,
       onUnselect: widget.onUnselect,
       onSelectItem: widget.onSelectItem,
       onClearSelectedItem: widget.onClearSelectedItem,
-
       onSelectExtra: (d) {
         if (d.prosesId.isNotEmpty) {
           widget.selectedProsesId(d.prosesId);
@@ -101,17 +97,14 @@ class _HullCobTableState extends State<HullCobTable> {
           widget.onSelectFilePolisHullId(d.filePolisId);
         }
       },
-
       onUnselectExtra: (d) {
         if (d.filePolisId.isNotEmpty) {
           widget.onUnselectFilePolisHullId(d.filePolisId);
         }
       },
-
       onOpenDetail: (context, d) {
         _showSuccessPopup(context, d);
       },
-
       columns: [
         if (showColumn)
           CobPolicyColumn<AsethullCariModel>(
@@ -159,7 +152,7 @@ class _HullCobTableState extends State<HullCobTable> {
         CobPolicyColumn<AsethullCariModel>(
           title: "PERIODE",
           valueGetter: (d) =>
-          "${cobPolicyFormatDate(d.periodeMulai)} - ${cobPolicyFormatDate(d.periodeAkhir)}",
+              "${cobPolicyFormatDate(d.periodeMulai)} - ${cobPolicyFormatDate(d.periodeAkhir)}",
           normalFlex: 2.2,
           compactWidth: 180,
           normalMaxLines: 2,
@@ -216,7 +209,7 @@ class _HullCobTableState extends State<HullCobTable> {
           showIcon: false,
           header: 'Detail Polis Belum Tersedia',
           description:
-          'Detail polis belum dapat ditampilkan karena polis masih dalam proses.',
+              'Detail polis belum dapat ditampilkan karena polis masih dalam proses.',
           buttonText: 'Mengerti',
           onPressed: () {
             // optional action
@@ -227,17 +220,12 @@ class _HullCobTableState extends State<HullCobTable> {
       return;
     }
 
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return MediaQuery.removeViewInsets(
-          context: dialogContext,
-          removeBottom: true,
-          child: DetailPolisHullTablePage(
-            sppa1Id: asetHullId,
-          ),
-        );
-      },
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DetailPolisHullTablePage(
+          sppa1Id: asetHullId,
+        ),
+      ),
     );
   }
 }

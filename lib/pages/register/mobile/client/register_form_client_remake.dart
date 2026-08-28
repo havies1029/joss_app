@@ -19,6 +19,7 @@ import '../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../widgets/apptheme/phone_number_field.dart';
 import '../../../login/welcome_header.dart';
 import '../../../../common/constants.dart';
+import 'register_phone_gate_page.dart';
 import 'widget/register_otp_popup_widget.dart';
 import 'widget/register_phone_status_popup_widget.dart';
 
@@ -603,6 +604,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         onSaveCallback: (value) => fieldComboMReferral = value,
       );
 
+  // ignore: unused_element
   Widget _buildLoginFooter(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -631,17 +633,14 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   }
 
   void handleBack() {
-    if (widget.requestFrom == 'daftarclient_page') {
-      Navigator.of(context).popUntil((route) => route.isFirst);
-      return;
-    }
-
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
-      return;
-    }
-
-    Navigator.of(context).popUntil((route) => route.isFirst);
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => RegisterPhoneGatePage(
+          requestFrom: widget.requestFrom,
+          initialPhone: _hpOtpTarget(fieldTeleponController.text),
+        ),
+      ),
+    );
   }
 
   @override
@@ -846,8 +845,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
                                             onSubmit();
                                           },
                                   ),
-                                  SizedBox(height: vPadding),
-                                  _buildLoginFooter(context),
                                 ],
                               ),
                             ),

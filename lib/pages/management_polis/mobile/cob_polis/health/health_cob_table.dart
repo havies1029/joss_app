@@ -52,7 +52,6 @@ class HealthCobTable extends StatefulWidget {
 }
 
 class _HealthCobTableState extends State<HealthCobTable> {
-
   String formatNum(num? value) =>
       NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
 
@@ -76,22 +75,18 @@ class _HealthCobTableState extends State<HealthCobTable> {
       selectedIds: widget.selectedIds,
       idGetter: _selectionId,
       nomorGetter: (d, index) => d.nomor.toString(),
-
       title: widget.title,
       readOnly: widget.readOnly,
       showFooter: widget.showFooter,
-
       hasReachedMax: context.watch<AsetHealthCariBloc>().state.hasReachedMax,
       isFetching: context.watch<AsetHealthCariBloc>().state.isFetching,
       onLoadMore: () {
         context.read<AsetHealthCariBloc>().add(FetchAsetHealthCariEvent());
       },
-
       onSelect: widget.onSelect,
       onUnselect: widget.onUnselect,
       onSelectItem: widget.onSelectItem,
       onClearSelectedItem: widget.onClearSelectedItem,
-
       onSelectExtra: (d) {
         if (d.prosesId.isNotEmpty) {
           widget.selectedProsesId(d.prosesId);
@@ -101,17 +96,14 @@ class _HealthCobTableState extends State<HealthCobTable> {
           widget.onSelectFilePolisHealthId(d.filePolisId);
         }
       },
-
       onUnselectExtra: (d) {
         if (d.filePolisId.isNotEmpty) {
           widget.onUnselectFilePolisHealthId(d.filePolisId);
         }
       },
-
       onOpenDetail: (context, d) {
         _showSuccessPopup(context, d);
       },
-
       columns: [
         if (showColumn)
           CobPolicyColumn<AsetHealthCariModel>(
@@ -153,7 +145,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
         CobPolicyColumn<AsetHealthCariModel>(
           title: "PERIODE",
           valueGetter: (d) =>
-          "${cobPolicyFormatDate(d.periodeMulai)} - ${cobPolicyFormatDate(d.periodeAkhir)}",
+              "${cobPolicyFormatDate(d.periodeMulai)} - ${cobPolicyFormatDate(d.periodeAkhir)}",
           normalFlex: 2.2,
           compactWidth: 180,
           normalMaxLines: 2,
@@ -202,7 +194,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
           showIcon: false,
           header: 'Detail Polis Belum Tersedia',
           description:
-          'Detail polis belum dapat ditampilkan karena polis masih dalam proses.',
+              'Detail polis belum dapat ditampilkan karena polis masih dalam proses.',
           buttonText: 'Mengerti',
           onPressed: () {
             // optional action
@@ -213,17 +205,12 @@ class _HealthCobTableState extends State<HealthCobTable> {
       return;
     }
 
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return MediaQuery.removeViewInsets(
-          context: dialogContext,
-          removeBottom: true,
-          child: DetailPolisHealthTablePage(
-            sppa1Id: asetHealthId,
-          ),
-        );
-      },
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DetailPolisHealthTablePage(
+          sppa1Id: asetHealthId,
+        ),
+      ),
     );
   }
 }

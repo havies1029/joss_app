@@ -54,7 +54,6 @@ class KargoCobTable extends StatefulWidget {
 }
 
 class _KargoCobTableState extends State<KargoCobTable> {
-
   String formatNum(num? value) =>
       NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
 
@@ -78,22 +77,18 @@ class _KargoCobTableState extends State<KargoCobTable> {
       selectedIds: widget.selectedIds,
       idGetter: _selectionId,
       nomorGetter: (d, index) => d.nomor.toString(),
-
       title: widget.title,
       readOnly: widget.readOnly,
       showFooter: widget.showFooter,
-
       hasReachedMax: context.watch<AsetothersCariBloc>().state.hasReachedMax,
       isFetching: context.watch<AsetothersCariBloc>().state.isFetching,
       onLoadMore: () {
         context.read<AsetothersCariBloc>().add(FetchAsetothersCariEvent());
       },
-
       onSelect: widget.onSelect,
       onUnselect: widget.onUnselect,
       onSelectItem: widget.onSelectItem,
       onClearSelectedItem: widget.onClearSelectedItem,
-
       onSelectExtra: (d) {
         if (d.prosesId.isNotEmpty) {
           widget.selectedProsesId(d.prosesId);
@@ -103,17 +98,14 @@ class _KargoCobTableState extends State<KargoCobTable> {
           widget.onSelectFilePolisHealthId(d.filePolisId);
         }
       },
-
       onUnselectExtra: (d) {
         if (d.filePolisId.isNotEmpty) {
           widget.onUnselectFilePolisHealthId(d.filePolisId);
         }
       },
-
       onOpenDetail: (context, d) {
         _showSuccessPopup(context, d);
       },
-
       columns: [
         if (showColumn)
           CobPolicyColumn<AsetothersCariModel>(
@@ -161,7 +153,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
         CobPolicyColumn<AsetothersCariModel>(
           title: "PERIODE",
           valueGetter: (d) =>
-          "${cobPolicyFormatDate(d.periodeMulai)} - ${cobPolicyFormatDate(d.periodeAkhir)}",
+              "${cobPolicyFormatDate(d.periodeMulai)} - ${cobPolicyFormatDate(d.periodeAkhir)}",
           normalFlex: 2.2,
           compactWidth: 180,
           normalMaxLines: 2,
@@ -218,7 +210,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
           showIcon: false,
           header: 'Detail Polis Belum Tersedia',
           description:
-          'Detail polis belum dapat ditampilkan karena polis masih dalam proses.',
+              'Detail polis belum dapat ditampilkan karena polis masih dalam proses.',
           buttonText: 'Mengerti',
           onPressed: () {
             // optional action
@@ -229,17 +221,12 @@ class _KargoCobTableState extends State<KargoCobTable> {
       return;
     }
 
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return MediaQuery.removeViewInsets(
-          context: dialogContext,
-          removeBottom: true,
-          child: DetailPolisOthersTablePage(
-            sppa1Id: asetOthersId,
-          ),
-        );
-      },
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DetailPolisOthersTablePage(
+          sppa1Id: asetOthersId,
+        ),
+      ),
     );
   }
 }

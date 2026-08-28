@@ -31,7 +31,7 @@ class AppData {
   //production = true
   //testing = false
 
-  static bool useSSL = false;
+  static bool useSSL = true;
 
   static String apiAuthority = isProduction
       ? "eassisttoolsapi.smartsoft-id.com"

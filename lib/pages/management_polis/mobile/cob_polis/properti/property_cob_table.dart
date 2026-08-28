@@ -73,22 +73,18 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
       selectedIds: widget.selectedIds,
       idGetter: _selectionId,
       nomorGetter: (d, index) => d.nomor.toString(),
-
       title: widget.title,
       readOnly: widget.readOnly,
       showFooter: widget.showFooter,
-
       hasReachedMax: context.watch<AsetParCariBloc>().state.hasReachedMax,
       isFetching: context.watch<AsetParCariBloc>().state.isFetching,
       onLoadMore: () {
         context.read<AsetParCariBloc>().add(FetchAsetParCariEvent());
       },
-
       onSelect: widget.onSelect,
       onUnselect: widget.onUnselect,
       onSelectItem: widget.onSelectItem,
       onClearSelectedItem: widget.onClearSelectedItem,
-
       onSelectExtra: (d) {
         if (d.prosesId.isNotEmpty) {
           widget.selectedProsesId(d.prosesId);
@@ -101,7 +97,6 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           widget.onSelectFilePolisEqId(d.filePolisEqId);
         }
       },
-
       onUnselectExtra: (d) {
         if (d.filePolisParId.isNotEmpty) {
           widget.onUnselectFilePolisParId(d.filePolisParId);
@@ -110,11 +105,9 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           widget.onUnselectFilePolisEqId(d.filePolisEqId);
         }
       },
-
       onOpenDetail: (context, d) {
         _showSuccessPopup(context, d);
       },
-
       columns: [
         if (showColumn)
           CobPolicyColumn<AsetParCariModel>(
@@ -156,7 +149,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
         CobPolicyColumn<AsetParCariModel>(
           title: "PERIODE",
           valueGetter: (d) =>
-          "${cobPolicyFormatDate(d.periodeMulai)} - ${cobPolicyFormatDate(d.periodeAkhir)}",
+              "${cobPolicyFormatDate(d.periodeMulai)} - ${cobPolicyFormatDate(d.periodeAkhir)}",
           normalFlex: 1.8,
           compactWidth: 180,
           normalMaxLines: 2,
@@ -205,7 +198,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           showIcon: false,
           header: 'Detail Polis Belum Tersedia',
           description:
-          'Detail polis belum dapat ditampilkan karena polis masih dalam proses.',
+              'Detail polis belum dapat ditampilkan karena polis masih dalam proses.',
           buttonText: 'Mengerti',
           onPressed: () {
             // optional action
@@ -216,17 +209,12 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
       return;
     }
 
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return MediaQuery.removeViewInsets(
-          context: dialogContext,
-          removeBottom: true,
-          child: DetailPolisParTablePage(
-            sppa1Id: asetParId,
-          ),
-        );
-      },
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DetailPolisParTablePage(
+          sppa1Id: asetParId,
+        ),
+      ),
     );
   }
 }

@@ -24,7 +24,7 @@ class DetailPolisTable<T> extends StatefulWidget {
     this.narrowBreakpoint = 900,
     this.headerHeight = 52,
     this.rowHeight = 52,
-    this.maxVisibleRows = 10,
+    this.maxVisibleRows = 6,
   });
 
   @override
@@ -71,31 +71,13 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
     final width = MediaQuery.of(context).size.width;
     final isNarrow = width < widget.narrowBreakpoint;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final maxVisibleRows = _maxRowsForHeight(constraints);
-        return isNarrow
-            ? _buildCompactTable(maxVisibleRows)
-            : _buildNormalTable(maxVisibleRows);
-      },
-    );
-  }
-
-  int _maxRowsForHeight(BoxConstraints constraints) {
-    if (!constraints.maxHeight.isFinite) return widget.maxVisibleRows;
-
-    final availableBodyHeight =
-        constraints.maxHeight - widget.headerHeight - 12;
-    if (availableBodyHeight <= widget.rowHeight) return 1;
-
-    final rowsByHeight = availableBodyHeight ~/ widget.rowHeight;
-    return rowsByHeight.clamp(1, widget.maxVisibleRows).toInt();
+    return isNarrow ? _buildCompactTable() : _buildNormalTable();
   }
 
   Widget _emptyState() {
     return Container(
       width: double.infinity,
-      height: 220,
+      height: 160,
       decoration: _boxDecoration(),
       alignment: Alignment.center,
       child: Text(
@@ -107,9 +89,9 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
     );
   }
 
-  Widget _buildCompactTable(int maxVisibleRows) {
-    final useVerticalScroll = widget.items.length > maxVisibleRows;
-    final bodyHeight = maxVisibleRows * widget.rowHeight;
+  Widget _buildCompactTable() {
+    final useVerticalScroll = widget.items.length > widget.maxVisibleRows;
+    final bodyHeight = widget.maxVisibleRows * widget.rowHeight;
     final tableHeight = widget.headerHeight + bodyHeight + 12;
 
     return ClipRRect(
@@ -187,10 +169,10 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
     );
   }
 
-  Widget _buildNormalTable(int maxVisibleRows) {
-    final useVerticalScroll = widget.items.length > maxVisibleRows;
+  Widget _buildNormalTable() {
+    final useVerticalScroll = widget.items.length > widget.maxVisibleRows;
     final tableHeight =
-        widget.headerHeight + (maxVisibleRows * widget.rowHeight) + 12;
+        widget.headerHeight + (widget.maxVisibleRows * widget.rowHeight) + 12;
     final table = Table(
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       border: _tableBorder(),

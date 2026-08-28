@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../../blocs/gen_detail_sts_sppa/mdetailstssppacari_bloc.dart';
 import '../../../../../blocs/gen_aset_mv/sppa2mvcari_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../common/loading_indicator.dart';
+import '../../../../base/base_background_sidepage.dart';
+import '../../../../gen_button_cob_app/button_group_detail_sts_sppa.dart';
 import '../../../../../widgets/listpage_filter_bar_ui.dart';
 import 'detail_polis_mv_table_widget.dart';
 
@@ -69,106 +72,83 @@ class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: hPadding * 1.5,
-        vertical: hPadding * 1.5,
-      ),
-      backgroundColor: pGrey,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: const BorderSide(color: sGrey),
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildHeader(context),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.all(hPadding),
-              child: ListPageFilterBarUIWidget(
+    final selectedDetailStatusId =
+        context.select<MDetailStsSppaCariBloc, String>(
+      (bloc) => bloc.state.selectedDetailStsSppaId,
+    );
+
+    return BaseBackgroundSidePage(
+      title: 'Detail Polis',
+      child: Container(
+        color: secondaryBlackColor,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            hPadding * 1.5,
+            hPadding,
+            hPadding * 1.5,
+            hPadding,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const ButtonGroupDetailStsSppaWidget(),
+              const SizedBox(height: hPadding),
+              Text(
+                'Detail Polis MV',
+                style: bodyTextStyle(
+                  context,
+                  fontSize: getResponsiveFont(context, 16),
+                ),
+              ),
+              const SizedBox(height: hPadding),
+              ListPageFilterBarUIWidget(
                 searchController: searchController,
                 searchButton: buildSearchButton(),
-                hintText: "No Plat/Merk Kendaraan",
+                hintText: 'No Plat/Merk Kendaraan',
               ),
-            ),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.all(hPadding),
-              child: BlocBuilder<Sppa2mvCariBloc, Sppa2mvCariState>(
-                buildWhen: (p, c) =>
-                    p.status != c.status ||
-                    p.items != c.items ||
-                    p.hasReachedMax != c.hasReachedMax ||
-                    p.isFetching != c.isFetching,
-                builder: (context, state) {
-                  if (state.status == ListStatus.initial) {
-                    return const SizedBox(
-                      height: 160,
-                      child: Center(child: LoadingIndicator()),
-                    );
-                  }
+              const SizedBox(height: hPadding),
+              Expanded(
+                child: selectedDetailStatusId == '10001'
+                    ? BlocBuilder<Sppa2mvCariBloc, Sppa2mvCariState>(
+                        buildWhen: (p, c) =>
+                            p.status != c.status ||
+                            p.items != c.items ||
+                            p.hasReachedMax != c.hasReachedMax ||
+                            p.isFetching != c.isFetching,
+                        builder: (context, state) {
+                          if (state.status == ListStatus.initial) {
+                            return const Center(child: LoadingIndicator());
+                          }
 
-                  if (state.status == ListStatus.failure) {
-                    return SizedBox(
-                      height: 160,
-                      child: _buildEmptyState("Gagal memuat data."),
-                    );
-                  }
+                          if (state.status == ListStatus.failure) {
+                            return _buildEmptyState('Gagal memuat data.');
+                          }
 
-                  if (state.items.isEmpty) {
-                    return SizedBox(
-                      height: 160,
-                      child: _buildEmptyState("Data polis tidak ditemukan."),
-                    );
-                  }
+                          if (state.items.isEmpty) {
+                            return _buildEmptyState(
+                                'Data polis tidak ditemukan.');
+                          }
 
-                  return DetailPolisMvTableWidget(
-                    items: state.items,
-                    isLoadingMore: state.isFetching,
-                    onLoadMore: () {
-                      if (!state.hasReachedMax && !state.isFetching) {
-                        context
-                            .read<Sppa2mvCariBloc>()
-                            .add(FetchSppa2mvCariEvent());
-                      }
-                    },
-                  );
-                },
+                          return Align(
+                            alignment: Alignment.topCenter,
+                            child: DetailPolisMvTableWidget(
+                              items: state.items,
+                              isLoadingMore: state.isFetching,
+                              onLoadMore: () {
+                                if (!state.hasReachedMax && !state.isFetching) {
+                                  context
+                                      .read<Sppa2mvCariBloc>()
+                                      .add(FetchSppa2mvCariEvent());
+                                }
+                              },
+                            ),
+                          );
+                        },
+                      )
+                    : const SizedBox.shrink(),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: SizedBox(
-        height: 48,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Text(
-              "Detail Polis MV",
-              style: bodyTextStyle(
-                context,
-                fontSize: getResponsiveFont(context, 16),
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: IconButton(
-                icon: const Icon(Icons.close),
-                color: primaryLightColor,
-                onPressed: () => Navigator.pop(context),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

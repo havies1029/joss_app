@@ -230,6 +230,7 @@ import 'blocs/gen_sppamv/sppamvlist_bloc.dart';
 import 'blocs/gen_sppapar/sppaparcrud_bloc.dart';
 import 'blocs/gen_sppapar/sppaparlist_bloc.dart';
 
+import 'blocs/gen_detail_sts_sppa/mdetailstssppacari_bloc.dart';
 import 'blocs/gen_status_aset/statusasetcari_bloc.dart';
 import 'blocs/gen_aset_dashboard/asetdashboardcari_bloc.dart';
 import 'blocs/gen_aset_health/asethealthcari_bloc.dart';
@@ -523,6 +524,7 @@ Future<void> main() async {
 
         // Aset
         BlocProvider(create: (_) => StatusAsetCariBloc()),
+        BlocProvider(create: (_) => MDetailStsSppaCariBloc()),
         BlocProvider(create: (_) => AsethullCariBloc()),
         BlocProvider(create: (_) => AsetRingkasanCariBloc()),
         BlocProvider(create: (_) => AsetParCariBloc()),

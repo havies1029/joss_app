@@ -68,22 +68,18 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
       selectedIds: widget.selectedIds,
       idGetter: _selectionId,
       nomorGetter: (d, index) => d.nomor.toString(),
-
       title: widget.title,
       readOnly: widget.readOnly,
       showFooter: widget.showFooter,
-
       hasReachedMax: context.watch<AsetMvCariBloc>().state.hasReachedMax,
       isFetching: context.watch<AsetMvCariBloc>().state.isFetching,
       onLoadMore: () {
         context.read<AsetMvCariBloc>().add(FetchAsetMvCariEvent());
       },
-
       onSelect: widget.onSelect,
       onUnselect: widget.onUnselect,
       onSelectItem: widget.onSelectItem,
       onClearSelectedItem: widget.onClearSelectedItem,
-
       onSelectExtra: (d) {
         if (d.prosesId.isNotEmpty) {
           widget.selectedProsesId(d.prosesId);
@@ -93,17 +89,14 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
           widget.onSelectFilePolisMvId(d.filePolisId);
         }
       },
-
       onUnselectExtra: (d) {
         if (d.filePolisId.isNotEmpty) {
           widget.onUnselectFilePolisMvId(d.filePolisId);
         }
       },
-
       onOpenDetail: (context, d) {
         _showSuccessPopup(context, d);
       },
-
       columns: [
         if (showColumn)
           CobPolicyColumn<AsetMvCariModel>(
@@ -151,7 +144,7 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
         CobPolicyColumn<AsetMvCariModel>(
           title: "PERIODE",
           valueGetter: (d) =>
-          "${cobPolicyFormatDate(d.periodeMulai)} - ${cobPolicyFormatDate(d.periodeAkhir)}",
+              "${cobPolicyFormatDate(d.periodeMulai)} - ${cobPolicyFormatDate(d.periodeAkhir)}",
           normalFlex: 2.0,
           compactWidth: 170,
           normalMaxLines: 1,
@@ -208,7 +201,7 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
           showIcon: false,
           header: 'Detail Polis Belum Tersedia',
           description:
-          'Detail polis belum dapat ditampilkan karena polis masih dalam proses.',
+              'Detail polis belum dapat ditampilkan karena polis masih dalam proses.',
           buttonText: 'Mengerti',
           onPressed: () {
             // optional action
@@ -219,17 +212,12 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
       return;
     }
 
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return MediaQuery.removeViewInsets(
-          context: dialogContext,
-          removeBottom: true,
-          child: DetailPolisMvTablePage(
-            sppa1Id: asetMvId,
-          ),
-        );
-      },
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DetailPolisMvTablePage(
+          sppa1Id: asetMvId,
+        ),
+      ),
     );
   }
 }

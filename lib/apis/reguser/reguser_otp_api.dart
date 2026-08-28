@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/models/reguser/reguser_otp_model.dart';
@@ -10,6 +11,10 @@ class ReguserOtpApi {
     final endpoint = "${AppData.prefixEndPoint}/api/reguser/otp/send";
     final queryParams = {"modul_id": "regUserOtpKirimAPI"};
     final uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
+    final body = jsonEncode(record.toJson());
+
+    debugPrint('[REGUSER_OTP_KIRIM] URI: $uri');
+    debugPrint('[REGUSER_OTP_KIRIM] PAYLOAD: $body');
 
     try {
       final response = await http.post(
@@ -18,22 +23,39 @@ class ReguserOtpApi {
           'Content-Type': 'application/json; odata=verbose',
           'Accept': 'application/json; odata=verbose',
         },
-        body: jsonEncode(record.toJson()),
+        body: body,
       );
 
+      debugPrint('[REGUSER_OTP_KIRIM] STATUS: ${response.statusCode}');
+      debugPrint('[REGUSER_OTP_KIRIM] BODY: ${response.body}');
+
       if (response.statusCode == 200) {
-        return ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+        try {
+          return ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+        } catch (e, st) {
+          debugPrint('[REGUSER_OTP_KIRIM] JSON PARSE ERROR: $e');
+          debugPrint('[REGUSER_OTP_KIRIM] JSON PARSE STACK: $st');
+
+          return ReturnDataAPI(
+            success: false,
+            data: 'Response OTP tidak valid: ${response.body}',
+            rowcount: 0,
+          );
+        }
       }
 
       return ReturnDataAPI(
         success: false,
-        data: "Gagal mengirim OTP.",
+        data:
+        'HTTP ${response.statusCode}: ${response.body.isNotEmpty ? response.body : response.reasonPhrase ?? 'Tidak ada response body'}',
         rowcount: 0,
       );
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('[REGUSER_OTP_KIRIM] EXCEPTION: $e');
+
       return ReturnDataAPI(
         success: false,
-        data: "Gagal mengirim OTP.",
+        data: 'Exception saat kirim OTP: $e',
         rowcount: 0,
       );
     }
