@@ -3,26 +3,29 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../../blocs/gen_detail_sts_sppa/mdetailstssppacari_bloc.dart';
 import '../../../../../blocs/gen_aset_mv/sppa2mvcari_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../common/loading_indicator.dart';
-import '../../../../base/base_background_sidepage.dart';
 import '../../../../../widgets/listpage_filter_bar_ui.dart';
+import '../../../../base/base_background_sidepage.dart';
+import '../../../../gen_button_cob_app/button_group_detail_sts_sppa.dart';
 import 'detail_polis_mv_table_widget.dart';
 
-class DetailPolisMvTablePage extends StatefulWidget {
+class DetailPolisMvTablePageV2 extends StatefulWidget {
   final String sppa1Id;
 
-  const DetailPolisMvTablePage({
+  const DetailPolisMvTablePageV2({
     super.key,
     required this.sppa1Id,
   });
 
   @override
-  State<DetailPolisMvTablePage> createState() => _DetailPolisMvTablePageState();
+  State<DetailPolisMvTablePageV2> createState() =>
+      _DetailPolisMvTablePageV2State();
 }
 
-class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
+class _DetailPolisMvTablePageV2State extends State<DetailPolisMvTablePageV2> {
   late final Sppa2mvCariBloc sppa2mvCariBloc;
 
   final TextEditingController searchController = TextEditingController();
@@ -70,6 +73,11 @@ class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedDetailStatusId =
+        context.select<MDetailStsSppaCariBloc, String>(
+      (bloc) => bloc.state.selectedDetailStsSppaId,
+    );
+
     return BaseBackgroundSidePage(
       title: 'Detail Polis',
       child: Container(
@@ -84,8 +92,10 @@ class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const ButtonGroupDetailStsSppaWidget(),
+              const SizedBox(height: hPadding),
               Text(
-                'Detail Polis MV',
+                'Detail Polis MV V2',
                 style: bodyTextStyle(
                   context,
                   fontSize: getResponsiveFont(context, 16),
@@ -99,41 +109,45 @@ class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
               ),
               const SizedBox(height: hPadding),
               Expanded(
-                child: BlocBuilder<Sppa2mvCariBloc, Sppa2mvCariState>(
-                  buildWhen: (p, c) =>
-                      p.status != c.status ||
-                      p.items != c.items ||
-                      p.hasReachedMax != c.hasReachedMax ||
-                      p.isFetching != c.isFetching,
-                  builder: (context, state) {
-                    if (state.status == ListStatus.initial) {
-                      return const Center(child: LoadingIndicator());
-                    }
-
-                    if (state.status == ListStatus.failure) {
-                      return _buildEmptyState('Gagal memuat data.');
-                    }
-
-                    if (state.items.isEmpty) {
-                      return _buildEmptyState('Data polis tidak ditemukan.');
-                    }
-
-                    return Align(
-                      alignment: Alignment.topCenter,
-                      child: DetailPolisMvTableWidget(
-                        items: state.items,
-                        isLoadingMore: state.isFetching,
-                        onLoadMore: () {
-                          if (!state.hasReachedMax && !state.isFetching) {
-                            context
-                                .read<Sppa2mvCariBloc>()
-                                .add(FetchSppa2mvCariEvent());
+                child: selectedDetailStatusId == '10001'
+                    ? BlocBuilder<Sppa2mvCariBloc, Sppa2mvCariState>(
+                        buildWhen: (p, c) =>
+                            p.status != c.status ||
+                            p.items != c.items ||
+                            p.hasReachedMax != c.hasReachedMax ||
+                            p.isFetching != c.isFetching,
+                        builder: (context, state) {
+                          if (state.status == ListStatus.initial) {
+                            return const Center(child: LoadingIndicator());
                           }
+
+                          if (state.status == ListStatus.failure) {
+                            return _buildEmptyState('Gagal memuat data.');
+                          }
+
+                          if (state.items.isEmpty) {
+                            return _buildEmptyState(
+                              'Data polis tidak ditemukan.',
+                            );
+                          }
+
+                          return Align(
+                            alignment: Alignment.topCenter,
+                            child: DetailPolisMvTableWidget(
+                              items: state.items,
+                              isLoadingMore: state.isFetching,
+                              onLoadMore: () {
+                                if (!state.hasReachedMax && !state.isFetching) {
+                                  context
+                                      .read<Sppa2mvCariBloc>()
+                                      .add(FetchSppa2mvCariEvent());
+                                }
+                              },
+                            ),
+                          );
                         },
-                      ),
-                    );
-                  },
-                ),
+                      )
+                    : const SizedBox.shrink(),
               ),
             ],
           ),

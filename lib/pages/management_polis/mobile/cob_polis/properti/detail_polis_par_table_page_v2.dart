@@ -3,31 +3,34 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../../blocs/gen_detail_sts_sppa/mdetailstssppacari_bloc.dart';
 import '../../../../../blocs/gen_aset_par/sppa2parcari_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../common/loading_indicator.dart';
-import '../../../../base/base_background_sidepage.dart';
 import '../../../../../widgets/listpage_filter_bar_ui.dart';
+import '../../../../base/base_background_sidepage.dart';
+import '../../../../gen_button_cob_app/button_group_detail_sts_sppa.dart';
 import 'detail_polis_par_table_widget.dart';
 
-class DetailPolisParTablePage extends StatefulWidget {
+class DetailPolisParTablePageV2 extends StatefulWidget {
   final String sppa1Id;
 
-  const DetailPolisParTablePage({
+  const DetailPolisParTablePageV2({
     super.key,
     required this.sppa1Id,
   });
 
   @override
-  State<DetailPolisParTablePage> createState() =>
-      _DetailPolisParTablePageState();
+  State<DetailPolisParTablePageV2> createState() =>
+      _DetailPolisParTablePageV2State();
 }
 
-class _DetailPolisParTablePageState extends State<DetailPolisParTablePage> {
+class _DetailPolisParTablePageV2State extends State<DetailPolisParTablePageV2> {
   late final Sppa2parCariBloc sppa2parCariBloc;
 
   final TextEditingController searchController = TextEditingController();
   Timer? _searchTimer;
+
   @override
   void initState() {
     super.initState();
@@ -70,6 +73,11 @@ class _DetailPolisParTablePageState extends State<DetailPolisParTablePage> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedDetailStatusId =
+        context.select<MDetailStsSppaCariBloc, String>(
+      (bloc) => bloc.state.selectedDetailStsSppaId,
+    );
+
     return BaseBackgroundSidePage(
       title: 'Detail Polis',
       child: Container(
@@ -84,8 +92,10 @@ class _DetailPolisParTablePageState extends State<DetailPolisParTablePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const ButtonGroupDetailStsSppaWidget(),
+              const SizedBox(height: hPadding),
               Text(
-                'Detail Polis PAR',
+                'Detail Polis PAR V2',
                 style: bodyTextStyle(
                   context,
                   fontSize: getResponsiveFont(context, 16),
@@ -99,41 +109,45 @@ class _DetailPolisParTablePageState extends State<DetailPolisParTablePage> {
               ),
               const SizedBox(height: hPadding),
               Expanded(
-                child: BlocBuilder<Sppa2parCariBloc, Sppa2parCariState>(
-                  buildWhen: (p, c) =>
-                      p.status != c.status ||
-                      p.items != c.items ||
-                      p.hasReachedMax != c.hasReachedMax ||
-                      p.isFetching != c.isFetching,
-                  builder: (context, state) {
-                    if (state.status == ListStatus.initial) {
-                      return const Center(child: LoadingIndicator());
-                    }
-
-                    if (state.status == ListStatus.failure) {
-                      return _buildEmptyState('Gagal memuat data.');
-                    }
-
-                    if (state.items.isEmpty) {
-                      return _buildEmptyState('Data polis tidak ditemukan.');
-                    }
-
-                    return Align(
-                      alignment: Alignment.topCenter,
-                      child: DetailPolisParTableWidget(
-                        items: state.items,
-                        isLoadingMore: state.isFetching,
-                        onLoadMore: () {
-                          if (!state.hasReachedMax && !state.isFetching) {
-                            context
-                                .read<Sppa2parCariBloc>()
-                                .add(FetchSppa2parCariEvent());
+                child: selectedDetailStatusId == '10001'
+                    ? BlocBuilder<Sppa2parCariBloc, Sppa2parCariState>(
+                        buildWhen: (p, c) =>
+                            p.status != c.status ||
+                            p.items != c.items ||
+                            p.hasReachedMax != c.hasReachedMax ||
+                            p.isFetching != c.isFetching,
+                        builder: (context, state) {
+                          if (state.status == ListStatus.initial) {
+                            return const Center(child: LoadingIndicator());
                           }
+
+                          if (state.status == ListStatus.failure) {
+                            return _buildEmptyState('Gagal memuat data.');
+                          }
+
+                          if (state.items.isEmpty) {
+                            return _buildEmptyState(
+                              'Data polis tidak ditemukan.',
+                            );
+                          }
+
+                          return Align(
+                            alignment: Alignment.topCenter,
+                            child: DetailPolisParTableWidget(
+                              items: state.items,
+                              isLoadingMore: state.isFetching,
+                              onLoadMore: () {
+                                if (!state.hasReachedMax && !state.isFetching) {
+                                  context
+                                      .read<Sppa2parCariBloc>()
+                                      .add(FetchSppa2parCariEvent());
+                                }
+                              },
+                            ),
+                          );
                         },
-                      ),
-                    );
-                  },
-                ),
+                      )
+                    : const SizedBox.shrink(),
               ),
             ],
           ),
