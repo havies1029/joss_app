@@ -45,17 +45,47 @@ class LoginUnverifiedRegisterException implements Exception {
 class LoginApi {
   final _base = AppData.apiDomain;
 
+  String _maskLoginResponseBody(String body) {
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is String) {
+        final parts = decoded.split(";");
+        if (parts.isNotEmpty) {
+          parts[0] = "<token hidden>";
+        }
+        return jsonEncode(parts.join(";"));
+      }
+    } catch (_) {}
+
+    return "<body hidden, length: ${body.length}>";
+  }
+
   Future<User> validateUserLoginAPI(UserLogin userLogin) async {
     String tokenEndpoint = "api/login/apilogin";
     final tokenURL = _base + tokenEndpoint;
     UserInfo userinfo = UserInfo(userLogin: userLogin);
+    final requestBody = jsonEncode(userinfo.toJson());
+
+    debugPrint("========== LOGIN REQUEST ==========");
+    debugPrint("URL      : $tokenURL");
+    debugPrint("METHOD   : POST");
+    debugPrint("BODY     : ${jsonEncode({
+          "userinfo": {
+            "email": userLogin.email,
+            "password": (userLogin.password?.isEmpty ?? true) ? "" : "********",
+          }
+        })}");
 
     final http.Response response = await http.post(Uri.parse(tokenURL),
         headers: <String, String>{
           'Content-Type': 'application/json; odata=verbos',
           'Accept': 'application/json; odata=verbos',
         },
-        body: jsonEncode(userinfo.toJson()));
+        body: requestBody);
+
+    debugPrint("========== LOGIN RESPONSE ==========");
+    debugPrint("STATUS CODE : ${response.statusCode}");
+    debugPrint("BODY        : ${_maskLoginResponseBody(response.body)}");
 
 
     if (response.statusCode == 200) {
@@ -99,12 +129,21 @@ class LoginApi {
     String urlGetUserEndPoint = "${AppData.prefixEndPoint}/api/login/getuser";
 
     var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetUserEndPoint);
+    debugPrint("========== GET USER REQUEST ==========");
+    debugPrint("URL      : $uri");
+    debugPrint("METHOD   : GET");
+    debugPrint("TOKEN    : ${token.isEmpty ? '' : '<token hidden>'}");
+
     final http.Response response =
         await http.get(uri, headers: <String, String>{
       'Content-Type': 'application/json; odata=verbos',
       'Accept': 'application/json; odata=verbos',
       'Authorization': 'Bearer $token'
     });
+
+    debugPrint("========== GET USER RESPONSE ==========");
+    debugPrint("STATUS CODE : ${response.statusCode}");
+    debugPrint("BODY        : ${response.body}");
 
     if (response.statusCode == 200) {
       String result = jsonDecode(response.body);

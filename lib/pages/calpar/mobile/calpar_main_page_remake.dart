@@ -155,6 +155,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
   //form1
   final fieldCoverBulanController = TextEditingController();
+  final fieldRKonstruksiojkController = TextEditingController();
   ComboRKonstruksiojkModel? previousKonstruksi;
   ComboRKonstruksiojkModel? fieldComboRKonstruksiojk;
   final konstruksiKey =
@@ -165,6 +166,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   //form2
   final fieldBiIndexRateController = TextEditingController();
   final fieldBiTotalController = TextEditingController();
+  final fieldRMatauangController = TextEditingController();
   final fieldSiBiController = TextEditingController();
   final fieldSiBuildingController = TextEditingController();
   final fieldSiContentController = TextEditingController();
@@ -257,6 +259,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     fieldCoverBulanController.text = "12";
 
     _loadDefaultCurrency();
+    _loadDefaultRKonstruksiojk();
     _initForm2DefaultZero();
 
     expanded = List.filled(CalparFormSection.values.length, false);
@@ -266,7 +269,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   Future<void> _loadDefaultCurrency() async {
     final currencies = await ComboRMatauangRepository().getComboRMatauang();
 
-    if (!mounted || fieldComboRMatauang != null) return;
+    if (!mounted) return;
 
     ComboRMatauangModel? defaultCurrency;
     for (final currency in currencies) {
@@ -280,9 +283,74 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
     setState(() {
       fieldComboRMatauang = defaultCurrency;
+      fieldRMatauangController.text = defaultCurrency!.rmatauangSimbol;
       _defaultCurrencyApplied = true;
       fieldErrors.remove('form2.mataUang');
     });
+  }
+
+  Future<void> _loadDefaultRKonstruksiojk() async {
+    try {
+      final konstruksi =
+          await ComboRKonstruksiojkRepository().getComboRKonstruksiojkOne();
+
+      if (!mounted || konstruksi.isEmpty) return;
+
+      final defaultKonstruksi = konstruksi.first;
+
+      setState(() {
+        fieldComboRKonstruksiojk = defaultKonstruksi;
+        previousKonstruksi = defaultKonstruksi;
+        fieldRKonstruksiojkController.text = defaultKonstruksi.kelasNama;
+        fieldErrors.remove('form1.rkonstruksiojkId');
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        fieldRKonstruksiojkController.clear();
+      });
+    }
+  }
+
+  void _showKonstruksiInfo() {
+    final kelasNama = fieldComboRKonstruksiojk?.kelasNama ??
+        fieldRKonstruksiojkController.text;
+    final title = kelasNama.isEmpty ? "Konstruksi" : kelasNama;
+
+    showDialog<void>(
+      context: context,
+      builder: (_) => Dialog(
+        backgroundColor: formGrey,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: bodyTextStyle(context),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                getKonstruksiSubtitle(kelasNama),
+                style: bodyTextStyle(context, fontSize: 15)
+                    .copyWith(color: hintGrey),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 13),
+              AppButton.primary(
+                text: "OK",
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -293,11 +361,13 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
     //form1
     fieldCoverBulanController.dispose();
+    fieldRKonstruksiojkController.dispose();
     //form1
 
     //form2
     fieldBiIndexRateController.dispose();
     fieldBiTotalController.dispose();
+    fieldRMatauangController.dispose();
     fieldSiBiController.dispose();
     fieldSiBuildingController.dispose();
     fieldSiContentController.dispose();
@@ -359,6 +429,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       final konstruksi = record.comboRKonstruksiojk;
       if (fieldComboRKonstruksiojk == null && konstruksi != null) {
         fieldComboRKonstruksiojk = konstruksi;
+        fieldRKonstruksiojkController.text = konstruksi.kelasNama;
       }
 
       if (previousKonstruksi == null && konstruksi != null) {
@@ -416,9 +487,11 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       }
 
       final mataUang = record.comboRMatauang;
-      if ((fieldComboRMatauang == null || _defaultCurrencyApplied) &&
+      if (fieldComboRMatauang == null &&
+          !_defaultCurrencyApplied &&
           mataUang != null) {
         fieldComboRMatauang = mataUang;
+        fieldRMatauangController.text = mataUang.rmatauangSimbol;
         _defaultCurrencyApplied = false;
       }
     });
@@ -721,7 +794,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                         const SizedBox(height: hPadding),
                         buildFieldRokupasiId(),
                         const SizedBox(height: hPadding),
-                        buildFieldRkonstruksiojkId(),
+                        buildFieldDefaultRkonstruksiojkId(),
                         const SizedBox(height: 8),
                       ],
                     ),
@@ -741,7 +814,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                       children: [
                         Row(
                           children: [
-                            Flexible(child: buildFieldRmatauangKode()),
+                            Flexible(child: buildFieldDefaultRMatauangKode()),
                             const SizedBox(width: 8),
                             Flexible(child: buildFieldSiMachinery()),
                           ],
@@ -1609,6 +1682,25 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         onSaveCallback: (value) => fieldComboRKonstruksiojk = value,
       );
 
+  Widget buildFieldDefaultRkonstruksiojkId() => GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _showKonstruksiInfo,
+        child: appTextField(
+          label: "Konstruksi",
+          controller: fieldRKonstruksiojkController,
+          enabled: false,
+          suffixIcon: Padding(
+            padding: const EdgeInsets.all(12),
+            child: SvgPicture.asset(
+              "assets/icons/regother_ajukan.svg",
+              width: 22,
+              height: 22,
+            ),
+          ),
+          errorText: err('form1.rkonstruksiojkId'),
+        ),
+      );
+
   Widget buildFieldRokupasiId() => ReusableComboBoxV2<ComboROkupasiModel>(
         hintText: "Okupasi",
         initItem: fieldComboROkupasi,
@@ -1621,10 +1713,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           setState(() {
             fieldComboROkupasi = v;
             clearErr('form1.rokupasiId');
-            fieldComboRKonstruksiojk = null;
-            previousKonstruksi = null;
             clearErr('form1.rkonstruksiojkId');
           });
+          _loadDefaultRKonstruksiojk();
         },
         onSaveCallback: (value) => fieldComboROkupasi = value,
       );
@@ -1651,6 +1742,13 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           });
         },
         onSaveCallback: (value) => fieldComboRMatauang = value,
+      );
+
+  Widget buildFieldDefaultRMatauangKode() => appTextField(
+        label: "Mata Uang",
+        controller: fieldRMatauangController,
+        enabled: false,
+        errorText: err('form2.mataUang'),
       );
 
   Widget buildFieldSiBuilding() => appTextField(

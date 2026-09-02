@@ -168,7 +168,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   Future<void> _loadDefaultCurrency() async {
     final currencies = await ComboRMatauangRepository().getComboRMatauang();
 
-    if (!mounted || fieldComboUang != null) return;
+    if (!mounted) return;
 
     ComboRMatauangModel? defaultCurrency;
     for (final currency in currencies) {
@@ -182,6 +182,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
     setState(() {
       fieldComboUang = defaultCurrency;
+      fieldCurrIdController.text = defaultCurrency!.rmatauangSimbol;
       fieldErrors.remove('form1.mataUang');
     });
   }
@@ -578,7 +579,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                         const SizedBox(height: hPadding),
                         Row(
                           children: [
-                            Flexible(child: _buildComboCurddId()),
+                            Flexible(child: _buildFieldDefaultCurddId()),
                             const SizedBox(width: 8),
                             Flexible(child: buildFieldComboTahun()),
                           ],
@@ -1365,6 +1366,13 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
         onSaveCallback: (value) => fieldComboUang = value,
       );
 
+  Widget _buildFieldDefaultCurddId() => appTextField(
+        label: "Mata Uang",
+        controller: fieldCurrIdController,
+        enabled: false,
+        errorText: err('form1.mataUang'),
+      );
+
   Widget _buildFieldMmvpakaiId() => ReusableComboBoxV2<ComboMMvpakaiModel>(
         hintText: "Penggunaan",
         initItem: fieldComboMMvpakai,
@@ -1438,9 +1446,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
         onChanged: (v) {
           final clean = v.replaceAll(",", "").trim();
           final angka = double.tryParse(clean);
-          if (angka != null &&
-              angka > 0 &&
-              angka <= _maxHargaKendaraanValue) {
+          if (angka != null && angka > 0 && angka <= _maxHargaKendaraanValue) {
             clearErr('form1.hargaKendaraan');
           }
         },

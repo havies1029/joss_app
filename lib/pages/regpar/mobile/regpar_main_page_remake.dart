@@ -178,6 +178,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   final fieldCoverLamaController = TextEditingController();
   final fieldPolisAkhirController = TextEditingController();
   final fieldPolisMulaiController = TextEditingController();
+  final fieldRKonstruksiojkController = TextEditingController();
 
   ComboRKonstruksiojkModel? fieldComboRKonstruksiojk;
   final comboRKonstruksiojkKey =
@@ -226,6 +227,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   final fieldSiMachineryController = TextEditingController();
   final fieldSiOtherController = TextEditingController();
   final fieldSiStockController = TextEditingController();
+  final fieldRMatauangController = TextEditingController();
   ComboRMatauangModel? fieldComboRMatauang;
   final comboRMatauangKey =
       GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
@@ -289,6 +291,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         context.read<Regpar1CrudBloc>().state.record?.regpar1Id ?? "";
     regpar1Id = widget.regpar1Id ?? regpar1;
     _loadDefaultCurrency();
+    _loadDefaultRKonstruksiojk();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final now = DateTime.now();
@@ -307,7 +310,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Future<void> _loadDefaultCurrency() async {
     final currencies = await ComboRMatauangRepository().getComboRMatauang();
 
-    if (!mounted || fieldComboRMatauang != null) return;
+    if (!mounted) return;
 
     ComboRMatauangModel? defaultCurrency;
     for (final currency in currencies) {
@@ -321,9 +324,74 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
     setState(() {
       fieldComboRMatauang = defaultCurrency;
+      fieldRMatauangController.text = defaultCurrency!.rmatauangSimbol;
       _defaultCurrencyApplied = true;
       fieldErrors.remove('form4.mataUang');
     });
+  }
+
+  Future<void> _loadDefaultRKonstruksiojk() async {
+    try {
+      final konstruksi =
+          await ComboRKonstruksiojkRepository().getComboRKonstruksiojkOne();
+
+      if (!mounted || konstruksi.isEmpty) return;
+
+      final defaultKonstruksi = konstruksi.first;
+
+      setState(() {
+        fieldComboRKonstruksiojk = defaultKonstruksi;
+        previousKonstruksi = defaultKonstruksi;
+        fieldRKonstruksiojkController.text = defaultKonstruksi.kelasNama;
+        fieldErrors.remove('form2.kelasKonstruksi');
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        fieldRKonstruksiojkController.clear();
+      });
+    }
+  }
+
+  void _showKonstruksiInfo() {
+    final kelasNama = fieldComboRKonstruksiojk?.kelasNama ??
+        fieldRKonstruksiojkController.text;
+    final title = kelasNama.isEmpty ? "Konstruksi" : kelasNama;
+
+    showDialog<void>(
+      context: context,
+      builder: (_) => Dialog(
+        backgroundColor: formGrey,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: bodyTextStyle(context),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                getKonstruksiSubtitle(kelasNama),
+                style: bodyTextStyle(context, fontSize: 15)
+                    .copyWith(color: hintGrey),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 13),
+              AppButton.primary(
+                text: "OK",
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -342,6 +410,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     fieldCoverLamaController.dispose();
     fieldPolisAkhirController.dispose();
     fieldPolisMulaiController.dispose();
+    fieldRKonstruksiojkController.dispose();
 
     // form3
     fieldIsEqController.dispose();
@@ -356,6 +425,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     fieldSiMachineryController.dispose();
     fieldSiOtherController.dispose();
     fieldSiStockController.dispose();
+    fieldRMatauangController.dispose();
 
     // form5
     fieldDiskonNilaiController.dispose();
@@ -563,6 +633,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       if (fieldComboRKonstruksiojk == null &&
           record.comboRKonstruksiojk != null) {
         fieldComboRKonstruksiojk = record.comboRKonstruksiojk;
+        fieldRKonstruksiojkController.text =
+            record.comboRKonstruksiojk!.kelasNama;
       }
 
       if (fieldComboROkupasi == null && record.comboROkupasi != null) {
@@ -649,9 +721,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     }
 
     setState(() {
-      if ((fieldComboRMatauang == null || _defaultCurrencyApplied) &&
+      if (fieldComboRMatauang == null &&
+          !_defaultCurrencyApplied &&
           record.comboRMatauang != null) {
         fieldComboRMatauang = record.comboRMatauang;
+        fieldRMatauangController.text = record.comboRMatauang!.rmatauangSimbol;
         _defaultCurrencyApplied = false;
       }
     });
@@ -1170,7 +1244,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                             ),
                             buildFieldRokupasiId(),
                             const SizedBox(height: hPadding),
-                            buildFieldRkonstruksiojkId(),
+                            buildFieldDefaultRkonstruksiojkId(),
                             const SizedBox(height: hPadding),
                             buildFieldObjectAlamat(),
                             const SizedBox(height: hPadding),
@@ -1261,7 +1335,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                           children: [
                             Row(
                               children: [
-                                Flexible(child: _buildComboCurddId()),
+                                Flexible(child: _buildFieldDefaultCurddId()),
                                 const SizedBox(width: 8),
                                 Flexible(child: buildFieldSiMachinery()),
                               ],
@@ -2553,7 +2627,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
   void _startHitungPremiTimeout() {
     final attempt = ++_hitungPremiAttempt;
-    Future.delayed(const Duration(seconds: 10), () {
+    Future.delayed(const Duration(seconds: 12), () {
       if (!mounted ||
           attempt != _hitungPremiAttempt ||
           !_isHitungPremiLoading) {
@@ -3013,6 +3087,25 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         onSaveCallback: (value) => fieldComboRKonstruksiojk = value,
       );
 
+  Widget buildFieldDefaultRkonstruksiojkId() => GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _showKonstruksiInfo,
+        child: appTextField(
+          label: "Konstruksi",
+          controller: fieldRKonstruksiojkController,
+          enabled: false,
+          suffixIcon: Padding(
+            padding: const EdgeInsets.all(12),
+            child: SvgPicture.asset(
+              "assets/icons/regother_ajukan.svg",
+              width: 22,
+              height: 22,
+            ),
+          ),
+          errorText: err('form2.kelasKonstruksi'),
+        ),
+      );
+
   Widget buildFieldRokupasiId() => ReusableComboBoxV2<ComboROkupasiModel>(
         hintText: "Okupasi",
         comboKey: comboROkupasiKey,
@@ -3031,10 +3124,9 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               'form4.siOther',
             ]);
 
-            fieldComboRKonstruksiojk = null;
-            previousKonstruksi = null;
             clearErr('form2.kelasKonstruksi');
           });
+          _loadDefaultRKonstruksiojk();
           if (v != null) {
             regpar2formbloc?.add(
               ComboROkupasiChangedEvent(comboROkupasi: v),
@@ -3347,6 +3439,13 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
           });
         },
         onSaveCallback: (value) => fieldComboRMatauang = value,
+      );
+
+  Widget _buildFieldDefaultCurddId() => appTextField(
+        label: "Mata Uang",
+        controller: fieldRMatauangController,
+        enabled: false,
+        errorText: err('form4.mataUang'),
       );
 
   Widget buildFieldSiBuilding() => appTextField(

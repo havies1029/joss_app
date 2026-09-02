@@ -161,6 +161,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   final fieldPassangerCountController = TextEditingController();
   final fieldPllController = TextEditingController();
   final fieldTplController = TextEditingController();
+  final fieldRMatauangController = TextEditingController();
   ComboRMatauangModel? fieldComboRMatauang;
   final comboRMatauangKey =
       GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
@@ -268,7 +269,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   Future<void> _loadDefaultCurrency() async {
     final currencies = await ComboRMatauangRepository().getComboRMatauang();
 
-    if (!mounted || fieldComboRMatauang != null) return;
+    if (!mounted) return;
 
     ComboRMatauangModel? defaultCurrency;
     for (final currency in currencies) {
@@ -282,6 +283,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
     setState(() {
       fieldComboRMatauang = defaultCurrency;
+      fieldRMatauangController.text = defaultCurrency!.rmatauangSimbol;
       _defaultCurrencyApplied = true;
       fieldErrors.remove('form2.mataUang');
     });
@@ -314,6 +316,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     fieldPassangerCountController.dispose();
     fieldPllController.dispose();
     fieldTplController.dispose();
+    fieldRMatauangController.dispose();
     //form2
 
     //form3
@@ -571,9 +574,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         if (v.isNotEmpty) selectedPassengerCount = v;
       }
 
-      if ((fieldComboRMatauang == null || _defaultCurrencyApplied) &&
+      if (fieldComboRMatauang == null &&
+          !_defaultCurrencyApplied &&
           record.comboRMatauang != null) {
         fieldComboRMatauang = record.comboRMatauang;
+        fieldRMatauangController.text = record.comboRMatauang!.rmatauangSimbol;
         _defaultCurrencyApplied = false;
       }
 
@@ -1180,7 +1185,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                             const SizedBox(height: hPadding),
                             Row(
                               children: [
-                                Flexible(child: _buildComboCurddId()),
+                                Flexible(child: _buildFieldDefaultCurddId()),
                                 const SizedBox(width: 8),
                                 const Flexible(child: SizedBox.shrink()),
                               ],
@@ -1262,7 +1267,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                                 const SizedBox(width: 8),
                                 Flexible(child: _buildHargaMobil()),
                               ],
-
                             ),
                             const SizedBox(height: hPadding),
                             _buildComboMWilayah(),
@@ -2785,7 +2789,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   void _startHitungPremiTimeout() {
     final attempt = ++_hitungPremiAttempt;
-    Future.delayed(const Duration(seconds: 10), () {
+    Future.delayed(const Duration(seconds: 12), () {
       if (!mounted ||
           attempt != _hitungPremiAttempt ||
           !_isHitungPremiLoading) {
@@ -3707,6 +3711,13 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onSaveCallback: (value) => fieldComboRMatauang = value,
       );
 
+  Widget _buildFieldDefaultCurddId() => appTextField(
+        label: "Mata Uang",
+        controller: fieldRMatauangController,
+        enabled: false,
+        errorText: err('form2.mataUang'),
+      );
+
   Widget _buildComboMMvjnscover() => ReusableComboBoxV2<ComboMMvjnscoverModel>(
         hintText: "Jenis Jaminan",
         initItem: fieldComboMMvjnscover,
@@ -4002,9 +4013,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onChanged: (v) {
           final clean = v.replaceAll(",", "").trim();
           final angka = double.tryParse(clean);
-          if (angka != null &&
-              angka > 0 &&
-              angka <= _maxHargaKendaraanValue) {
+          if (angka != null && angka > 0 && angka <= _maxHargaKendaraanValue) {
             clearErr('form3.hargaMobil');
           }
           _clearBackendValidationForChangedField('form3.hargaMobil');

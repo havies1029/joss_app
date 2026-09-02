@@ -27,14 +27,14 @@ class AppData {
   // static String prefixEndPoint = "";a
   // static String httpAuthority = "eassisttoolsapi.smartsoft-id.com";
 
-  static const bool isProduction = false; //cukup ganti ke true jika ingin menggunakan production version
+  static const bool isProduction = true; //cukup ganti ke true jika ingin menggunakan production version
   //production = true
   //testing = false
 
   static bool useSSL = true;
-
   static String apiAuthority = isProduction
       ? "eassisttoolsapi.smartsoft-id.com"
+      // ? "eassisttoolstestapi.smartsoft-id.com"
       : "eassisttoolsv2api.smartsoft-id.com";
 
   static String adminApiAuthority = isProduction
