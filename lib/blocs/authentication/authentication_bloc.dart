@@ -68,7 +68,13 @@ class AuthenticationBloc
 
     debugPrint("hasToken ?");
     if (token.isNotEmpty) {
-      var user = await userRepository.getUserByToken(token);
+      User? user;
+      try {
+        user = await userRepository.getUserByToken(token);
+      } catch (error) {
+        debugPrint("Failed to restore user from token: $error");
+        user = null;
+      }
 
       if (user == null) {
         debugPrint("Invalid token, proceed to unauthenticated");

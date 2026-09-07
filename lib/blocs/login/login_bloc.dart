@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:joss_app/apis/login/login_api.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
 import 'package:joss_app/blocs/authentication/authentication_bloc.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/repositories/user/user_repository.dart';
@@ -75,6 +77,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           : (error.phone.isNotEmpty ? error.phone : input);
 
       emit(LoginUnverifiedRegister(initialPhone: initialPhone));
+    } on SocketException {
+      emit(LoginFailure(error: "Tidak dapat terhubung ke server"));
+    } on TimeoutException {
+      emit(LoginFailure(error: "Koneksi ke server timeout"));
+    } on http.ClientException {
+      emit(LoginFailure(error: "Tidak dapat terhubung ke server"));
     } catch (error) {
       emit(LoginFailure(error: "username atau password salah"));
     }

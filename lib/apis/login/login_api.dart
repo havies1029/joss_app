@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -76,12 +77,14 @@ class LoginApi {
           }
         })}");
 
-    final http.Response response = await http.post(Uri.parse(tokenURL),
-        headers: <String, String>{
-          'Content-Type': 'application/json; odata=verbos',
-          'Accept': 'application/json; odata=verbos',
-        },
-        body: requestBody);
+    final http.Response response = await http
+        .post(Uri.parse(tokenURL),
+            headers: <String, String>{
+              'Content-Type': 'application/json; odata=verbos',
+              'Accept': 'application/json; odata=verbos',
+            },
+            body: requestBody)
+        .timeout(const Duration(seconds: 30));
 
     debugPrint("========== LOGIN RESPONSE ==========");
     debugPrint("STATUS CODE : ${response.statusCode}");
@@ -134,12 +137,23 @@ class LoginApi {
     debugPrint("METHOD   : GET");
     debugPrint("TOKEN    : ${token.isEmpty ? '' : '<token hidden>'}");
 
-    final http.Response response =
-        await http.get(uri, headers: <String, String>{
-      'Content-Type': 'application/json; odata=verbos',
-      'Accept': 'application/json; odata=verbos',
-      'Authorization': 'Bearer $token'
-    });
+    late final http.Response response;
+    try {
+      response = await http.get(uri, headers: <String, String>{
+        'Content-Type': 'application/json; odata=verbos',
+        'Accept': 'application/json; odata=verbos',
+        'Authorization': 'Bearer $token'
+      }).timeout(const Duration(seconds: 30));
+    } on SocketException catch (e) {
+      debugPrint("GET USER network error: $e");
+      return null;
+    } on TimeoutException catch (e) {
+      debugPrint("GET USER timeout: $e");
+      return null;
+    } on http.ClientException catch (e) {
+      debugPrint("GET USER client error: $e");
+      return null;
+    }
 
     debugPrint("========== GET USER RESPONSE ==========");
     debugPrint("STATUS CODE : ${response.statusCode}");

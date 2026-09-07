@@ -17,6 +17,7 @@ class RegmvValidationPreviewRequestModel {
   int passangerCount;
   String? mwilayahId;
   String platNo;
+  String rangkaNo;
   String? mmvmerkId;
   String? mmvtipeId;
   String? mmvmodelId;
@@ -44,6 +45,7 @@ class RegmvValidationPreviewRequestModel {
     required this.passangerCount,
     this.mwilayahId,
     required this.platNo,
+    required this.rangkaNo,
     this.mmvmerkId,
     this.mmvtipeId,
     this.mmvmodelId,
@@ -72,6 +74,7 @@ class RegmvValidationPreviewRequestModel {
         'passangerCount': passangerCount.toString(),
         'mwilayahId': mwilayahId,
         'platNo': platNo,
+        'rangkaNo': rangkaNo,
         'mmvmerkId': mmvmerkId,
         'mmvtipeId': mmvtipeId,
         'mmvmodelId': mmvmodelId,

@@ -2290,6 +2290,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       passangerCount: int.tryParse(selectedPassengerCount.trim()) ?? 0,
       mwilayahId: fieldComboMWilayah?.mwilayahId,
       platNo: fieldPlatNoController.text.trim(),
+      rangkaNo: fieldRangkaNoController.text.trim(),
       mmvmerkId: fieldComboMMvmerk?.mmvmerkId,
       mmvtipeId: fieldComboMMvtipe?.mmvtipeId,
       mmvmodelId: fieldComboMMvmodel?.mmvmodelId,
