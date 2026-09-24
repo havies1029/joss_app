@@ -20,6 +20,7 @@ class RiwayatTablePageRemake extends StatefulWidget {
 class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
   final ScrollController _vController = ScrollController();
   final ScrollController _hController = ScrollController();
+  final Set<String> _expandedPolisKeys = {};
 
   bool _fetchLock = false;
 
@@ -116,21 +117,21 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
       child: isNo
           ? Center(
-        child: Text(
-          text,
-          style: const TextStyle(
-            fontSize: 15,
-            color: primaryLightColor,
-          ),
-        ),
-      )
+              child: Text(
+                text,
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: primaryLightColor,
+                ),
+              ),
+            )
           : Text(
-        text,
-        style: const TextStyle(
-          fontSize: 15,
-          color: primaryLightColor,
-        ),
-      ),
+              text,
+              style: const TextStyle(
+                fontSize: 15,
+                color: primaryLightColor,
+              ),
+            ),
     );
   }
 
@@ -140,6 +141,7 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
       children: [
         _headerCell("NO"),
         _headerCell("NO PEMBAYARAN"),
+        _headerCell("NO POLIS"),
         _headerCell("TANGGAL\nDIBAYAR"),
         _headerCell("JUMLAH\nPOLIS"),
         _headerCell("STATUS"),
@@ -149,10 +151,10 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
   }
 
   Widget _cell(
-      String text, {
-        bool center = false,
-        bool right = false,
-      }) {
+    String text, {
+    bool center = false,
+    bool right = false,
+  }) {
     final t = Text(
       text,
       style: const TextStyle(
@@ -168,6 +170,85 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
     return Padding(
       padding: const EdgeInsets.all(6),
       child: child,
+    );
+  }
+
+  List<String> _wrapPolisNoLines(String polisNo, {int maxChars = 28}) {
+    final items = polisNo
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+
+    if (items.isEmpty) return const ['-'];
+
+    final rows = <String>[];
+    var current = '';
+
+    for (final item in items) {
+      final candidate = current.isEmpty ? item : '$current, $item';
+      if (current.isNotEmpty && candidate.length > maxChars) {
+        rows.add(current);
+        current = item;
+      } else {
+        current = candidate;
+      }
+    }
+
+    if (current.isNotEmpty) rows.add(current);
+    return rows;
+  }
+
+  Widget _cellPolisNo(HistorybayarCariModel d) {
+    final key = d.inv1Id;
+    final isExpanded = _expandedPolisKeys.contains(key);
+    final rows = _wrapPolisNoLines(d.polisNo);
+    final canExpand = rows.length > 2;
+    final visibleRows = isExpanded || !canExpand ? rows : rows.take(2).toList();
+
+    final style = const TextStyle(
+      color: primaryLightColor,
+      fontSize: 15,
+      height: 1.25,
+    );
+
+    final linkStyle = style.copyWith(
+      color: dBlue,
+      fontWeight: FontWeight.w600,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.all(6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () => _onTapRow(d),
+            child: Text(
+              visibleRows.join('\n'),
+              style: style,
+            ),
+          ),
+          if (canExpand)
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                setState(() {
+                  if (isExpanded) {
+                    _expandedPolisKeys.remove(key);
+                  } else {
+                    _expandedPolisKeys.add(key);
+                  }
+                });
+              },
+              child: Text(
+                isExpanded ? 'lihat lebih sedikit' : 'lihat lebih banyak',
+                style: linkStyle,
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -187,6 +268,7 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
       children: [
         _tapWrap(d, _cell((index + 1).toString(), center: true)),
         _tapWrap(d, _cell(d.inv1Id)),
+        _cellPolisNo(d),
         _tapWrap(d, _cell(formatDate(d.invTgl))),
         _tapWrap(d, _cell(d.jmlPolis.toString())),
         _tapWrap(d, _cell(d.status)),
@@ -230,12 +312,13 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
                       3: IntrinsicColumnWidth(),
                       4: IntrinsicColumnWidth(),
                       5: IntrinsicColumnWidth(),
+                      6: IntrinsicColumnWidth(),
                     },
                     children: [
                       _headerRow(),
                       ...items.asMap().entries.map(
                             (e) => _row(e.value, e.key),
-                      ),
+                          ),
                     ],
                   ),
                 ),
@@ -260,16 +343,17 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
             columnWidths: const {
               0: FlexColumnWidth(1),
               1: FlexColumnWidth(3),
-              2: FlexColumnWidth(2),
+              2: FlexColumnWidth(3),
               3: FlexColumnWidth(2),
               4: FlexColumnWidth(2),
-              5: FlexColumnWidth(3),
+              5: FlexColumnWidth(2),
+              6: FlexColumnWidth(3),
             },
             children: [
               _headerRow(),
               ...items.asMap().entries.map(
                     (e) => _row(e.value, e.key),
-              ),
+                  ),
             ],
           ),
         ),
@@ -283,7 +367,7 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
 
     return BlocBuilder<HistorybayarCariBloc, HistorybayarCariState>(
       buildWhen: (p, c) =>
-      p.status != c.status ||
+          p.status != c.status ||
           p.items != c.items ||
           p.isLoaded != c.isLoaded ||
           p.isLoading != c.isLoading,
@@ -301,10 +385,10 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
           // padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
           child: Column(
             children: [
-              isNarrow ? _buildTableCompact(state.items) : _buildTableNormal(state.items),
-
+              isNarrow
+                  ? _buildTableCompact(state.items)
+                  : _buildTableNormal(state.items),
               const SizedBox(height: 16),
-
               if (state.isLoading)
                 const Padding(
                   padding: EdgeInsets.only(bottom: 16),

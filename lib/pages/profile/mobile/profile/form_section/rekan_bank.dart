@@ -96,11 +96,13 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                     listenWhen: (prev, curr) =>
                         prev.isLoaded != curr.isLoaded ||
                         prev.isSaved != curr.isSaved,
-                    listener: (context, state) {
+                    listener: (context, state) async {
                       if (state.isLoaded && _isFirstLoad) {
                         if (state.record != null) {
-                          _injectPayload(state.record!);
+                          await _injectPayload(state.record!);
                         }
+
+                        if (!mounted) return;
 
                         if (mounted) {
                           setState(() {
@@ -201,13 +203,25 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
     );
   }
 
-  void _injectPayload(MRekanBankCrudModel record) {
+  Future<void> _injectPayload(MRekanBankCrudModel record) async {
     fieldMrekan1IdController.text = record.mrekan1Id;
     fieldRekNamaController.text = record.rekNama;
     fieldRekNoController.text = record.rekNo;
 
     if (record.comboMBank != null) {
       fieldComboMBank = record.comboMBank;
+    } else if ((record.mbankId ?? '').isNotEmpty) {
+      try {
+        final banks = await ComboMBankRepository().getComboMBank();
+        for (final bank in banks) {
+          if (bank.mbankId == record.mbankId) {
+            fieldComboMBank = bank;
+            break;
+          }
+        }
+      } catch (_) {
+        fieldComboMBank = null;
+      }
     }
 
     if (record.mrekanbankId.isNotEmpty) {

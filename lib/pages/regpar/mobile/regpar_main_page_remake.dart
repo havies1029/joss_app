@@ -1641,21 +1641,19 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   }) {
     return Padding(
       padding: padding,
-      child: Stack(
-        children: [
-          child,
-          if (isLoading)
-            Positioned.fill(
-              child: Container(
-                color: pGrey,
-                alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 32),
-                  child: LoadingIndicator(),
-                ),
-              ),
-            ),
-        ],
+      child: isLoading ? _buildSectionLoadingPlaceholder() : child,
+    );
+  }
+
+  Widget _buildSectionLoadingPlaceholder() {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final loadingHeight = (screenHeight * 0.32).clamp(220.0, 360.0);
+
+    return SizedBox(
+      width: double.infinity,
+      height: loadingHeight,
+      child: const Center(
+        child: LoadingIndicator(),
       ),
     );
   }

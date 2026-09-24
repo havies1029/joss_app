@@ -69,7 +69,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
     if (visibleEnough) {
       _visibilityTimers[key] ??= Timer(
-        const Duration(milliseconds: 700),
+        const Duration(milliseconds: 500),
             () {
           if (!mounted) return;
 

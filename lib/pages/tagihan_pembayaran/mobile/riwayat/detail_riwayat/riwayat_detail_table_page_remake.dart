@@ -6,13 +6,11 @@ import 'package:joss_app/blocs/payment/historybayar2cari_bloc.dart';
 import 'package:joss_app/blocs/payment/historybayarcari_bloc.dart';
 // import 'package:joss_app/pages/payment/mobile/riwayat/detail_riwayat/riwayat_table_widget_remake.dart';
 
-
 import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../common/loading_indicator.dart';
 import '../../../../../helper/pdf_open_helper.dart';
 import '../../../../../models/payment/historybayarcari_model.dart';
-import '../../../../../widgets/apptheme/register_client_pop_up.dart';
 import 'riwayat_table_widget_remake.dart';
 
 class RiwayatDetailTablePageRemake extends StatefulWidget {
@@ -20,15 +18,18 @@ class RiwayatDetailTablePageRemake extends StatefulWidget {
   const RiwayatDetailTablePageRemake({super.key, required this.inv1Id});
 
   @override
-  RiwayatDetailTablePageRemakeState createState() => RiwayatDetailTablePageRemakeState();
+  RiwayatDetailTablePageRemakeState createState() =>
+      RiwayatDetailTablePageRemakeState();
 }
 
-class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRemake> {
+class RiwayatDetailTablePageRemakeState
+    extends State<RiwayatDetailTablePageRemake> {
   late Historybayar2CariBloc historybayar2cariBloc;
   late HistorybayarCariBloc historybayarCariBloc;
 
   final _dateFmt = DateFormat('dd MMM yyyy');
   String _fmtNum(num v) => NumberFormat.decimalPattern().format(v);
+  bool _isDetailLoading = true;
 
   @override
   void initState() {
@@ -36,9 +37,7 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
     historybayarCariBloc = context.read<HistorybayarCariBloc>();
     historybayar2cariBloc = context.read<Historybayar2CariBloc>();
 
-    Future.delayed(const Duration(milliseconds: 500), () {
-      refreshData();
-    });
+    refreshData();
   }
 
   bool _isGlobalLoadingShown = false;
@@ -107,20 +106,16 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
                 ),
               ),
             ),
-
             const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: hPadding * 1.5,
                 vertical: hPadding,
               ),
-              child:
-              BlocConsumer<HistorybayarCariBloc, HistorybayarCariState>(
-                buildWhen: (p, c) =>
-                p.selectedItem != c.selectedItem,
+              child: BlocConsumer<HistorybayarCariBloc, HistorybayarCariState>(
+                buildWhen: (p, c) => p.selectedItem != c.selectedItem,
                 listenWhen: (prev, curr) =>
-                prev.isDownloading != curr.isDownloading ||
+                    prev.isDownloading != curr.isDownloading ||
                     prev.downloadPath != curr.downloadPath,
                 listener: (context, state) async {
                   if (state.isDownloading) {
@@ -153,83 +148,101 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
                   final selected = state.selectedItem;
                   if (selected == null) return const LoadingIndicator();
 
+                  final isContinuePayment = selected.stsInvId == '10002';
+                  final canDownloadInvoice = selected.isActive;
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _buildPay1SummaryFromModel(selected),
-
                       const SizedBox(height: hPadding),
                       const Divider(height: 1),
                       const SizedBox(height: hPadding),
-
-                      SingleChildScrollView(
-                        child: RiwayatTableWidgetRemake(),
+                      BlocListener<Historybayar2CariBloc,
+                          Historybayar2CariState>(
+                        listenWhen: (prev, curr) =>
+                            prev.status != curr.status ||
+                            prev.inv1Id != curr.inv1Id,
+                        listener: (context, state) {
+                          if (state.inv1Id == widget.inv1Id &&
+                              state.status == ListStatus.success &&
+                              _isDetailLoading) {
+                            setState(() {
+                              _isDetailLoading = false;
+                            });
+                          }
+                        },
+                        child: _isDetailLoading
+                            ? const Center(child: LoadingIndicator())
+                            : const SingleChildScrollView(
+                                child: RiwayatTableWidgetRemake(),
+                              ),
                       ),
-
                       const SizedBox(height: hPadding),
                       const Divider(height: 1),
                       const SizedBox(height: hPadding),
-
                       _buildTotalBayar(selected),
-
                       const SizedBox(height: hPadding),
-
                       Align(
                         alignment: Alignment.centerRight,
                         child: AppButton.iconLeft(
-                          text: selected.stsInvId == '10002'
+                          text: isContinuePayment
                               ? 'Lanjut Pembayaran'
                               : 'Unduh Invoice',
-                          backgroundColor: selected.stsInvId == '10002'
+                          backgroundColor: isContinuePayment
                               ? primaryColor
                               : greenforPayment,
                           icon: SvgPicture.asset(
-                            selected.stsInvId == '10002'
+                            isContinuePayment
                                 ? 'assets/icons/unduh_invoice.svg'
                                 : 'assets/icons/invoice.svg',
                             width: 18,
                             height: 18,
                           ),
-                          onPressed: () {
-                            if (selected.stsInvId == '10002') {
-                              context.read<DnRekap2invBloc>().add(
-                                SetPaymentSummaryEvent(
-                                  curr: '', // isi kalau ada currency
-                                  totalBayar: selected.totalBayar,
-                                ),
-                              );
+                          onPressed: !isContinuePayment && !canDownloadInvoice
+                              ? null
+                              : () {
+                                  if (isContinuePayment) {
+                                    context.read<DnRekap2invBloc>().add(
+                                          SetPaymentSummaryEvent(
+                                            curr: '', // isi kalau ada currency
+                                            totalBayar: selected.totalBayar,
+                                          ),
+                                        );
 
-                              context.read<DnRekap2invBloc>().add(
-                                CheckInvoiceStatusEvent(
-                                  invoiceId: selected.inv1Id,
-                                  source: InvoiceStatusCheckSource.riwayatContinuePayment,
-                                ),
-                                // SetPaymentSummaryEvent(curr: state.)
-                              );
-                              // showDialog(
-                              //   context: context,
-                              //   barrierDismissible: true,
-                              //   barrierColor: Colors.black.withOpacity(0.6),
-                              //   builder: (dialogContext) => RegisterClientPopUp(
-                              //     showIcon: false,
-                              //     header: 'Fitur pembayaran belum tersedia.',
-                              //     description:
-                              //     'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
-                              //     buttonText: 'Mengerti',
-                              //     onPressed: () {
-                              //       Navigator.of(dialogContext).pop();
-                              //     },
-                              //   ),
-                              // );
-                            } else {
-                              _showGlobalLoading();
+                                    context.read<DnRekap2invBloc>().add(
+                                          CheckInvoiceStatusEvent(
+                                            invoiceId: selected.inv1Id,
+                                            source: InvoiceStatusCheckSource
+                                                .riwayatContinuePayment,
+                                          ),
+                                          // SetPaymentSummaryEvent(curr: state.)
+                                        );
+                                    // showDialog(
+                                    //   context: context,
+                                    //   barrierDismissible: true,
+                                    //   barrierColor: Colors.black.withOpacity(0.6),
+                                    //   builder: (dialogContext) => RegisterClientPopUp(
+                                    //     showIcon: false,
+                                    //     header: 'Fitur pembayaran belum tersedia.',
+                                    //     description:
+                                    //     'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
+                                    //     buttonText: 'Mengerti',
+                                    //     onPressed: () {
+                                    //       Navigator.of(dialogContext).pop();
+                                    //     },
+                                    //   ),
+                                    // );
+                                  } else {
+                                    _showGlobalLoading();
 
-                              // klik -> event -> bloc set isDownloading=true -> loading langsung muncul
-                              context.read<HistorybayarCariBloc>().add(
-                                DownloadInvoiceEvent(noInv: selected.inv1Id),
-                              );
-                            }
-                          },
+                                    // klik -> event -> bloc set isDownloading=true -> loading langsung muncul
+                                    context.read<HistorybayarCariBloc>().add(
+                                          DownloadInvoiceEvent(
+                                              noInv: selected.inv1Id),
+                                        );
+                                  }
+                                },
                         ),
                       ),
                     ],
@@ -246,7 +259,7 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
   Widget _buildPay1SummaryFromModel(HistorybayarCariModel model) {
     final title = bodyTextStyle(context, fontSize: 14);
     final value =
-    bodyTextStyle(context, fontSize: 14).copyWith(color: hintGrey);
+        bodyTextStyle(context, fontSize: 14).copyWith(color: hintGrey);
 
     return Column(
       children: [
@@ -258,7 +271,6 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
           ],
         ),
         const SizedBox(height: hPadding),
-
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -267,7 +279,6 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
           ],
         ),
         const SizedBox(height: hPadding),
-
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -279,13 +290,12 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
     );
   }
 
-
   Widget _buildTotalBayar(HistorybayarCariModel model) {
     final title = bodyTextStyle(context, fontSize: 14);
     final value =
-    bodyTextStyle(context, fontSize: 14).copyWith(color: hintGrey);
+        bodyTextStyle(context, fontSize: 14).copyWith(color: hintGrey);
 
-    return  Row(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text("Total Pembayaran:", style: title),
@@ -295,7 +305,13 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
   }
 
   void refreshData() {
+    if (!_isDetailLoading) {
+      setState(() {
+        _isDetailLoading = true;
+      });
+    }
     // historybayarCariBloc.add(RefreshHistorybayarCariEvent(statusId: widget.inv1Id, searchText: ''));
-    historybayar2cariBloc.add(RefreshHistorybayar2CariEvent(inv1Id: widget.inv1Id));
+    historybayar2cariBloc
+        .add(RefreshHistorybayar2CariEvent(inv1Id: widget.inv1Id));
   }
 }
