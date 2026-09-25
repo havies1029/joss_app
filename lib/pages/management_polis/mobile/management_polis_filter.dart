@@ -767,7 +767,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       v == null ? "-" : DateFormat('dd MMM yyyy').format(v);
 
   String formatNum(num? value) =>
-      NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
+      NumberFormat("#,##0.00##", "id_ID").format(value ?? 0);
 
   String fmtMoney(String curr, num? value) => "$curr ${formatNum(value)}";
 

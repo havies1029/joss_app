@@ -486,7 +486,8 @@ class MobileDownloadHelper {
   }
 
   static bool _shouldWrapValue(String value) {
-    return value.length > 28;
+    // Keep long currency values visible in PDF cells instead of clipping them.
+    return value.length > 18;
   }
 
   static String _formatHeaderName(String header) {
