@@ -85,14 +85,18 @@ class RegUserOtpBloc extends Bloc<RegUserOtpEvent, RegUserOtpState> {
 
   String _parseDirectHpRegistrationStatus(String data) {
     final trimmed = data.trim().toUpperCase();
-    if (trimmed == RegUserHpRegistrationStatus.registeredLogin) {
+    if (trimmed == RegUserHpRegistrationStatus.registeredLogin ||
+        trimmed == RegUserHpRegistrationStatus.registeredPic) {
       return trimmed;
     }
 
     final parts = trimmed.split(';');
-    if (parts.length >= 2 &&
-        parts[1].trim() == RegUserHpRegistrationStatus.registeredLogin) {
-      return RegUserHpRegistrationStatus.registeredLogin;
+    if (parts.length >= 2) {
+      final status = parts[1].trim();
+      if (status == RegUserHpRegistrationStatus.registeredLogin ||
+          status == RegUserHpRegistrationStatus.registeredPic) {
+        return status;
+      }
     }
 
     return '';

@@ -222,6 +222,21 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
     }
     _lastHandledHpStatusKey = key;
 
+    // PIC tanpa SYS_USER bukan akun yang dapat login atau mereset password.
+    // Tampilkan informasi saja, baik untuk respons bypass maupun token lama.
+    if (state.hpRegistrationStatus ==
+        RegUserHpRegistrationStatus.registeredPic) {
+      _pendingOpenOtpFor = '';
+      _lastHandledHpStatusKey = '';
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          infoSnackBar('Nomor telepon telah terdaftar.'),
+        );
+      context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
+      return;
+    }
+
     setState(() {
       _verifiedTarget = state.hpStatusTarget;
       _verifiedRequestId = state.hpStatusRequestId;
@@ -244,11 +259,6 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
       return;
     }
 
-    if (state.hpRegistrationStatus ==
-        RegUserHpRegistrationStatus.registeredPic) {
-      _showRegisteredPopup(state);
-      return;
-    }
     if (state.hpRegistrationStatus ==
         RegUserHpRegistrationStatus.notRegistered) {
       _showNotRegisteredPopup(state);
