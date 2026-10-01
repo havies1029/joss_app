@@ -50,6 +50,10 @@ class RingkasanPageState extends State<RingkasanPage> {
 
     return BlocListener<DnRekap2invBloc, DnRekap2invState>(
       listener: (BuildContext context, DnRekap2invState state) {
+        if (state.statusCheckSource == InvoiceStatusCheckSource.viaVa) {
+          return;
+        }
+
         if (state.isProcessed) {
           if (state.paymentStatus == "20") {
             final curr = state.curr;

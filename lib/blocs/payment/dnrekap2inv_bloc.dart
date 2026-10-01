@@ -218,7 +218,13 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
   Future<void> onInvoice2PaymentViaVA(
       Invoice2PaymentViaVAEvent event, Emitter<DnRekap2invState> emit) async {
     if (state.isProcessing) return;
-    emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
+    emit(state.copyWith(
+      invoiceId: event.invoiceId,
+      isProcessing: true,
+      isProcessed: false,
+      hasFailure: false,
+      statusCheckSource: InvoiceStatusCheckSource.viaVa,
+    ));
 
     try {
 
@@ -227,12 +233,15 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       InvoiceStatusModel invoiceStatus = await repo.processInvoiceToPaymentViaVa(event.invoiceId, event.methodId);
 
       emit(state.copyWith(
+        invoiceId: invoiceStatus.invoiceId.isNotEmpty
+            ? invoiceStatus.invoiceId
+            : event.invoiceId,
         isProcessing: false,
         isProcessed: true,
         paymentStatus: invoiceStatus.status,
         totalBayar: invoiceStatus.totalBayar,
         curr: invoiceStatus.curr,
-        statusCheckSource: InvoiceStatusCheckSource.general,
+        statusCheckSource: InvoiceStatusCheckSource.viaVa,
       ));
     } catch (e) {
       emit(state.copyWith(

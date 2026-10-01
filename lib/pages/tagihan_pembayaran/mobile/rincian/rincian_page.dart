@@ -130,6 +130,10 @@ class _RincianPageState extends State<RincianPage> {
                 previous.paymentStatus != current.paymentStatus;
           },
           listener: (BuildContext context, DnRekap2invState state) {
+            if (state.statusCheckSource == InvoiceStatusCheckSource.viaVa) {
+              return;
+            }
+
             if (!state.isProcessed) return;
 
             if (state.paymentStatus == "20") {

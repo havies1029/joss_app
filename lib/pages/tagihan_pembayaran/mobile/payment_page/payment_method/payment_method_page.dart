@@ -18,6 +18,7 @@ import '../../../../../helper/navigation_keys.dart';
 import '../../../../../models/payment/paymentcard_model.dart';
 import '../../../../base/base_background_sidepage.dart';
 import '../../../tagihan_pembayaran_page.dart';
+import '../payment_process/payment_process.dart';
 import 'payment_list.dart';
 
 class PaymentMethodPage extends StatefulWidget {
@@ -36,6 +37,7 @@ class PaymentMethodPage extends StatefulWidget {
 
 class _PaymentMethodPageState extends State<PaymentMethodPage> {
   int? _expandedIndex;
+  bool _hasOpenedPaymentProcess = false;
   late final ScrollController _scrollCtrl;
 
   final fieldNomorKartuController = TextEditingController();
@@ -221,7 +223,41 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
+    return BlocConsumer<DnRekap2invBloc, DnRekap2invState>(
+      listenWhen: (previous, current) {
+        if (current.statusCheckSource != InvoiceStatusCheckSource.viaVa) {
+          return false;
+        }
+
+        return previous.isProcessed != current.isProcessed ||
+            previous.hasFailure != current.hasFailure;
+      },
+      listener: (context, state) {
+        if (state.hasFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            errorSnackBar('Gagal membuat pembayaran VA. Silakan coba lagi.'),
+          );
+          return;
+        }
+
+        if (!state.isProcessed ||
+            state.paymentStatus != "30" ||
+            _hasOpenedPaymentProcess) {
+          return;
+        }
+
+        _hasOpenedPaymentProcess = true;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PaymentProcess(
+              viewMode: "ubah",
+              recordId: state.invoiceId,
+            ),
+          ),
+        );
+      },
       builder: (context, dnState) {
         final busy = dnState.isProcessing;
 

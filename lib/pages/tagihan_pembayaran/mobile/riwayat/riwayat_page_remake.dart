@@ -65,6 +65,10 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                 previous.paymentStatus != current.paymentStatus;
           },
           listener: (context, state) {
+            if (state.statusCheckSource == InvoiceStatusCheckSource.viaVa) {
+              return;
+            }
+
             if (!state.isProcessed) return;
 
             if (state.paymentStatus == "20") {

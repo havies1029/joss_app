@@ -3,6 +3,7 @@ part of 'dnrekap2inv_bloc.dart';
 enum InvoiceStatusCheckSource {
   general,
   riwayatContinuePayment,
+  viaVa,
 }
 
 abstract class DnRekap2invEvent extends Equatable {

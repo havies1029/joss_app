@@ -48,7 +48,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
     super.dispose();
   }
 
-
   void _onScroll() {
     if (!_scrollController.hasClients) return;
     final bloc = context.read<LogtrscariBloc>();
@@ -61,10 +60,20 @@ class _TransaksiPageState extends State<TransaksiPage> {
     }
   }
 
-  void _loadData() {
-    context.read<LogtrscariBloc>().add(
-      RefreshLogtrscariEvent(groupLogId: _groupLogId),
-    );
+  Future<void> _loadData() async {
+    final bloc = context.read<LogtrscariBloc>();
+    final groupLogId = _groupLogId;
+
+    bloc.add(RefreshLogtrscariEvent(groupLogId: groupLogId));
+
+    await bloc.stream
+        .firstWhere(
+          (state) =>
+              state.groupLogId == groupLogId &&
+              state.status != ListStatus.initial &&
+              !state.isLoadingMore,
+        )
+        .timeout(const Duration(seconds: 15), onTimeout: () => bloc.state);
   }
 
   @override
@@ -117,7 +126,8 @@ class _TransaksiPageState extends State<TransaksiPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.error_outline, size: 48, color: hintGrey),
+                            Icon(Icons.error_outline,
+                                size: 48, color: hintGrey),
                             const SizedBox(height: 16),
                             Text(
                               "Gagal memuat data",
@@ -126,12 +136,15 @@ class _TransaksiPageState extends State<TransaksiPage> {
                             const SizedBox(height: 8),
                             Text(
                               "Periksa koneksi internet Anda",
-                              style: bodyTextStyle(context).copyWith(color: hintGrey),
+                              style: bodyTextStyle(context)
+                                  .copyWith(color: hintGrey),
                             ),
                             const SizedBox(height: 16),
                             AppButton.primary(
                               text: "Coba Lagi",
-                              onPressed: _loadData,
+                              onPressed: () {
+                                _loadData();
+                              },
                               backgroundColor: pBlue,
                             ),
                           ],
@@ -150,7 +163,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                   final groups = _groupByBulan(items);
 
                   return RefreshIndicator(
-                    onRefresh: () async => _loadData(),
+                    onRefresh: _loadData,
                     child: ListView.builder(
                       controller: _scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -159,7 +172,8 @@ class _TransaksiPageState extends State<TransaksiPage> {
                       itemBuilder: (context, groupIndex) {
                         final group = groups[groupIndex];
                         final month = group['month'] as String;
-                        final groupItems = group['items'] as List<LogtrscariModel>;
+                        final groupItems =
+                            group['items'] as List<LogtrscariModel>;
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,17 +201,20 @@ class _TransaksiPageState extends State<TransaksiPage> {
 
                             // Card
                             Container(
-                              margin: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: hPadding * 1.5),
                               decoration: BoxDecoration(
                                 color: pGrey,
-                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                                borderRadius:
+                                    BorderRadius.circular(cardBorderRadius),
                                 border: Border.all(color: sGrey),
                               ),
                               child: ListView.separated(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: groupItems.length,
-                                separatorBuilder: (_, __) => kDivider(color: sGrey),
+                                separatorBuilder: (_, __) =>
+                                    kDivider(color: sGrey),
                                 itemBuilder: (context, index) {
                                   final item = groupItems[index];
                                   return _buildLogItem(context, item);
@@ -260,7 +277,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
         children: [
           _logIcon(item.jenisLog),
           const SizedBox(width: 16),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,7 +305,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
               ],
             ),
           ),
-
           _buildRightSide(item),
         ],
       ),
@@ -407,21 +422,21 @@ class _TransaksiPageState extends State<TransaksiPage> {
     switch (_filter) {
       case LogFilter.aktivitas:
         return (
-        icon: "assets/icons/aktifitas_notifikasi.svg",
-        header: "Tidak Ada Aktivitas",
-        desc: "Saat ini Anda belum membuat Aktivitas apa pun",
+          icon: "assets/icons/aktifitas_notifikasi.svg",
+          header: "Tidak Ada Aktivitas",
+          desc: "Saat ini Anda belum membuat Aktivitas apa pun",
         );
       case LogFilter.transaksi:
         return (
-        icon: "assets/icons/transaksi_notifikasi.svg",
-        header: "Tidak ada Transaksi",
-        desc: "Saat ini Anda belum membuat Transaksi apa pun",
+          icon: "assets/icons/transaksi_notifikasi.svg",
+          header: "Tidak ada Transaksi",
+          desc: "Saat ini Anda belum membuat Transaksi apa pun",
         );
       case LogFilter.semua:
         return (
-        icon: "assets/icons/semua_notifikasi.svg",
-        header: "Tidak ada Riwayat Transaksi",
-        desc: "Saat ini Anda belum membuat Aktivitas Transaksi apa pun",
+          icon: "assets/icons/semua_notifikasi.svg",
+          header: "Tidak ada Riwayat Transaksi",
+          desc: "Saat ini Anda belum membuat Aktivitas Transaksi apa pun",
         );
     }
   }
@@ -436,7 +451,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
           children: [
             SvgPicture.asset(e.icon, height: 50),
             const SizedBox(height: 20),
-
             Text(
               e.header,
               style: TextStyle(
@@ -445,7 +459,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
               ),
             ),
             const SizedBox(height: 6),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text(
@@ -470,12 +483,18 @@ class _TransaksiPageState extends State<TransaksiPage> {
 
     if (j.contains("klaim baru")) {
       asset = "assets/icons/KlaimBaru.svg";
-    } else if (j.contains("pembatalan")) asset = "assets/icons/BatalKlaim.svg";
-    else if (j.contains("update")) asset = "assets/icons/PerbaruiKlaim.svg";
-    else if (j.contains("lapor")) asset = "assets/icons/LaporKlaim.svg";
-    else if (j.contains("endorse")) asset = "assets/icons/EndorseLog.svg";
-    else if (j.contains("perpanjang polis")) asset = "assets/icons/PerpanjanganLog.svg";
-    else if (j.contains("aktivasi kembali")) asset = "assets/icons/AktifKembali.svg";
+    } else if (j.contains("pembatalan"))
+      asset = "assets/icons/BatalKlaim.svg";
+    else if (j.contains("update"))
+      asset = "assets/icons/PerbaruiKlaim.svg";
+    else if (j.contains("lapor"))
+      asset = "assets/icons/LaporKlaim.svg";
+    else if (j.contains("endorse"))
+      asset = "assets/icons/EndorseLog.svg";
+    else if (j.contains("perpanjang polis"))
+      asset = "assets/icons/PerpanjanganLog.svg";
+    else if (j.contains("aktivasi kembali"))
+      asset = "assets/icons/AktifKembali.svg";
     else if (j.contains("beli polis")) asset = "assets/icons/RegOthers.svg";
     return SvgPicture.asset(
       asset,

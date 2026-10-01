@@ -441,6 +441,10 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                 previous.hasFailure != current.hasFailure;
           },
           listener: (context, state) {
+            if (state.statusCheckSource == InvoiceStatusCheckSource.viaVa) {
+              return;
+            }
+
             if (state.isProcessed || state.hasFailure) {
               _hideGlobalLoading();
               if (!mounted) return;

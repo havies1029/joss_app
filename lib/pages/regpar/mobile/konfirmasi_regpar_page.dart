@@ -358,6 +358,10 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
           listener: (context, state) {
             debugPrint('DnRekap2inv listener status: ${state.paymentStatus}');
 
+            if (state.statusCheckSource == InvoiceStatusCheckSource.viaVa) {
+              return;
+            }
+
             if (state.isProcessed || state.hasFailure) {
               _hideGlobalLoading();
               if (!mounted) return;

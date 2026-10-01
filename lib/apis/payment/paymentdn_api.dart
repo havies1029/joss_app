@@ -133,6 +133,7 @@ class PaymentDnAPI{
 
 	Future<InvoiceStatusModel> invoice2PaymentViaVaAPI(
 			String invoiceId, String methodId) async {
+		const methodName = "invoice2PaymentViaVaAPI";
 
 		String endpoint =
 				"${AppData.prefixEndPoint}/api/payment/invtobayarviava";
@@ -153,25 +154,50 @@ class PaymentDnAPI{
 		};
 
 		try {
+			debugPrint("=== [$methodName] REQUEST ===");
+			debugPrint("invoiceId: $invoiceId");
+			debugPrint("methodId : $methodId");
+			debugPrint("URL      : $uri");
+
 			final response = await http.get(uri, headers: headers);
+
+			debugPrint("=== [$methodName] RESPONSE ===");
+			debugPrint("Status Code: ${response.statusCode}");
+			debugPrint("Body       : ${response.body}");
 
 			if (response.statusCode == 200) {
 				final decoded = json.decode(response.body);
 
 				if (decoded == null) {
+					debugPrint("=== [$methodName] ERROR ===");
+					debugPrint("API returned null body");
 					throw Exception("API returned null body");
 				}
 
 				if (decoded is! Map<String, dynamic>) {
+					debugPrint("=== [$methodName] ERROR ===");
+					debugPrint("Invalid response format: ${decoded.runtimeType}");
 					throw Exception("Invalid response format: ${decoded.runtimeType}");
 				}
 
+				debugPrint("=== [$methodName] PARSED ===");
+				debugPrint("invoiceId : ${decoded['invoiceId']}");
+				debugPrint("status    : ${decoded['status']}");
+				debugPrint("totalBayar: ${decoded['totalBayar']}");
+				debugPrint("curr      : ${decoded['curr']}");
+
 				return InvoiceStatusModel.fromJson(decoded);
 			} else {
+				debugPrint("=== [$methodName] HTTP ERROR ===");
+				debugPrint("Status Code: ${response.statusCode}");
+				debugPrint("Body       : ${response.body}");
 				throw Exception(
 						"Failed to load data (Status: ${response.statusCode})");
 			}
 		} catch (e, stackTrace) {
+			debugPrint("=== [$methodName] EXCEPTION ===");
+			debugPrint("Error     : $e");
+			debugPrint("StackTrace: $stackTrace");
 			rethrow;
 		}
 	}

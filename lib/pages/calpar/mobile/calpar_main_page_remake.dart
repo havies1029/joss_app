@@ -876,7 +876,16 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                             const Flexible(child: SizedBox.shrink()),
                           ],
                         ),
-                        const SizedBox(height: hPadding),
+                        const SizedBox(height: 6),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "*lokasi object asuransi tidak dalam wilayah banjir",
+                            style: bodyTextStyle(context, fontSize: 16)
+                                .copyWith(color: hintGrey),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
                         buildFieldMwilayahId(),
                         if (!_showZonaGempa) ...[
                           const SizedBox(height: 8),

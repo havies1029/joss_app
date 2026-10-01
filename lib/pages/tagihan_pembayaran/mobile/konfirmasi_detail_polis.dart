@@ -137,6 +137,10 @@ class KonfirmasiDetailPolisPage extends StatelessWidget {
       ),
       body: BlocListener<DnRekap2invBloc, DnRekap2invState>(
         listener: (context, state) {
+          if (state.statusCheckSource == InvoiceStatusCheckSource.viaVa) {
+            return;
+          }
+
           if (state.isProcessed) {
             if (state.paymentStatus == "20") {
               ScaffoldMessenger.of(context).showSnackBar(
