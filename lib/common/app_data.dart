@@ -38,7 +38,8 @@ class AppData {
       : "eassisttoolsv2api.smartsoft-id.com";
 
   static String adminApiAuthority = isProduction
-      ? "jossadminapi.smartsoft-id.com"
+      // ? "jossadminapi.smartsoft-id.com"
+      ? "eassisttoolstestadminapi.smartsoft-id.com"
       : "eassisttoolsv2adminapi.smartsoft-id.com";
 
   static String apiDomain = "http${useSSL ? "s" : ""}://$apiAuthority/";

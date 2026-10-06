@@ -1,3 +1,4 @@
+import 'dart:async';
 
 import 'package:joss_app/apis/payment/paymentdn_api.dart';
 import 'package:joss_app/models/payment/invoicestatus_model.dart';
@@ -14,7 +15,6 @@ part 'dnrekap2inv_state.dart';
 
 class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
   DnRekap2invBloc() : super(DnRekap2invState()) {
-
     on<DnToInvByListCobProcessEvent>(onDnToInvByListCobProcess);
     on<DnToInvByListDnProcessEvent>(onDnToInvByListDnProcess);
     on<CheckInvoiceStatusEvent>(onCheckInvoiceStatus);
@@ -35,15 +35,13 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
   }
 
   Future<void> onSetPaymentSummary(
-      SetPaymentSummaryEvent event,
-      Emitter<DnRekap2invState> emit,
-      ) async {
-
-    final newCurr =
-    event.curr.isNotEmpty ? event.curr : state.curr;
+    SetPaymentSummaryEvent event,
+    Emitter<DnRekap2invState> emit,
+  ) async {
+    final newCurr = event.curr.isNotEmpty ? event.curr : state.curr;
 
     final newTotalBayar =
-    event.totalBayar != 0 ? event.totalBayar : state.totalBayar;
+        event.totalBayar != 0 ? event.totalBayar : state.totalBayar;
 
     emit(state.copyWith(
       curr: newCurr,
@@ -51,18 +49,21 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
     ));
   }
 
-  Future<void> onDnToInvByListCobProcess(
-      DnToInvByListCobProcessEvent event, Emitter<DnRekap2invState> emit) async {
-    
+  Future<void> onDnToInvByListCobProcess(DnToInvByListCobProcessEvent event,
+      Emitter<DnRekap2invState> emit) async {
     if (state.isProcessing) return;
 
-    emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false, curr: event.curr ?? state.curr));
+    emit(state.copyWith(
+        isProcessing: true,
+        isProcessed: false,
+        hasFailure: false,
+        curr: event.curr ?? state.curr));
 
     try {
-
       PaymentDnAPI api = PaymentDnAPI();
       PaymentDnRepository repo = PaymentDnRepository(api: api);
-      InvoiceStatusModel invoiceStatus = await repo.fetchDnToInvByListCob(event.listCob);
+      InvoiceStatusModel invoiceStatus =
+          await repo.fetchDnToInvByListCob(event.listCob);
 
       emit(state.copyWith(
         isProcessing: false,
@@ -82,11 +83,10 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
   }
 
   Future<void> onDnToInvByListDnProcess(
-      DnToInvByListDnProcessEvent event,
-      Emitter<DnRekap2invState> emit,
-      ) async {
-
-      if (state.isProcessing) return;
+    DnToInvByListDnProcessEvent event,
+    Emitter<DnRekap2invState> emit,
+  ) async {
+    if (state.isProcessing) return;
 
     emit(state.copyWith(
       isProcessing: true,
@@ -100,7 +100,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       PaymentDnRepository repo = PaymentDnRepository(api: api);
 
       InvoiceStatusModel invoiceStatus =
-      await repo.fetchDnToInvByListDn(event.listDn);
+          await repo.fetchDnToInvByListDn(event.listDn);
 
       emit(state.copyWith(
         isProcessing: false,
@@ -120,9 +120,9 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
   }
 
   Future<void> onCheckInvoiceStatus(
-      CheckInvoiceStatusEvent event,
-      Emitter<DnRekap2invState> emit,
-      ) async {
+    CheckInvoiceStatusEvent event,
+    Emitter<DnRekap2invState> emit,
+  ) async {
     if (state.isProcessing) {
       return;
     }
@@ -130,6 +130,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       isProcessing: true,
       isProcessed: false,
       hasFailure: false,
+      isViaVaTimeoutRecovery: event.afterViaVaTimeout,
       statusCheckSource: event.source,
     ));
     try {
@@ -137,10 +138,11 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       PaymentDnRepository repo = PaymentDnRepository(api: api);
 
       InvoiceStatusModel invoiceStatus =
-      await repo.fetchInvoiceStatus(event.invoiceId);
+          await repo.fetchInvoiceStatus(event.invoiceId);
 
-      final double finalTotalBayar =
-      (invoiceStatus.totalBayar > 0) ? invoiceStatus.totalBayar : state.totalBayar;
+      final double finalTotalBayar = (invoiceStatus.totalBayar > 0)
+          ? invoiceStatus.totalBayar
+          : state.totalBayar;
 
       emit(state.copyWith(
         invoiceId: event.invoiceId,
@@ -151,7 +153,6 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         curr: invoiceStatus.curr,
         statusCheckSource: event.source,
       ));
-
     } catch (e) {
       emit(state.copyWith(
         isProcessing: false,
@@ -162,25 +163,26 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
 
   Future<void> onSetRecordInvoiceStatus(
       SetRecordInvoiceStatusEvent event, Emitter<DnRekap2invState> emit) async {
-    emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
-    
-      InvoiceStatusModel invoiceStatus = event.invoiceStatusRecord;
+    emit(state.copyWith(
+        isProcessing: true, isProcessed: false, hasFailure: false));
 
-      emit(state.copyWith(
-        invoiceId: invoiceStatus.invoiceId,
-        isProcessing: false,
-        isProcessed: true,
-        paymentStatus: invoiceStatus.status,
-        totalBayar: invoiceStatus.totalBayar,
-        curr: invoiceStatus.curr,
-        statusCheckSource: InvoiceStatusCheckSource.general,
-      ));    
+    InvoiceStatusModel invoiceStatus = event.invoiceStatusRecord;
+
+    emit(state.copyWith(
+      invoiceId: invoiceStatus.invoiceId,
+      isProcessing: false,
+      isProcessed: true,
+      paymentStatus: invoiceStatus.status,
+      totalBayar: invoiceStatus.totalBayar,
+      curr: invoiceStatus.curr,
+      statusCheckSource: InvoiceStatusCheckSource.general,
+    ));
   }
 
   Future<void> onInvoice2PaymentViaCard(
-      Invoice2PaymentViaCardEvent event,
-      Emitter<DnRekap2invState> emit,
-      ) async {
+    Invoice2PaymentViaCardEvent event,
+    Emitter<DnRekap2invState> emit,
+  ) async {
     if (state.isProcessing) return;
 
     emit(state.copyWith(
@@ -194,7 +196,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       PaymentDnRepository repo = PaymentDnRepository(api: api);
 
       InvoiceStatusModel invoiceStatus =
-      await repo.processInvoiceToPaymentViaCard(
+          await repo.processInvoiceToPaymentViaCard(
         event.record,
       );
 
@@ -223,14 +225,15 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       isProcessing: true,
       isProcessed: false,
       hasFailure: false,
+      isViaVaTimeoutRecovery: false,
       statusCheckSource: InvoiceStatusCheckSource.viaVa,
     ));
 
     try {
-
       PaymentDnAPI api = PaymentDnAPI();
       PaymentDnRepository repo = PaymentDnRepository(api: api);
-      InvoiceStatusModel invoiceStatus = await repo.processInvoiceToPaymentViaVa(event.invoiceId, event.methodId);
+      InvoiceStatusModel invoiceStatus = await repo
+          .processInvoiceToPaymentViaVa(event.invoiceId, event.methodId);
 
       emit(state.copyWith(
         invoiceId: invoiceStatus.invoiceId.isNotEmpty
@@ -243,6 +246,27 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         curr: invoiceStatus.curr,
         statusCheckSource: InvoiceStatusCheckSource.viaVa,
       ));
+    } on TimeoutException {
+      // The VA request may already be processing on the server even though the
+      // client did not receive a response. Check it once instead of retrying it.
+      emit(state.copyWith(
+        isProcessing: false,
+        isProcessed: false,
+        hasFailure: false,
+        isViaVaTimeoutRecovery: true,
+        statusCheckSource: InvoiceStatusCheckSource.viaVa,
+      ));
+
+      // Run the recovery check in the same handler. Re-queuing it as a new
+      // event can make the isProcessing guard discard the check.
+      await onCheckInvoiceStatus(
+        CheckInvoiceStatusEvent(
+          invoiceId: event.invoiceId,
+          source: InvoiceStatusCheckSource.viaVa,
+          afterViaVaTimeout: true,
+        ),
+        emit,
+      );
     } catch (e) {
       emit(state.copyWith(
         isProcessing: false,
@@ -255,13 +279,14 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       GetRincianSOACustomerEvent event, Emitter<DnRekap2invState> emit) async {
     debugPrint("onGetRincianSOACustomer called");
     if (state.isProcessing) return;
-    emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
+    emit(state.copyWith(
+        isProcessing: true, isProcessed: false, hasFailure: false));
 
     try {
-
       PaymentDnAPI api = PaymentDnAPI();
       PaymentDnRepository repo = PaymentDnRepository(api: api);
-      RincianSOAModel rincianSOA = await repo.fetchRincianSOACustomer(event.searchText);
+      RincianSOAModel rincianSOA =
+          await repo.fetchRincianSOACustomer(event.searchText);
 
       emit(state.copyWith(
         isProcessing: false,
@@ -278,21 +303,24 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
 
   Future<void> onSelectDetail(
       SelectDetailEvent event, Emitter<DnRekap2invState> emit) async {
-    final updatedSelectedIds = List<String>.from(state.selectedIds)..add(event.dn1Id);
+    final updatedSelectedIds = List<String>.from(state.selectedIds)
+      ..add(event.dn1Id);
     emit(state.copyWith(selectedIds: updatedSelectedIds));
   }
+
   Future<void> onUnselectDetail(
       UnselectDetailEvent event, Emitter<DnRekap2invState> emit) async {
-    final updatedSelectedIds = List<String>.from(state.selectedIds)..remove(event.dn1Id);
+    final updatedSelectedIds = List<String>.from(state.selectedIds)
+      ..remove(event.dn1Id);
     emit(state.copyWith(selectedIds: updatedSelectedIds));
   }
 
   Future<void> onForcePaymentViaVa(
       ForcePaymentViaVaEvent event, Emitter<DnRekap2invState> emit) async {
-    emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
+    emit(state.copyWith(
+        isProcessing: true, isProcessed: false, hasFailure: false));
 
     try {
-
       PaymentDnAPI api = PaymentDnAPI();
       PaymentDnRepository repo = PaymentDnRepository(api: api);
       await repo.forcePaymentViaVa(event.invoiceId);
@@ -311,10 +339,10 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
 
   Future<void> onRegMv2Inv(
       RegMv2InvoiceEvent event, Emitter<DnRekap2invState> emit) async {
-    emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
+    emit(state.copyWith(
+        isProcessing: true, isProcessed: false, hasFailure: false));
 
     try {
-
       PaymentDnAPI api = PaymentDnAPI();
       PaymentDnRepository repo = PaymentDnRepository(api: api);
       InvoiceStatusModel invoiceStatus = await repo.regMv2Inv(event.regmv1Id);
@@ -338,10 +366,10 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
 
   Future<void> onRegPar2Inv(
       RegPar2InvoiceEvent event, Emitter<DnRekap2invState> emit) async {
-    emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
+    emit(state.copyWith(
+        isProcessing: true, isProcessed: false, hasFailure: false));
 
     try {
-
       PaymentDnAPI api = PaymentDnAPI();
       PaymentDnRepository repo = PaymentDnRepository(api: api);
       InvoiceStatusModel invoiceStatus = await repo.regPar2Inv(event.regpar1Id);
@@ -364,9 +392,9 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
   }
 
   Future<void> onBatalInvById(
-      BatalInvByIdEvent event,
-      Emitter<DnRekap2invState> emit,
-      ) async {
+    BatalInvByIdEvent event,
+    Emitter<DnRekap2invState> emit,
+  ) async {
     if (state.isProcessing) return;
 
     emit(state.copyWith(
@@ -380,7 +408,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       PaymentDnRepository repo = PaymentDnRepository(api: api);
 
       InvoiceStatusModel invoiceStatus =
-      await repo.batalInvById(event.invoiceId);
+          await repo.batalInvById(event.invoiceId);
 
       emit(state.copyWith(
         isProcessing: false,
@@ -398,5 +426,4 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       ));
     }
   }
-
 }

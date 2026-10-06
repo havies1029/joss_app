@@ -11,6 +11,7 @@ class DnRekap2invState extends Equatable {
   final double totalBayar;
   final String curr;
   final bool silentPaymentMessage;
+  final bool isViaVaTimeoutRecovery;
   final InvoiceStatusCheckSource statusCheckSource;
 
   DnRekap2invState({
@@ -24,6 +25,7 @@ class DnRekap2invState extends Equatable {
     this.totalBayar = 0.0,
     this.curr = "",
     this.silentPaymentMessage = false,
+    this.isViaVaTimeoutRecovery = false,
     this.statusCheckSource = InvoiceStatusCheckSource.general,
   }) : rincianSOA = rincianSOA ?? RincianSOAModel(headers: [], grandtotal: []);
 
@@ -42,6 +44,7 @@ class DnRekap2invState extends Equatable {
     double? totalBayar,
     String? curr,
     bool? silentPaymentMessage,
+    bool? isViaVaTimeoutRecovery,
     InvoiceStatusCheckSource? statusCheckSource,
   }) {
     return DnRekap2invState(
@@ -55,22 +58,25 @@ class DnRekap2invState extends Equatable {
       totalBayar: totalBayar ?? this.totalBayar,
       curr: curr ?? this.curr,
       silentPaymentMessage: silentPaymentMessage ?? this.silentPaymentMessage,
+      isViaVaTimeoutRecovery:
+          isViaVaTimeoutRecovery ?? this.isViaVaTimeoutRecovery,
       statusCheckSource: statusCheckSource ?? this.statusCheckSource,
     );
   }
 
   @override
   List<Object> get props => [
-    invoiceId,
-    paymentStatus,
-    isProcessing,
-    isProcessed,
-    hasFailure,
-    rincianSOA,
-    selectedIds,
-    totalBayar,
-    curr,
-    silentPaymentMessage,
-    statusCheckSource,
-  ];
+        invoiceId,
+        paymentStatus,
+        isProcessing,
+        isProcessed,
+        hasFailure,
+        rincianSOA,
+        selectedIds,
+        totalBayar,
+        curr,
+        silentPaymentMessage,
+        isViaVaTimeoutRecovery,
+        statusCheckSource,
+      ];
 }

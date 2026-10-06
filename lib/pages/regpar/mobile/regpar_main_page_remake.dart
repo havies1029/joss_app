@@ -1078,7 +1078,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
             BlocListener<PolisTanggalBloc, PolisTanggalState>(
               listenWhen: (prev, curr) =>
                   prev.mulai != curr.mulai || prev.berakhir != curr.berakhir,
-              listener: (_, __) => _refreshPremiSnapshotVisibility(),
+              listener: (_, __) {
+                _clearValidationPreviewState();
+                _refreshPremiSnapshotVisibility();
+              },
             ),
             BlocListener<RegparUploadFotoObjectBloc,
                 RegParUploadFotoObjectState>(
@@ -2119,8 +2122,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   }
 
   RegparValidationPreviewRequestModel _buildValidationPreviewRequest() {
+    final polis = context.read<PolisTanggalBloc>().state;
+
     return RegparValidationPreviewRequestModel(
       regpar1Id: regpar1Id ?? '',
+      polisMulai: polis.mulai,
       rokupasiId: fieldComboROkupasi?.rokupasiId,
       currId: fieldComboRMatauang?.rmatauangKode,
       siBuilding: _parseMoney(fieldSiBuildingController.text),
@@ -2138,9 +2144,14 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   String _currentValidationPreviewKey() {
     String moneyKey(TextEditingController controller) =>
         _parseMoney(controller.text).toStringAsFixed(2);
+    final polisMulai = context.read<PolisTanggalBloc>().state.mulai;
+    final polisMulaiKey =
+        DateTime(polisMulai.year, polisMulai.month, polisMulai.day)
+            .toIso8601String();
 
     return [
       regpar1Id ?? '',
+      polisMulaiKey,
       fieldComboROkupasi?.rokupasiId ?? '',
       fieldComboRMatauang?.rmatauangKode ?? '',
       moneyKey(fieldSiBuildingController),
@@ -2588,6 +2599,13 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       rows.add(_buildValidationPreviewDetailRow(
         'Total saat ini',
         _formatValidationIdr(issue.expectedValue),
+      ));
+    }
+
+    if (issue.minValue.trim().isNotEmpty) {
+      rows.add(_buildValidationPreviewDetailRow(
+        'Batas minimum',
+        _formatValidationIdr(issue.minValue),
       ));
     }
 

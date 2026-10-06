@@ -13,7 +13,6 @@ abstract class DnRekap2invEvent extends Equatable {
   List<Object> get props => [];
 }
 
-
 class DnToInvByListCobProcessEvent extends DnRekap2invEvent {
   final String listCob;
   final String? curr;
@@ -26,7 +25,6 @@ class DnToInvByListCobProcessEvent extends DnRekap2invEvent {
   @override
   List<Object> get props => [listCob, curr ?? ""];
 }
-
 
 class DnToInvByListDnProcessEvent extends DnRekap2invEvent {
   final String listDn;
@@ -44,14 +42,16 @@ class DnToInvByListDnProcessEvent extends DnRekap2invEvent {
 class CheckInvoiceStatusEvent extends DnRekap2invEvent {
   final String invoiceId;
   final InvoiceStatusCheckSource source;
+  final bool afterViaVaTimeout;
 
   const CheckInvoiceStatusEvent({
     required this.invoiceId,
     this.source = InvoiceStatusCheckSource.general,
+    this.afterViaVaTimeout = false,
   });
 
   @override
-  List<Object> get props => [invoiceId, source];
+  List<Object> get props => [invoiceId, source, afterViaVaTimeout];
 }
 
 class SetRecordInvoiceStatusEvent extends DnRekap2invEvent {
@@ -67,7 +67,8 @@ class Invoice2PaymentViaVAEvent extends DnRekap2invEvent {
   final String invoiceId;
   final String methodId;
 
-  const Invoice2PaymentViaVAEvent({required this.invoiceId, required this.methodId});
+  const Invoice2PaymentViaVAEvent(
+      {required this.invoiceId, required this.methodId});
   @override
   List<Object> get props => [invoiceId, methodId];
 }

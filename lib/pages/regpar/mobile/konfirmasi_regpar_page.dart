@@ -857,55 +857,77 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                         ? const Center(
                             child: LoadingIndicator(),
                           )
-                        : (regpar3Record?.isEq == true)
-                            ? Row(
-                                children: [
-                                  Expanded(
-                                    child: AppButton.iconLeft(
-                                      text: "Lihat Penawaran PAR",
-                                      backgroundColor: pdfRed,
-                                      onPressed: isSubmitting
-                                          ? null
-                                          : () {
-                                              context
-                                                  .read<QuotationPdfBloc>()
-                                                  .add(
-                                                    DownloadQuotationPdfEvent(
-                                                      quotationType: "par",
-                                                      quotationNo:
-                                                          widget.recordId ?? "",
-                                                    ),
-                                                  );
-                                            },
-                                      icon: _pdfIcon(),
+                        : LayoutBuilder(
+                            builder: (context, constraints) {
+                              final isEq = regpar3Record?.isEq == true;
+                              final quotationButtonFontSize =
+                                  isEq && constraints.maxWidth < 370
+                                      ? 16.0
+                                      : 18.0;
+                              final quotationButtonTextStyle = bodyTextStyle(
+                                context,
+                                fontSize: quotationButtonFontSize,
+                              );
+
+                              if (isEq) {
+                                return Row(
+                                  children: [
+                                    Expanded(
+                                      child: AppButton.iconLeft(
+                                        text: "Lihat Penawaran PAR",
+                                        backgroundColor: pdfRed,
+                                        textStyle: quotationButtonTextStyle,
+                                        iconTextSpacing: 6,
+                                        onPressed: isSubmitting
+                                            ? null
+                                            : () {
+                                                context
+                                                    .read<QuotationPdfBloc>()
+                                                    .add(
+                                                      DownloadQuotationPdfEvent(
+                                                        quotationType: "par",
+                                                        quotationNo:
+                                                            widget.recordId ??
+                                                                "",
+                                                      ),
+                                                    );
+                                              },
+                                        icon: _pdfIcon(),
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: AppButton.iconLeft(
-                                      text: "Lihat Penawaran EQ",
-                                      backgroundColor: pdfRed,
-                                      onPressed: isSubmitting
-                                          ? null
-                                          : () {
-                                              context
-                                                  .read<QuotationPdfBloc>()
-                                                  .add(
-                                                    DownloadQuotationPdfEvent(
-                                                      quotationType: "pareq",
-                                                      quotationNo:
-                                                          widget.recordId ?? "",
-                                                    ),
-                                                  );
-                                            },
-                                      icon: _pdfIcon(),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: AppButton.iconLeft(
+                                        text: "Lihat Penawaran EQ",
+                                        backgroundColor: pdfRed,
+                                        textStyle: quotationButtonTextStyle,
+                                        iconTextSpacing: 6,
+                                        onPressed: isSubmitting
+                                            ? null
+                                            : () {
+                                                context
+                                                    .read<QuotationPdfBloc>()
+                                                    .add(
+                                                      DownloadQuotationPdfEvent(
+                                                        quotationType: "pareq",
+                                                        quotationNo:
+                                                            widget.recordId ??
+                                                                "",
+                                                      ),
+                                                    );
+                                              },
+                                        icon: _pdfIcon(),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              )
-                            : AppButton.iconLeft(
+                                  ],
+                                );
+                              }
+
+                              return AppButton.iconLeft(
                                 text: "Lihat Penawaran PAR",
                                 backgroundColor: pdfRed,
+                                textStyle: quotationButtonTextStyle,
+                                iconTextSpacing: 6,
                                 onPressed: isSubmitting
                                     ? null
                                     : () {
@@ -918,7 +940,9 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                                             );
                                       },
                                 icon: _pdfIcon(),
-                              ),
+                              );
+                            },
+                          ),
                   ),
 
                   const SizedBox(height: hPadding),

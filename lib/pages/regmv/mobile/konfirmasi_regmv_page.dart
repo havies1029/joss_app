@@ -120,7 +120,8 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
       currId: hasNextCurrencyId ? next.currId : current.currId,
       comboRMatauang: next.comboRMatauang ??
           (!hasNextCurrencyId || sameCurrency ? current.comboRMatauang : null),
-      mmvjnscoverId: hasNextCoverId ? next.mmvjnscoverId : current.mmvjnscoverId,
+      mmvjnscoverId:
+          hasNextCoverId ? next.mmvjnscoverId : current.mmvjnscoverId,
       comboMMvjnscover: next.comboMMvjnscover ??
           (!hasNextCoverId || sameCover ? current.comboMMvjnscover : null),
     );
@@ -469,7 +470,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
               onViewPaymentMethods(curr, state.totalBayar);
               _showSafeSnackBar(
                 successSnackBar(
-                  'Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.',
+                  'Invoice berhasil dibuat. Silakan lanjut ke metode pembayaran.',
                 ),
               );
             } else if (state.paymentStatus == "30") {
@@ -904,28 +905,40 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                   // ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                    child: AppButton.iconLeft(
-                      text: "Lihat Penawaran",
-                      backgroundColor: pdfRed,
-                      onPressed: isSubmitting
-                          ? null
-                          : () {
-                              context.read<QuotationPdfBloc>().add(
-                                    DownloadQuotationPdfEvent(
-                                      quotationType: "mv",
-                                      quotationNo: widget.recordId ?? "",
-                                    ),
-                                  );
-                            },
-                      icon: SvgPicture.asset(
-                        'assets/icons/icon_pdf.svg',
-                        width: 18,
-                        height: 18,
-                        colorFilter: const ColorFilter.mode(
-                          Colors.white,
-                          BlendMode.srcIn,
-                        ),
-                      ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final quotationButtonFontSize =
+                            constraints.maxWidth < 370 ? 16.0 : 18.0;
+
+                        return AppButton.iconLeft(
+                          text: "Lihat Penawaran",
+                          backgroundColor: pdfRed,
+                          textStyle: bodyTextStyle(
+                            context,
+                            fontSize: quotationButtonFontSize,
+                          ),
+                          iconTextSpacing: 6,
+                          onPressed: isSubmitting
+                              ? null
+                              : () {
+                                  context.read<QuotationPdfBloc>().add(
+                                        DownloadQuotationPdfEvent(
+                                          quotationType: "mv",
+                                          quotationNo: widget.recordId ?? "",
+                                        ),
+                                      );
+                                },
+                          icon: SvgPicture.asset(
+                            'assets/icons/icon_pdf.svg',
+                            width: 18,
+                            height: 18,
+                            colorFilter: const ColorFilter.mode(
+                              Colors.white,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
 

@@ -8,89 +8,94 @@ import 'package:http/http.dart' as http;
 
 import '../../models/payment/paymentcard_model.dart';
 
-class PaymentDnAPI{
-	void _logRequest({
-		required String name,
-		required Uri uri,
-		required Map<String, String> headers,
-	}) {
-		debugPrint("=== [$name] REQUEST ===");
-		debugPrint("URL: $uri");
-		debugPrint("Headers: $headers");
-	}
+class PaymentDnAPI {
+  void _logRequest({
+    required String name,
+    required Uri uri,
+    required Map<String, String> headers,
+  }) {
+    debugPrint("=== [$name] REQUEST ===");
+    debugPrint("URL: $uri");
+    debugPrint("Headers: $headers");
+  }
 
-	void _logResponse({
-		required String name,
-		required http.Response response,
-	}) {
-		debugPrint("=== [$name] RESPONSE ===");
-		debugPrint("Status Code: ${response.statusCode}");
-		debugPrint("Body: ${response.body}");
-	}
+  void _logResponse({
+    required String name,
+    required http.Response response,
+  }) {
+    debugPrint("=== [$name] RESPONSE ===");
+    debugPrint("Status Code: ${response.statusCode}");
+    debugPrint("Body: ${response.body}");
+  }
 
-	Future<List<PaymentCategory>> getPaymentMethods() async {
-		String endpoint = "${AppData.prefixEndPoint}/api/payment/methods";
-		var uri = AppData.uriHtpp(AppData.httpAuthority, endpoint);
+  Future<List<PaymentCategory>> getPaymentMethods() async {
+    String endpoint = "${AppData.prefixEndPoint}/api/payment/methods";
+    var uri = AppData.uriHtpp(AppData.httpAuthority, endpoint);
 
-		final headers = {
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		};
+    final headers = {
+      'Content-Type': 'application/json; odata=verbos',
+      'Accept': 'application/json; odata=verbos',
+      'Authorization': 'Bearer ${AppData.userToken}'
+    };
 
-		_logRequest(name: "getPaymentMethods", uri: uri, headers: headers);
+    _logRequest(name: "getPaymentMethods", uri: uri, headers: headers);
 
-		final response = await http.get(uri, headers: headers);
+    final response = await http.get(uri, headers: headers);
 
-		_logResponse(name: "getPaymentMethods", response: response);
+    _logResponse(name: "getPaymentMethods", response: response);
 
-		if (response.statusCode == 200) {
-			final List<dynamic> jsonData = json.decode(response.body);
-			return jsonData.map((e) => PaymentCategory.fromJson(e)).toList();
-		} else {
-			throw Exception("Failed to load data");
-		}
-	}
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      return jsonData.map((e) => PaymentCategory.fromJson(e)).toList();
+    } else {
+      throw Exception("Failed to load data");
+    }
+  }
 
-	Future<InvoiceStatusModel> cekPaymentStatusAPI(String inv1Id) async {
-		String endpoint = "${AppData.prefixEndPoint}/api/payment/cekstatus";
+  Future<InvoiceStatusModel> cekPaymentStatusAPI(String inv1Id) async {
+    String endpoint = "${AppData.prefixEndPoint}/api/payment/cekstatus";
 
-		Map<String, String> queryParams = {'inv1_id': inv1Id};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
+    Map<String, String> queryParams = {'inv1_id': inv1Id};
+    var uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
 
-		final headers = {
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		};
+    final headers = {
+      'Content-Type': 'application/json; odata=verbos',
+      'Accept': 'application/json; odata=verbos',
+      'Authorization': 'Bearer ${AppData.userToken}'
+    };
 
-		_logRequest(name: "cekPaymentStatusAPI", uri: uri, headers: headers);
+    _logRequest(name: "cekPaymentStatusAPI", uri: uri, headers: headers);
 
-		final response = await http.get(uri, headers: headers);
+    final response = await http.get(uri, headers: headers);
 
-		_logResponse(name: "cekPaymentStatusAPI", response: response);
+    _logResponse(name: "cekPaymentStatusAPI", response: response);
 
-		if (response.statusCode == 200) {
-			final jsonData = json.decode(response.body);
-			debugPrint("Parsed status: ${jsonData['status']}");
-			return InvoiceStatusModel.fromJson(jsonData);
-		} else {
-			throw Exception("Failed to load data");
-		}
-	}
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      debugPrint("Parsed status: ${jsonData['status']}");
+      return InvoiceStatusModel.fromJson(jsonData);
+    } else {
+      throw Exception("Failed to load data");
+    }
+  }
 
-	Future<InvoiceStatusModel> dnToInvByListCobAPI(String listcob) async {
-		String lihatEndpoint = "${AppData.prefixEndPoint}/api/payment/dntoinvbylistcob";
-		Map<String, String> queryParams = {'listcob': listcob, 'modulId': 'dnToInvByListCobAPI'};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
-		final http.Response response =
-		await http.get(uri, headers: <String, String>{
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		});
+  Future<InvoiceStatusModel> dnToInvByListCobAPI(String listcob) async {
+    String lihatEndpoint =
+        "${AppData.prefixEndPoint}/api/payment/dntoinvbylistcob";
+    Map<String, String> queryParams = {
+      'listcob': listcob,
+      'modulId': 'dnToInvByListCobAPI'
+    };
+    var uri =
+        AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+    final http.Response response =
+        await http.get(uri, headers: <String, String>{
+      'Content-Type': 'application/json; odata=verbos',
+      'Accept': 'application/json; odata=verbos',
+      'Authorization': 'Bearer ${AppData.userToken}'
+    });
 
-		if (response.statusCode == 200) {
+    if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData =
           json.decode(response.body) as Map<String, dynamic>;
 
@@ -98,407 +103,407 @@ class PaymentDnAPI{
     } else {
       throw Exception("Failed to load data");
     }
-	}
-
-	Future<InvoiceStatusModel> dnToInvByListDnAPI(String listdn) async {
-		String endpoint = "${AppData.prefixEndPoint}/api/payment/dntoinvbylistdn";
-
-		Map<String, String> queryParams = {
-			'listdn': listdn,
-			'modulId': 'dnToInvByListDnAPI'
-		};
-
-		var uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
-
-		final headers = {
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		};
-
-		_logRequest(name: "dnToInvByListDnAPI", uri: uri, headers: headers);
-
-		final response = await http.get(uri, headers: headers);
-
-		_logResponse(name: "dnToInvByListDnAPI", response: response);
-
-		if (response.statusCode == 200) {
-			final jsonData = json.decode(response.body);
-			debugPrint("Parsed status: ${jsonData['status']}");
-			return InvoiceStatusModel.fromJson(jsonData);
-		} else {
-			throw Exception("Failed to load data");
-		}
-	}
-
-	Future<InvoiceStatusModel> invoice2PaymentViaVaAPI(
-			String invoiceId, String methodId) async {
-		const methodName = "invoice2PaymentViaVaAPI";
-
-		String endpoint =
-				"${AppData.prefixEndPoint}/api/payment/invtobayarviava";
-
-		Map<String, String> queryParams = {
-			'invoiceId': invoiceId,
-			'methodId': methodId,
-			'modulId': 'invoice2PaymentAPI'
-		};
-
-		var uri = AppData.uriHtpp(
-				AppData.httpAuthority, endpoint, queryParams);
-
-		final headers = <String, String>{
-			'Content-Type': 'application/json; odata=verbose', // fix typo
-			'Accept': 'application/json; odata=verbose',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		};
-
-		try {
-			debugPrint("=== [$methodName] REQUEST ===");
-			debugPrint("invoiceId: $invoiceId");
-			debugPrint("methodId : $methodId");
-			debugPrint("URL      : $uri");
-
-			final response = await http.get(uri, headers: headers);
-
-			debugPrint("=== [$methodName] RESPONSE ===");
-			debugPrint("Status Code: ${response.statusCode}");
-			debugPrint("Body       : ${response.body}");
-
-			if (response.statusCode == 200) {
-				final decoded = json.decode(response.body);
-
-				if (decoded == null) {
-					debugPrint("=== [$methodName] ERROR ===");
-					debugPrint("API returned null body");
-					throw Exception("API returned null body");
-				}
-
-				if (decoded is! Map<String, dynamic>) {
-					debugPrint("=== [$methodName] ERROR ===");
-					debugPrint("Invalid response format: ${decoded.runtimeType}");
-					throw Exception("Invalid response format: ${decoded.runtimeType}");
-				}
-
-				debugPrint("=== [$methodName] PARSED ===");
-				debugPrint("invoiceId : ${decoded['invoiceId']}");
-				debugPrint("status    : ${decoded['status']}");
-				debugPrint("totalBayar: ${decoded['totalBayar']}");
-				debugPrint("curr      : ${decoded['curr']}");
-
-				return InvoiceStatusModel.fromJson(decoded);
-			} else {
-				debugPrint("=== [$methodName] HTTP ERROR ===");
-				debugPrint("Status Code: ${response.statusCode}");
-				debugPrint("Body       : ${response.body}");
-				throw Exception(
-						"Failed to load data (Status: ${response.statusCode})");
-			}
-		} catch (e, stackTrace) {
-			debugPrint("=== [$methodName] EXCEPTION ===");
-			debugPrint("Error     : $e");
-			debugPrint("StackTrace: $stackTrace");
-			rethrow;
-		}
-	}
-
-	Future<InvoiceStatusModel> invoice2PaymentViaCardAPI(
-			PaymentCardModel record,
-			) async {
-		String endpoint =
-				"${AppData.prefixEndPoint}/api/payment/invtobayarviacard";
-
-		Map<String, String> queryParams = {
-			'invoiceId': record.invoiceId,
-			'card_number': record.cardNumber,
-			'expiry_month': record.expiryMonth,
-			'expiry_year': record.expiryYear,
-			'cvn': record.cvn,
-			'cardholder_first_name': record.cardholderFirstName,
-			'cardholder_last_name': record.cardholderLastName,
-			'cardholder_email': record.cardholderEmail,
-			'cardholder_phone_number': record.cardholderPhoneNumber,
-			'modulId': 'invoice2PaymentViaCardAPI',
-		};
-
-		var uri = AppData.uriHtpp(
-			AppData.httpAuthority,
-			endpoint,
-			queryParams,
-		);
-
-		final headers = <String, String>{
-			'Content-Type': 'application/json; odata=verbose',
-			'Accept': 'application/json; odata=verbose',
-			'Authorization': 'Bearer ${AppData.userToken}',
-		};
-
-		_logRequest(
-			name: "invoice2PaymentViaCardAPI",
-			uri: uri,
-			headers: headers,
-		);
-
-		final response = await http.get(uri, headers: headers);
-
-		_logResponse(
-			name: "invoice2PaymentViaCardAPI",
-			response: response,
-		);
-
-		if (response.statusCode == 200) {
-			final decoded = json.decode(response.body);
-
-			if (decoded == null) {
-				throw Exception("API returned null body");
-			}
-
-			if (decoded is! Map<String, dynamic>) {
-				throw Exception("Invalid response format: ${decoded.runtimeType}");
-			}
-
-			return InvoiceStatusModel.fromJson(decoded);
-		} else {
-			throw Exception(
-				"Failed to load data (Status: ${response.statusCode})",
-			);
-		}
-	}
-
-	Future<RincianSOAModel> getRincianSOACustomer(String searchText) async {
-		try {
-			String urlGetListEndPoint =
-					"${AppData.prefixEndPoint}/api/payment/rinciansoa";
-
-			Map<String, String> queryParams = {
-				'searchText': searchText,
-			};
-
-			var uri = AppData.uriHtpp(
-				AppData.httpAuthority,
-				urlGetListEndPoint,
-				queryParams,
-			);
-
-			debugPrint("========== GET RINCIAN SOA ==========");
-			debugPrint("URL       : $uri");
-			debugPrint("PARAMS    : $queryParams");
-			debugPrint("TOKEN     : ${AppData.userToken}");
-
-			final http.Response response = await http.get(
-				uri,
-				headers: <String, String>{
-					'Content-Type': 'application/json; odata=verbos',
-					'Accept': 'application/json; odata=verbos',
-					'Authorization': 'Bearer ${AppData.userToken}'
-				},
-			);
-
-			debugPrint("STATUS CODE : ${response.statusCode}");
-			debugPrint("RESPONSE    : ${response.body}");
-
-			if (response.statusCode == 200) {
-				final Map<String, dynamic> jsonData =
-				json.decode(response.body) as Map<String, dynamic>;
-
-				debugPrint("JSON DATA   : $jsonData");
-
-				return RincianSOAModel.fromJson(jsonData);
-			} else {
-				debugPrint(
-					"ERROR RESPONSE : ${response.body}",
-				);
-
-				throw Exception(
-					"Failed to load data. Status: ${response.statusCode}",
-				);
-			}
-		} catch (e, stackTrace) {
-			debugPrint("========== ERROR GET RINCIAN SOA ==========");
-			debugPrint("ERROR      : $e");
-			debugPrint("STACKTRACE : $stackTrace");
-
-			rethrow;
-		}
-	}
-
-	Future<bool> forcePaymentViaVaAPI(String invoiceId) async {
-		String lihatEndpoint = "${AppData.prefixEndPoint}/api/payment/forcepaymentviava";
-		Map<String, String> queryParams = {'invoiceId': invoiceId};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
-		final http.Response response =
-		await http.get(uri, headers: <String, String>{
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		});
-
-		if (response.statusCode == 200) {
-			return true;
-		} else {
-			throw Exception("Failed to process data");
-		}
-	}
-
-	Future<InvoiceStatusModel> regMv2InvAPI(String regmv1Id) async {
-		String endpoint = "${AppData.prefixEndPoint}/api/payment/regmvtosppa";
-
-		Map<String, String> queryParams = {
-			'regmv1Id': regmv1Id,
-			'modulId': 'RegMv2InvAPI'
-		};
-
-		var uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
-
-		final headers = {
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		};
-
-		_logRequest(name: "regMv2InvAPI", uri: uri, headers: headers);
-
-		final response = await http.get(uri, headers: headers);
-
-		_logResponse(name: "regMv2InvAPI", response: response);
-
-		if (response.statusCode == 200) {
-			final jsonData = json.decode(response.body);
-
-			debugPrint("=== PARSED ===");
-			debugPrint("invoiceId: ${jsonData['invoiceId']}");
-			debugPrint("status: ${jsonData['status']}");
-			debugPrint("totalBayar: ${jsonData['totalBayar']}");
-
-			return InvoiceStatusModel.fromJson(jsonData);
-		} else {
-			throw Exception("Failed to load data");
-		}
-	}
-
-	Future<InvoiceStatusModel> regPar2InvAPI(String regpar1Id) async {
-		try {
-			String endpoint = "${AppData.prefixEndPoint}/api/payment/regpartosppa";
-
-			Map<String, String> queryParams = {
-				'regpar1Id': regpar1Id,
-				'modulId': 'RegPar2InvAPI'
-			};
-
-			var uri = AppData.uriHtpp(
-				AppData.httpAuthority,
-				endpoint,
-				queryParams,
-			);
-
-			final headers = {
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			};
-
-			_logRequest(
-				name: "regPar2InvAPI",
-				uri: uri,
-				headers: headers,
-			);
-
-			final response = await http.get(
-				uri,
-				headers: headers,
-			);
-
-			_logResponse(
-				name: "regPar2InvAPI",
-				response: response,
-			);
-
-			if (response.statusCode == 200) {
-				final Map<String, dynamic> jsonData =
-				json.decode(response.body) as Map<String, dynamic>;
-
-				debugPrint("=== PARSED ===");
-				debugPrint("invoiceId: ${jsonData['invoiceId']}");
-				debugPrint("status: ${jsonData['status']}");
-				debugPrint("totalBayar: ${jsonData['totalBayar']}");
-
-				return InvoiceStatusModel.fromJson(jsonData);
-			} else {
-				debugPrint("=== ERROR RESPONSE ===");
-				debugPrint("statusCode : ${response.statusCode}");
-				debugPrint("body       : ${response.body}");
-
-				throw Exception("Failed to load data");
-			}
-		} catch (e, s) {
-			debugPrint("=== regPar2InvAPI ERROR ===");
-			debugPrint("error : $e");
-			debugPrint("stack : $s");
-
-			rethrow;
-		}
-	}
-
-	Future<InvoiceStatusModel> batalInvByIdAPI(String invoiceId) async {
-		try {
-			String endpoint = "${AppData.prefixEndPoint}/api/payment/batalinvbyid";
-
-			Map<String, String> queryParams = {
-				'invoiceId': invoiceId,
-			};
-
-			var uri = AppData.uriHtpp(
-				AppData.httpAuthority,
-				endpoint,
-				queryParams,
-			);
-
-			final headers = {
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}',
-			};
-
-			_logRequest(
-				name: "batalInvByIdAPI",
-				uri: uri,
-				headers: headers,
-			);
-
-			final response = await http.get(
-				uri,
-				headers: headers,
-			);
-
-			_logResponse(
-				name: "batalInvByIdAPI",
-				response: response,
-			);
-
-			if (response.statusCode == 200) {
-				final Map<String, dynamic> jsonData =
-				json.decode(response.body) as Map<String, dynamic>;
-
-				debugPrint("=== PARSED BATAL INV ===");
-				debugPrint("invoiceId: ${jsonData['invoiceId']}");
-				debugPrint("status: ${jsonData['status']}");
-				debugPrint("totalBayar: ${jsonData['totalBayar']}");
-				debugPrint("curr: ${jsonData['curr']}");
-
-				return InvoiceStatusModel.fromJson(jsonData);
-			} else {
-				debugPrint("=== ERROR BATAL INV ===");
-				debugPrint("statusCode : ${response.statusCode}");
-				debugPrint("body       : ${response.body}");
-
-				throw Exception("Failed to cancel invoice");
-			}
-		} catch (e, s) {
-			debugPrint("=== batalInvByIdAPI ERROR ===");
-			debugPrint("error : $e");
-			debugPrint("stack : $s");
-
-			rethrow;
-		}
-	}
+  }
+
+  Future<InvoiceStatusModel> dnToInvByListDnAPI(String listdn) async {
+    String endpoint = "${AppData.prefixEndPoint}/api/payment/dntoinvbylistdn";
+
+    Map<String, String> queryParams = {
+      'listdn': listdn,
+      'modulId': 'dnToInvByListDnAPI'
+    };
+
+    var uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
+
+    final headers = {
+      'Content-Type': 'application/json; odata=verbos',
+      'Accept': 'application/json; odata=verbos',
+      'Authorization': 'Bearer ${AppData.userToken}'
+    };
+
+    _logRequest(name: "dnToInvByListDnAPI", uri: uri, headers: headers);
+
+    final response = await http.get(uri, headers: headers);
+
+    _logResponse(name: "dnToInvByListDnAPI", response: response);
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      debugPrint("Parsed status: ${jsonData['status']}");
+      return InvoiceStatusModel.fromJson(jsonData);
+    } else {
+      throw Exception("Failed to load data");
+    }
+  }
+
+  Future<InvoiceStatusModel> invoice2PaymentViaVaAPI(
+      String invoiceId, String methodId) async {
+    const methodName = "invoice2PaymentViaVaAPI";
+
+    String endpoint = "${AppData.prefixEndPoint}/api/payment/invtobayarviava";
+
+    Map<String, String> queryParams = {
+      'invoiceId': invoiceId,
+      'methodId': methodId,
+      'modulId': 'invoice2PaymentAPI'
+    };
+
+    var uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
+
+    final headers = <String, String>{
+      'Content-Type': 'application/json; odata=verbose', // fix typo
+      'Accept': 'application/json; odata=verbose',
+      'Authorization': 'Bearer ${AppData.userToken}'
+    };
+
+    try {
+      debugPrint("=== [$methodName] REQUEST ===");
+      debugPrint("invoiceId: $invoiceId");
+      debugPrint("methodId : $methodId");
+      debugPrint("URL      : $uri");
+
+      final response = await http
+          .get(uri, headers: headers)
+          .timeout(const Duration(seconds: 10));
+
+      debugPrint("=== [$methodName] RESPONSE ===");
+      debugPrint("Status Code: ${response.statusCode}");
+      debugPrint("Body       : ${response.body}");
+
+      if (response.statusCode == 200) {
+        final decoded = json.decode(response.body);
+
+        if (decoded == null) {
+          debugPrint("=== [$methodName] ERROR ===");
+          debugPrint("API returned null body");
+          throw Exception("API returned null body");
+        }
+
+        if (decoded is! Map<String, dynamic>) {
+          debugPrint("=== [$methodName] ERROR ===");
+          debugPrint("Invalid response format: ${decoded.runtimeType}");
+          throw Exception("Invalid response format: ${decoded.runtimeType}");
+        }
+
+        debugPrint("=== [$methodName] PARSED ===");
+        debugPrint("invoiceId : ${decoded['invoiceId']}");
+        debugPrint("status    : ${decoded['status']}");
+        debugPrint("totalBayar: ${decoded['totalBayar']}");
+        debugPrint("curr      : ${decoded['curr']}");
+
+        return InvoiceStatusModel.fromJson(decoded);
+      } else {
+        debugPrint("=== [$methodName] HTTP ERROR ===");
+        debugPrint("Status Code: ${response.statusCode}");
+        debugPrint("Body       : ${response.body}");
+        throw Exception("Failed to load data (Status: ${response.statusCode})");
+      }
+    } catch (e, stackTrace) {
+      debugPrint("=== [$methodName] EXCEPTION ===");
+      debugPrint("Error     : $e");
+      debugPrint("StackTrace: $stackTrace");
+      rethrow;
+    }
+  }
+
+  Future<InvoiceStatusModel> invoice2PaymentViaCardAPI(
+    PaymentCardModel record,
+  ) async {
+    String endpoint = "${AppData.prefixEndPoint}/api/payment/invtobayarviacard";
+
+    Map<String, String> queryParams = {
+      'invoiceId': record.invoiceId,
+      'card_number': record.cardNumber,
+      'expiry_month': record.expiryMonth,
+      'expiry_year': record.expiryYear,
+      'cvn': record.cvn,
+      'cardholder_first_name': record.cardholderFirstName,
+      'cardholder_last_name': record.cardholderLastName,
+      'cardholder_email': record.cardholderEmail,
+      'cardholder_phone_number': record.cardholderPhoneNumber,
+      'modulId': 'invoice2PaymentViaCardAPI',
+    };
+
+    var uri = AppData.uriHtpp(
+      AppData.httpAuthority,
+      endpoint,
+      queryParams,
+    );
+
+    final headers = <String, String>{
+      'Content-Type': 'application/json; odata=verbose',
+      'Accept': 'application/json; odata=verbose',
+      'Authorization': 'Bearer ${AppData.userToken}',
+    };
+
+    _logRequest(
+      name: "invoice2PaymentViaCardAPI",
+      uri: uri,
+      headers: headers,
+    );
+
+    final response = await http.get(uri, headers: headers);
+
+    _logResponse(
+      name: "invoice2PaymentViaCardAPI",
+      response: response,
+    );
+
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+
+      if (decoded == null) {
+        throw Exception("API returned null body");
+      }
+
+      if (decoded is! Map<String, dynamic>) {
+        throw Exception("Invalid response format: ${decoded.runtimeType}");
+      }
+
+      return InvoiceStatusModel.fromJson(decoded);
+    } else {
+      throw Exception(
+        "Failed to load data (Status: ${response.statusCode})",
+      );
+    }
+  }
+
+  Future<RincianSOAModel> getRincianSOACustomer(String searchText) async {
+    try {
+      String urlGetListEndPoint =
+          "${AppData.prefixEndPoint}/api/payment/rinciansoa";
+
+      Map<String, String> queryParams = {
+        'searchText': searchText,
+      };
+
+      var uri = AppData.uriHtpp(
+        AppData.httpAuthority,
+        urlGetListEndPoint,
+        queryParams,
+      );
+
+      debugPrint("========== GET RINCIAN SOA ==========");
+      debugPrint("URL       : $uri");
+      debugPrint("PARAMS    : $queryParams");
+      debugPrint("TOKEN     : ${AppData.userToken}");
+
+      final http.Response response = await http.get(
+        uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; odata=verbos',
+          'Accept': 'application/json; odata=verbos',
+          'Authorization': 'Bearer ${AppData.userToken}'
+        },
+      );
+
+      debugPrint("STATUS CODE : ${response.statusCode}");
+      debugPrint("RESPONSE    : ${response.body}");
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData =
+            json.decode(response.body) as Map<String, dynamic>;
+
+        debugPrint("JSON DATA   : $jsonData");
+
+        return RincianSOAModel.fromJson(jsonData);
+      } else {
+        debugPrint(
+          "ERROR RESPONSE : ${response.body}",
+        );
+
+        throw Exception(
+          "Failed to load data. Status: ${response.statusCode}",
+        );
+      }
+    } catch (e, stackTrace) {
+      debugPrint("========== ERROR GET RINCIAN SOA ==========");
+      debugPrint("ERROR      : $e");
+      debugPrint("STACKTRACE : $stackTrace");
+
+      rethrow;
+    }
+  }
+
+  Future<bool> forcePaymentViaVaAPI(String invoiceId) async {
+    String lihatEndpoint =
+        "${AppData.prefixEndPoint}/api/payment/forcepaymentviava";
+    Map<String, String> queryParams = {'invoiceId': invoiceId};
+    var uri =
+        AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+    final http.Response response =
+        await http.get(uri, headers: <String, String>{
+      'Content-Type': 'application/json; odata=verbos',
+      'Accept': 'application/json; odata=verbos',
+      'Authorization': 'Bearer ${AppData.userToken}'
+    });
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception("Failed to process data");
+    }
+  }
+
+  Future<InvoiceStatusModel> regMv2InvAPI(String regmv1Id) async {
+    String endpoint = "${AppData.prefixEndPoint}/api/payment/regmvtosppa";
+
+    Map<String, String> queryParams = {
+      'regmv1Id': regmv1Id,
+      'modulId': 'RegMv2InvAPI'
+    };
+
+    var uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
+
+    final headers = {
+      'Content-Type': 'application/json; odata=verbos',
+      'Accept': 'application/json; odata=verbos',
+      'Authorization': 'Bearer ${AppData.userToken}'
+    };
+
+    _logRequest(name: "regMv2InvAPI", uri: uri, headers: headers);
+
+    final response = await http.get(uri, headers: headers);
+
+    _logResponse(name: "regMv2InvAPI", response: response);
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+
+      debugPrint("=== PARSED ===");
+      debugPrint("invoiceId: ${jsonData['invoiceId']}");
+      debugPrint("status: ${jsonData['status']}");
+      debugPrint("totalBayar: ${jsonData['totalBayar']}");
+
+      return InvoiceStatusModel.fromJson(jsonData);
+    } else {
+      throw Exception("Failed to load data");
+    }
+  }
+
+  Future<InvoiceStatusModel> regPar2InvAPI(String regpar1Id) async {
+    try {
+      String endpoint = "${AppData.prefixEndPoint}/api/payment/regpartosppa";
+
+      Map<String, String> queryParams = {
+        'regpar1Id': regpar1Id,
+        'modulId': 'RegPar2InvAPI'
+      };
+
+      var uri = AppData.uriHtpp(
+        AppData.httpAuthority,
+        endpoint,
+        queryParams,
+      );
+
+      final headers = {
+        'Content-Type': 'application/json; odata=verbos',
+        'Accept': 'application/json; odata=verbos',
+        'Authorization': 'Bearer ${AppData.userToken}'
+      };
+
+      _logRequest(
+        name: "regPar2InvAPI",
+        uri: uri,
+        headers: headers,
+      );
+
+      final response = await http.get(
+        uri,
+        headers: headers,
+      );
+
+      _logResponse(
+        name: "regPar2InvAPI",
+        response: response,
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData =
+            json.decode(response.body) as Map<String, dynamic>;
+
+        debugPrint("=== PARSED ===");
+        debugPrint("invoiceId: ${jsonData['invoiceId']}");
+        debugPrint("status: ${jsonData['status']}");
+        debugPrint("totalBayar: ${jsonData['totalBayar']}");
+
+        return InvoiceStatusModel.fromJson(jsonData);
+      } else {
+        debugPrint("=== ERROR RESPONSE ===");
+        debugPrint("statusCode : ${response.statusCode}");
+        debugPrint("body       : ${response.body}");
+
+        throw Exception("Failed to load data");
+      }
+    } catch (e, s) {
+      debugPrint("=== regPar2InvAPI ERROR ===");
+      debugPrint("error : $e");
+      debugPrint("stack : $s");
+
+      rethrow;
+    }
+  }
+
+  Future<InvoiceStatusModel> batalInvByIdAPI(String invoiceId) async {
+    try {
+      String endpoint = "${AppData.prefixEndPoint}/api/payment/batalinvbyid";
+
+      Map<String, String> queryParams = {
+        'invoiceId': invoiceId,
+      };
+
+      var uri = AppData.uriHtpp(
+        AppData.httpAuthority,
+        endpoint,
+        queryParams,
+      );
+
+      final headers = {
+        'Content-Type': 'application/json; odata=verbos',
+        'Accept': 'application/json; odata=verbos',
+        'Authorization': 'Bearer ${AppData.userToken}',
+      };
+
+      _logRequest(
+        name: "batalInvByIdAPI",
+        uri: uri,
+        headers: headers,
+      );
+
+      final response = await http.get(
+        uri,
+        headers: headers,
+      );
+
+      _logResponse(
+        name: "batalInvByIdAPI",
+        response: response,
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData =
+            json.decode(response.body) as Map<String, dynamic>;
+
+        debugPrint("=== PARSED BATAL INV ===");
+        debugPrint("invoiceId: ${jsonData['invoiceId']}");
+        debugPrint("status: ${jsonData['status']}");
+        debugPrint("totalBayar: ${jsonData['totalBayar']}");
+        debugPrint("curr: ${jsonData['curr']}");
+
+        return InvoiceStatusModel.fromJson(jsonData);
+      } else {
+        debugPrint("=== ERROR BATAL INV ===");
+        debugPrint("statusCode : ${response.statusCode}");
+        debugPrint("body       : ${response.body}");
+
+        throw Exception("Failed to cancel invoice");
+      }
+    } catch (e, s) {
+      debugPrint("=== batalInvByIdAPI ERROR ===");
+      debugPrint("error : $e");
+      debugPrint("stack : $s");
+
+      rethrow;
+    }
+  }
 }

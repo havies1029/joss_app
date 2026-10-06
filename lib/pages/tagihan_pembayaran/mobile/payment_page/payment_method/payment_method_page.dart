@@ -235,7 +235,22 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
       listener: (context, state) {
         if (state.hasFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
-            errorSnackBar('Gagal membuat pembayaran VA. Silakan coba lagi.'),
+            errorSnackBar(
+              state.isViaVaTimeoutRecovery
+                  ? 'Konfirmasi sedang diproses. Silakan cek kembali beberapa saat lagi.'
+                  : 'Gagal membuat pembayaran VA. Silakan coba lagi.',
+            ),
+          );
+          return;
+        }
+
+        if (state.isViaVaTimeoutRecovery &&
+            state.isProcessed &&
+            state.paymentStatus != "30") {
+          ScaffoldMessenger.of(context).showSnackBar(
+            infoSnackBar(
+              'Konfirmasi sedang diproses. Silakan cek kembali beberapa saat lagi.',
+            ),
           );
           return;
         }

@@ -1,5 +1,6 @@
 class RegparValidationPreviewRequestModel {
   String regpar1Id;
+  DateTime polisMulai;
   String? rokupasiId;
   String? currId;
   double siBuilding;
@@ -10,6 +11,7 @@ class RegparValidationPreviewRequestModel {
 
   RegparValidationPreviewRequestModel({
     required this.regpar1Id,
+    required this.polisMulai,
     this.rokupasiId,
     this.currId,
     required this.siBuilding,
@@ -21,6 +23,7 @@ class RegparValidationPreviewRequestModel {
 
   Map<String, dynamic> toJson() => {
         'regpar1Id': regpar1Id,
+        'polisMulai': polisMulai.toIso8601String(),
         'rokupasiId': rokupasiId,
         'currId': currId,
         'siBuilding': siBuilding.toString(),
