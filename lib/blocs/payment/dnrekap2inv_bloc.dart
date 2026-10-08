@@ -175,7 +175,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       paymentStatus: invoiceStatus.status,
       totalBayar: invoiceStatus.totalBayar,
       curr: invoiceStatus.curr,
-      statusCheckSource: InvoiceStatusCheckSource.general,
+      statusCheckSource: event.source,
     ));
   }
 
@@ -189,6 +189,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       isProcessing: true,
       isProcessed: false,
       hasFailure: false,
+      statusCheckSource: InvoiceStatusCheckSource.viaCard,
     ));
 
     try {
@@ -207,12 +208,13 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         paymentStatus: invoiceStatus.status,
         totalBayar: invoiceStatus.totalBayar,
         curr: invoiceStatus.curr,
-        statusCheckSource: InvoiceStatusCheckSource.general,
+        statusCheckSource: InvoiceStatusCheckSource.viaCard,
       ));
     } catch (e) {
       emit(state.copyWith(
         isProcessing: false,
         hasFailure: true,
+        statusCheckSource: InvoiceStatusCheckSource.viaCard,
       ));
     }
   }

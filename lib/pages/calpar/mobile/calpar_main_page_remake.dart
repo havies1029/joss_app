@@ -644,6 +644,18 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           ),
           BlocListener<Calpar1CrudBloc, Calpar1CrudState>(
             listener: (context, state) {
+              if (_isHitungPremiLoading && _calpar1SaveStartedForHitungPremi) {
+                if (!state.isSaving) {
+                  _calpar1SaveStartedForHitungPremi = false;
+                  if (state.hasFailure) {
+                    _endHitungPremiUiLock();
+                    openForm1();
+                  }
+                }
+              } else if (_isHitungPremiLoading && state.isSaving) {
+                _calpar1SaveStartedForHitungPremi = true;
+              }
+
               if (state.isSaved && !state.hasFailure && state.record != null) {
                 setState(() {
                   calpar1Id = state.record!.calpar1Id;
@@ -656,6 +668,18 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           ),
           BlocListener<Calpar2FormBloc, Calpar2FormState>(
             listener: (context, state) {
+              if (_isHitungPremiLoading && _calpar2SaveStartedForHitungPremi) {
+                if (!state.isSaving) {
+                  _calpar2SaveStartedForHitungPremi = false;
+                  if (state.hasFailure) {
+                    _endHitungPremiUiLock();
+                    openForm2();
+                  }
+                }
+              } else if (_isHitungPremiLoading && state.isSaving) {
+                _calpar2SaveStartedForHitungPremi = true;
+              }
+
               if (state.isSaved && !state.hasFailure && state.record != null) {
                 setState(() {
                   calpar2Id = state.record!.calpar2Id;
@@ -668,6 +692,18 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           ),
           BlocListener<Calpar3FormBloc, Calpar3FormState>(
             listener: (context, state) {
+              if (_isHitungPremiLoading && _calpar3SaveStartedForHitungPremi) {
+                if (!state.isSaving) {
+                  _calpar3SaveStartedForHitungPremi = false;
+                  if (state.hasFailure) {
+                    _endHitungPremiUiLock();
+                    openForm3();
+                  }
+                }
+              } else if (_isHitungPremiLoading && state.isSaving) {
+                _calpar3SaveStartedForHitungPremi = true;
+              }
+
               if (state.isSaved && !state.hasFailure && state.record != null) {
                 setState(() {
                   calpar3Id = state.record!.calpar3Id;
@@ -1358,6 +1394,34 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   }
 
   bool _isHitungPremiLoading = false;
+  bool _calpar1SaveStartedForHitungPremi = false;
+  bool _calpar2SaveStartedForHitungPremi = false;
+  bool _calpar3SaveStartedForHitungPremi = false;
+
+  void _beginHitungPremiUiLock() {
+    if (!mounted) return;
+
+    _calpar1SaveStartedForHitungPremi = false;
+    _calpar2SaveStartedForHitungPremi = false;
+    _calpar3SaveStartedForHitungPremi = false;
+
+    setState(() {
+      _isHitungPremiLoading = true;
+      expanded = List<bool>.filled(expanded.length, false);
+    });
+  }
+
+  void _endHitungPremiUiLock() {
+    if (!mounted) return;
+
+    setState(() {
+      _isHitungPremiLoading = false;
+    });
+  }
+
+  bool _canOpenSectionWhileHitungPremi(CalparFormSection section) {
+    return !_isHitungPremiLoading || section == CalparFormSection.form4;
+  }
 
   Widget buildButtonHitungPremi() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -1393,11 +1457,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       return;
     }
 
-    if (mounted) {
-      setState(() {
-        _isHitungPremiLoading = true;
-      });
-    }
+    _beginHitungPremiUiLock();
 
     draftForm1ToBloc(context);
     draftForm2ToBloc(context);
@@ -2189,6 +2249,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   }
 
   void openSection(CalparFormSection section, {VoidCallback? onRefresh}) {
+    if (!_canOpenSectionWhileHitungPremi(section)) return;
+
     final idx = sectionIndex(section);
 
     setState(() {
@@ -2200,6 +2262,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   }
 
   void tryOpenSection(CalparFormSection section, {VoidCallback? onRefresh}) {
+    if (!_canOpenSectionWhileHitungPremi(section)) return;
+
     final targetIdx = sectionIndex(section);
     final opened = getOpenedIndex();
 

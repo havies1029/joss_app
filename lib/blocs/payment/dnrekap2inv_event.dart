@@ -4,6 +4,7 @@ enum InvoiceStatusCheckSource {
   general,
   riwayatContinuePayment,
   viaVa,
+  viaCard,
 }
 
 abstract class DnRekap2invEvent extends Equatable {
@@ -56,11 +57,15 @@ class CheckInvoiceStatusEvent extends DnRekap2invEvent {
 
 class SetRecordInvoiceStatusEvent extends DnRekap2invEvent {
   final InvoiceStatusModel invoiceStatusRecord;
+  final InvoiceStatusCheckSource source;
 
-  const SetRecordInvoiceStatusEvent({required this.invoiceStatusRecord});
+  const SetRecordInvoiceStatusEvent({
+    required this.invoiceStatusRecord,
+    required this.source,
+  });
 
   @override
-  List<Object> get props => [invoiceStatusRecord];
+  List<Object> get props => [invoiceStatusRecord, source];
 }
 
 class Invoice2PaymentViaVAEvent extends DnRekap2invEvent {

@@ -151,7 +151,9 @@ class KonfirmasiDetailPolisPage extends StatelessWidget {
               Navigator.pushNamed(context, '/payment-methods');
             } else if (state.paymentStatus == "30") {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Silakan lakukan pembayaran.')),
+                const SnackBar(
+                  content: Text('Silakan lanjutkan proses pembayaran Anda.'),
+                ),
               );
               Navigator.pushNamed(
                 context,

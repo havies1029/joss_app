@@ -1981,6 +1981,20 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
   bool _isHitungPremiLoading = false;
   int _hitungPremiAttempt = 0;
+
+  void _beginHitungPremiUiLock() {
+    if (!mounted) return;
+
+    setState(() {
+      _isHitungPremiLoading = true;
+      expanded = List<bool>.filled(expanded.length, false);
+    });
+  }
+
+  bool _canOpenSectionWhileHitungPremi(RegparSection section) {
+    return !_isHitungPremiLoading || section == RegparSection.form5;
+  }
+
   final RegparValidationPreviewRepository _validationPreviewRepository =
       RegparValidationPreviewRepository();
   RegparValidationPreviewResponseModel? _lastValidationPreviewResponse;
@@ -2042,20 +2056,12 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       return;
     }
 
-    if (mounted) {
-      setState(() {
-        _isHitungPremiLoading = true;
-      });
-    }
+    _beginHitungPremiUiLock();
 
     final canContinueByPreview = await _runValidationPreviewBeforeFlow();
     if (!mounted || !canContinueByPreview) return;
 
-    if (mounted) {
-      setState(() {
-        _isHitungPremiLoading = true;
-      });
-    }
+    _beginHitungPremiUiLock();
     _startHitungPremiTimeout();
 
     final localIds6 = form6State.items.map((e) => e.localId).toList();
@@ -3810,6 +3816,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     VoidCallback? onRefresh,
     bool showLoading = false,
   }) {
+    if (!_canOpenSectionWhileHitungPremi(section)) return;
+
     final idx = sectionIndex(section);
     setState(() {
       expanded = List.filled(expanded.length, false);
@@ -3851,6 +3859,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     VoidCallback? onRefresh,
     bool showLoading = false,
   }) {
+    if (!_canOpenSectionWhileHitungPremi(target)) return;
+
     final targetIdx = sectionIndex(target);
     final opened = getOpenedIndex();
     if (opened == targetIdx) return;

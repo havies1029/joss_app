@@ -362,6 +362,9 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
               return;
             }
 
+            final isCardStatus =
+                state.statusCheckSource == InvoiceStatusCheckSource.viaCard;
+
             if (state.isProcessed || state.hasFailure) {
               _hideGlobalLoading();
               if (!mounted) return;
@@ -384,7 +387,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
               onViewPaymentMethods(state.curr, state.totalBayar);
               _showSafeSnackBar(
                 successSnackBar(
-                  "Invoice berhasil dibuat. Silakan lanjut ke metode pembayaran.",
+                  "Silakan lanjut ke metode pembayaran.",
                 ),
               );
               return;
@@ -413,9 +416,10 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
             }
 
             if (state.paymentStatus == "40") {
-              if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
                 _isCardWebViewOpen = false;
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               }
 
               _showSafeSnackBar(
@@ -441,6 +445,13 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
             if (state.paymentStatus == "91") {
               refreshData();
 
+              if (isCardStatus &&
+                  _isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -458,6 +469,22 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                       );
                     },
                   ),
+                ),
+              );
+
+              return;
+            }
+
+            if (state.paymentStatus == "50" && isCardStatus) {
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+
+              _showSafeSnackBar(
+                errorSnackBar(
+                  "Pembayaran kartu kredit gagal diproses. Silakan coba lagi.",
                 ),
               );
 
@@ -1112,7 +1139,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
           if (data == null) ...[
             _buildCardLoading(),
           ] else ...[
-            _buildDetailRow("NO SPPA:", data.regpar1Id),
+            _buildDetailRow("No Request:", data.regpar1Id),
             _buildDetailRow("Nama Tertanggung:", data.ttgNama),
             _buildDetailRow("Alamat Tertanggung:", data.ttgAlamat),
           ],

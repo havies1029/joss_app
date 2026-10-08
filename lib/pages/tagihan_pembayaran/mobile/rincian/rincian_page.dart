@@ -134,6 +134,9 @@ class _RincianPageState extends State<RincianPage> {
               return;
             }
 
+            final isCardStatus =
+                state.statusCheckSource == InvoiceStatusCheckSource.viaCard;
+
             if (!state.isProcessed) return;
 
             if (state.paymentStatus == "20") {
@@ -146,7 +149,7 @@ class _RincianPageState extends State<RincianPage> {
               onViewPaymentMethods(curr, state.totalBayar);
             } else if (state.paymentStatus == "30") {
               ScaffoldMessenger.of(context).showSnackBar(
-                infoSnackBar('Silakan lakukan pembayaran.'),
+                infoSnackBar('Silakan lanjutkan proses pembayaran Anda.'),
               );
 
               Navigator.push(
@@ -159,9 +162,10 @@ class _RincianPageState extends State<RincianPage> {
                 ),
               );
             } else if (state.paymentStatus == "40") {
-              if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
                 _isCardWebViewOpen = false;
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               }
 
               ScaffoldMessenger.of(context).showSnackBar(
@@ -178,7 +182,26 @@ class _RincianPageState extends State<RincianPage> {
                   ),
                 ),
               );
+            } else if (state.paymentStatus == "50" && isCardStatus) {
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(
+                  'Pembayaran kartu kredit gagal diproses. Silakan coba lagi.',
+                ),
+              );
             } else if (state.paymentStatus == "91") {
+              if (isCardStatus &&
+                  _isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+
               if (_hasHandledPaymentCancel) return;
               _hasHandledPaymentCancel = true;
 
@@ -595,8 +618,8 @@ class _RincianPageState extends State<RincianPage> {
 
                 if (selectedDetails.isEmpty) {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      errorSnackBar("Maaf data tidak tersedia"));
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(errorSnackBar("Maaf data tidak tersedia"));
                   return;
                 }
 

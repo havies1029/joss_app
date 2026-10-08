@@ -64,7 +64,7 @@ class RingkasanPageState extends State<RingkasanPage> {
             onViewPaymentMethods(curr, state.totalBayar);
           } else if (state.paymentStatus == "30") {
             ScaffoldMessenger.of(context).showSnackBar(
-              infoSnackBar('Silakan lakukan pembayaran.'),
+              infoSnackBar('Silakan lanjutkan proses pembayaran Anda.'),
             );
             Navigator.push(
               context,

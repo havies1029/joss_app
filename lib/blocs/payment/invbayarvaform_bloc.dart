@@ -20,8 +20,15 @@ class InvbayarvaFormBloc
   Timer? _statusTimer;
   int _vaAttempt = 0;
   int _statusAttempt = 0;
+  InvoiceStatusCheckSource _statusCheckSource =
+      InvoiceStatusCheckSource.general;
+  String? _activeStatusInvoiceId;
+  bool _hasHandledTerminalStatus = false;
 
-  InvbayarvaFormBloc({required this.infoVArepository, required this.paymentDnRepository, required this.dnRekap2invBloc})
+  InvbayarvaFormBloc(
+      {required this.infoVArepository,
+      required this.paymentDnRepository,
+      required this.dnRekap2invBloc})
       : super(const InvbayarvaFormState()) {
     on<InvbayarvaPollingStarted>(_onStartPolling);
     on<InvbayarvaPollingStopped>(_onStopPolling);
@@ -34,13 +41,16 @@ class InvbayarvaFormBloc
   }
 
   void _onStartCreditCardPaymentChecking(
-      CreditCardPaymentCheckingStarted event,
-      Emitter<InvbayarvaFormState> emit,
-      ) {
+    CreditCardPaymentCheckingStarted event,
+    Emitter<InvbayarvaFormState> emit,
+  ) {
     _stopAllTimers();
 
     _vaAttempt = 0;
     _statusAttempt = 0;
+    _statusCheckSource = InvoiceStatusCheckSource.viaCard;
+    _activeStatusInvoiceId = event.invoiceId;
+    _hasHandledTerminalStatus = false;
 
     emit(state.copyWith(
       isPollingVa: false,
@@ -57,12 +67,15 @@ class InvbayarvaFormBloc
   }
 
   void _onStartStatusOnlyPolling(
-      InvoiceStatusPollingStarted event,
-      Emitter<InvbayarvaFormState> emit,
-      ) {
+    InvoiceStatusPollingStarted event,
+    Emitter<InvbayarvaFormState> emit,
+  ) {
     _stopAllTimers();
 
     _statusAttempt = 0;
+    _statusCheckSource = InvoiceStatusCheckSource.general;
+    _activeStatusInvoiceId = event.invoiceId;
+    _hasHandledTerminalStatus = false;
 
     emit(state.copyWith(
       isPollingVa: false,
@@ -75,13 +88,16 @@ class InvbayarvaFormBloc
   }
 
   void _onStartPolling(
-      InvbayarvaPollingStarted event,
-      Emitter<InvbayarvaFormState> emit,
-      ) {
+    InvbayarvaPollingStarted event,
+    Emitter<InvbayarvaFormState> emit,
+  ) {
     _stopAllTimers();
 
     _vaAttempt = 0;
     _statusAttempt = 0;
+    _statusCheckSource = InvoiceStatusCheckSource.viaVa;
+    _activeStatusInvoiceId = event.invoiceId;
+    _hasHandledTerminalStatus = false;
 
     emit(state.copyWith(
       isPollingVa: true,
@@ -98,14 +114,14 @@ class InvbayarvaFormBloc
   }
 
   Future<void> _onVaTick(
-      _VaPollingTick event,
-      Emitter<InvbayarvaFormState> emit,
-      ) async {
+    _VaPollingTick event,
+    Emitter<InvbayarvaFormState> emit,
+  ) async {
     if (!state.isPollingVa) return;
 
     try {
       final record =
-      await infoVArepository.invbayarvaFormLihat(event.invoiceId);
+          await infoVArepository.invbayarvaFormLihat(event.invoiceId);
 
       emit(state.copyWith(
         record: record,
@@ -135,42 +151,63 @@ class InvbayarvaFormBloc
     }
   }
 
-  Future<void> _onStatusTick(_StatusPollingTick event,Emitter<InvbayarvaFormState> emit,) async {
+  Future<void> _onStatusTick(
+    _StatusPollingTick event,
+    Emitter<InvbayarvaFormState> emit,
+  ) async {
     if (!state.isPollingStatus) return;
 
     try {
       final InvoiceStatusModel recordStatus =
           await paymentDnRepository.fetchInvoiceStatus(event.invoiceId);
 
-      final currentRecord =
-          state.record ?? InvbayarvaFormModel.empty();
+      if (!state.isPollingStatus || _activeStatusInvoiceId != event.invoiceId) {
+        return;
+      }
+
+      final currentRecord = state.record ?? InvbayarvaFormModel.empty();
 
       final updatedRecord =
           currentRecord.copyWith(paymentStatus: recordStatus.status);
 
-      emit(state.copyWith(record: updatedRecord));
-
       final status = recordStatus.status;
+      final isTerminalStatus = status == "40" ||
+          status == "50" ||
+          status == "91" ||
+          status == "92" ||
+          status == "93";
 
-      if (status == "40" || status == "50"  || status == "91" || status == "92" ||
-      status == "93") {
+      if (isTerminalStatus && !_hasHandledTerminalStatus) {
+        _hasHandledTerminalStatus = true;
         _statusTimer?.cancel();
         _statusTimer = null;
 
-        emit(state.copyWith(isPollingStatus: false));
+        emit(state.copyWith(
+          record: updatedRecord,
+          isPollingStatus: false,
+        ));
 
-        dnRekap2invBloc.add(SetRecordInvoiceStatusEvent(invoiceStatusRecord: recordStatus));
-
+        dnRekap2invBloc.add(
+          SetRecordInvoiceStatusEvent(
+            invoiceStatusRecord: recordStatus,
+            source: _statusCheckSource,
+          ),
+        );
+        return;
       }
-    } catch (_) {}
 
+      emit(state.copyWith(record: updatedRecord));
+    } catch (_) {}
   }
 
   void _onStopPolling(
-      InvbayarvaPollingStopped event,
-      Emitter<InvbayarvaFormState> emit,
-      ) {
+    InvbayarvaPollingStopped event,
+    Emitter<InvbayarvaFormState> emit,
+  ) {
     _stopAllTimers();
+    _activeStatusInvoiceId = null;
+    _hasHandledTerminalStatus = false;
+    _statusCheckSource = InvoiceStatusCheckSource.general;
 
     emit(state.copyWith(
       isPollingVa: false,
@@ -193,9 +230,9 @@ class InvbayarvaFormBloc
   }
 
   void _startStatusPolling(
-      String invoiceId, {
-        Duration interval = const Duration(seconds: 5),
-      }) {
+    String invoiceId, {
+    Duration interval = const Duration(seconds: 5),
+  }) {
     if (!state.isPollingStatus) return;
 
     _statusTimer = Timer(interval, () {

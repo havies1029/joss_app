@@ -69,6 +69,9 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
               return;
             }
 
+            final isCardStatus =
+                state.statusCheckSource == InvoiceStatusCheckSource.viaCard;
+
             if (!state.isProcessed) return;
 
             if (state.paymentStatus == "20") {
@@ -78,7 +81,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
               onViewPaymentMethods(state.curr, state.totalBayar);
             } else if (state.paymentStatus == "30") {
               ScaffoldMessenger.of(context).showSnackBar(
-                infoSnackBar('Silakan lakukan pembayaran.'),
+                infoSnackBar('Silakan lanjutkan proses pembayaran Anda.'),
               );
               Navigator.push(
                 context,
@@ -90,9 +93,10 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                 ),
               );
             } else if (state.paymentStatus == "40") {
-              if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
                 _isCardWebViewOpen = false;
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               }
 
               ScaffoldMessenger.of(context).showSnackBar(
@@ -107,6 +111,18 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                     description: "Polis Anda kini aktif.",
                     displayButton: "Kembali",
                   ),
+                ),
+              );
+            } else if (state.paymentStatus == "50" && isCardStatus) {
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(
+                  'Pembayaran kartu kredit gagal diproses. Silakan coba lagi.',
                 ),
               );
             } else if (state.paymentStatus == "91" && state.isProcessed) {
@@ -143,6 +159,13 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                   ),
                 );
                 return;
+              }
+
+              if (isCardStatus &&
+                  _isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
               }
 
               if (_hasHandledPaymentCancel) return;

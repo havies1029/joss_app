@@ -19,6 +19,7 @@ import '../../../../../helper/navigation_keys.dart';
 import '../../../../../widgets/payment/bank_logo_widget.dart';
 import '../../../../base/base_background_sidepage.dart';
 import '../../../tagihan_pembayaran_page.dart';
+import '../payment_success/payment_success.dart';
 
 //micky 2026-02-27
 
@@ -44,6 +45,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
 
   Timer? _countdownTimer;
   DateTime _now = DateTime.now();
+  bool _hasHandledTerminalStatus = false;
 
   final fieldBatasBayarController =
       TextEditingController(text: DateTime.now().toIso8601String());
@@ -105,6 +107,35 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   void _refreshHeaderData() {
     context.read<SumdashBloc>().add(SumdashLihatEvent());
     context.read<LogtrscaritopxBloc>().add(RefreshLogtrscaritopxEvent());
+  }
+
+  void _handleTerminalPaymentStatus(InvbayarvaFormState state) {
+    final status =
+        (state.record?.paymentStatus ?? '').toString().trim().toUpperCase();
+
+    if (!_isTerminalPaymentStatus(status) ||
+        _hasHandledTerminalStatus ||
+        !mounted) {
+      return;
+    }
+
+    _hasHandledTerminalStatus = true;
+    _countdownTimer?.cancel();
+    invbayarvaFormBloc.add(const InvbayarvaPollingStopped());
+
+    if (status != '40' && status != 'PAID') {
+      return;
+    }
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => const PaymentSuccess(
+          display: 'Pembayaran Berhasil!',
+          description: 'Polis Anda kini aktif.',
+          displayButton: 'Kembali',
+        ),
+      ),
+    );
   }
 
   Future<bool?> showLeavePaymentDialog(BuildContext context) {
@@ -422,6 +453,22 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                 fieldBatasBayarController.text = r.batasBayar.toString();
               },
             ),
+            BlocListener<InvbayarvaFormBloc, InvbayarvaFormState>(
+              listenWhen: (previous, current) {
+                final previousStatus = (previous.record?.paymentStatus ?? '')
+                    .toString()
+                    .trim()
+                    .toUpperCase();
+                final currentStatus = (current.record?.paymentStatus ?? '')
+                    .toString()
+                    .trim()
+                    .toUpperCase();
+
+                return previousStatus != currentStatus &&
+                    _isTerminalPaymentStatus(currentStatus);
+              },
+              listener: (context, state) => _handleTerminalPaymentStatus(state),
+            ),
           ],
           child: BlocBuilder<InvbayarvaFormBloc, InvbayarvaFormState>(
             builder: (context, state) {
@@ -477,16 +524,19 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                           const SizedBox(height: hPadding),
                           buildInstruksiPembayaran(state),
                           const SizedBox(height: hPadding),
-                          AppButton.iconLeft(
-                            text: 'Batal Pembayaran',
-                            backgroundColor: redPayment,
-                            icon: SvgPicture.asset(
-                              'assets/icons/gg_trash.svg',
-                              width: 18,
-                              height: 18,
+                          if (!_isTerminalPaymentStatus(
+                            state.record?.paymentStatus,
+                          ))
+                            AppButton.iconLeft(
+                              text: 'Batal Pembayaran',
+                              backgroundColor: redPayment,
+                              icon: SvgPicture.asset(
+                                'assets/icons/gg_trash.svg',
+                                width: 18,
+                                height: 18,
+                              ),
+                              onPressed: () => _handleCancelPayment(context),
                             ),
-                            onPressed: () => _handleCancelPayment(context),
-                          ),
                           FormError(errors: errors, key: null),
                         ],
                       ),
@@ -515,6 +565,47 @@ class PaymentProcessFormState extends State<PaymentProcess> {
       );
     }
 
+    // Tetap dukung status lama dari API sekaligus status numerik dari database.
+    if (status == "40" || status == "PAID") {
+      return _badge(
+        icon: Icons.check_circle,
+        text: "Pembayaran Berhasil",
+        color: Colors.green,
+      );
+    }
+
+    if (status == "50") {
+      return _badge(
+        icon: Icons.error,
+        text: "Pembayaran Gagal Diproses",
+        color: Colors.red,
+      );
+    }
+
+    if (status == "91" || status == "EXPIRED") {
+      return _badge(
+        icon: Icons.timer_off,
+        text: "Waktu Pembayaran Habis",
+        color: Colors.red,
+      );
+    }
+
+    if (status == "92") {
+      return _badge(
+        icon: Icons.credit_card_off,
+        text: "Nomor Kartu Salah",
+        color: Colors.red,
+      );
+    }
+
+    if (status == "93") {
+      return _badge(
+        icon: Icons.cancel,
+        text: "Pembayaran Dibatalkan",
+        color: Colors.red,
+      );
+    }
+
     // Menunggu VA
     if (va.isEmpty && state.isPollingVa) {
       return _badge(
@@ -525,29 +616,11 @@ class PaymentProcessFormState extends State<PaymentProcess> {
     }
 
     // VA sudah ada, menunggu pembayaran
-    if (va.isNotEmpty && state.isPollingStatus && status != "PAID") {
+    if (va.isNotEmpty && state.isPollingStatus) {
       return _badge(
         icon: Icons.hourglass_bottom,
         text: "Menunggu Pembayaran",
         color: primaryColor,
-      );
-    }
-
-    // Paid
-    if (status == "PAID") {
-      return _badge(
-        icon: Icons.check_circle,
-        text: "Pembayaran Berhasil",
-        color: Colors.green,
-      );
-    }
-
-    // Expired
-    if (status == "EXPIRED") {
-      return _badge(
-        icon: Icons.error,
-        text: "Pembayaran Kadaluarsa",
-        color: Colors.red,
       );
     }
 
@@ -557,6 +630,12 @@ class PaymentProcessFormState extends State<PaymentProcess> {
       text: "Menunggu Pembayaran",
       color: primaryColor,
     );
+  }
+
+  bool _isTerminalPaymentStatus(dynamic paymentStatus) {
+    final status = (paymentStatus ?? '').toString().trim().toUpperCase();
+    return const {'40', '50', '91', '92', '93', 'PAID', 'EXPIRED'}
+        .contains(status);
   }
 
   Widget _badge({

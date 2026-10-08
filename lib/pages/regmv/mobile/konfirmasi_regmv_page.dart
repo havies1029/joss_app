@@ -446,6 +446,9 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
               return;
             }
 
+            final isCardStatus =
+                state.statusCheckSource == InvoiceStatusCheckSource.viaCard;
+
             if (state.isProcessed || state.hasFailure) {
               _hideGlobalLoading();
               if (!mounted) return;
@@ -470,12 +473,12 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
               onViewPaymentMethods(curr, state.totalBayar);
               _showSafeSnackBar(
                 successSnackBar(
-                  'Invoice berhasil dibuat. Silakan lanjut ke metode pembayaran.',
+                  'Silakan lanjut ke metode pembayaran.',
                 ),
               );
             } else if (state.paymentStatus == "30") {
               _showSafeSnackBar(
-                successSnackBar('Silakan lakukan pembayaran.'),
+                successSnackBar('Silakan lanjutkan proses pembayaran Anda.'),
               );
 
               Navigator.push(
@@ -485,6 +488,18 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                     viewMode: "ubah",
                     recordId: state.invoiceId,
                   ),
+                ),
+              );
+            } else if (state.paymentStatus == "50" && isCardStatus) {
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+
+              _showSafeSnackBar(
+                errorSnackBar(
+                  'Pembayaran kartu kredit gagal diproses. Silakan coba lagi.',
                 ),
               );
             } else if (state.paymentStatus == "92") {
@@ -500,9 +515,10 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                 ),
               );
             } else if (state.paymentStatus == "40") {
-              if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
                 _isCardWebViewOpen = false;
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               }
 
               _showSafeSnackBar(
@@ -533,6 +549,13 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                 ),
               );
             } else if (state.paymentStatus == "91") {
+              if (isCardStatus &&
+                  _isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -1084,7 +1107,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
         children: [
           _buildSectionHeader("Data Tertanggung"),
           kDivider(color: sGrey),
-          _buildDetailRow("NO SPPA:", data.regmv1Id),
+          _buildDetailRow("Nox Request:", data.regmv1Id),
           _buildDetailRow("Nama Tertanggung:", data.ttgNama),
           _buildDetailRow("Alamat:", data.ttgAlamat),
         ],

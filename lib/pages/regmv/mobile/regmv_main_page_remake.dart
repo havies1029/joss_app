@@ -2084,6 +2084,20 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   bool _isHitungPremiLoading = false;
   int _hitungPremiAttempt = 0;
+
+  void _beginHitungPremiUiLock() {
+    if (!mounted) return;
+
+    setState(() {
+      _isHitungPremiLoading = true;
+      expanded = List<bool>.filled(expanded.length, false);
+    });
+  }
+
+  bool _canOpenSectionWhileHitungPremi(RegmvFormSection section) {
+    return !_isHitungPremiLoading || section == RegmvFormSection.form6;
+  }
+
   final RegmvValidationPreviewRepository _validationPreviewRepository =
       RegmvValidationPreviewRepository();
   RegmvValidationPreviewResponseModel? _lastValidationPreviewResponse;
@@ -2163,11 +2177,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       return;
     }
 
-    if (mounted) {
-      setState(() {
-        _isHitungPremiLoading = true;
-      });
-    }
+    _beginHitungPremiUiLock();
 
     final canContinueByPreview = await _runValidationPreviewBeforeFlow();
     if (!mounted || !canContinueByPreview) return;
@@ -2177,11 +2187,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       return;
     }
 
-    if (mounted) {
-      setState(() {
-        _isHitungPremiLoading = true;
-      });
-    }
+    _beginHitungPremiUiLock();
     _startHitungPremiTimeout();
 
     final localIds4 = stnkState.items.map((e) => e.localId).toList();
@@ -4517,6 +4523,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     VoidCallback? onRefresh,
     bool showLoading = false,
   }) {
+    if (!_canOpenSectionWhileHitungPremi(section)) return;
+
     final idx = sectionIndex(section);
 
     setState(() {
@@ -4535,6 +4543,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     VoidCallback? onRefresh,
     bool showLoading = false,
   }) {
+    if (!_canOpenSectionWhileHitungPremi(section)) return;
+
     final targetIdx = sectionIndex(section);
     final opened = getOpenedIndex();
 
