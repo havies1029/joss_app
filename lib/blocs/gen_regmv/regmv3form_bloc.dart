@@ -307,7 +307,7 @@ class Regmv3FormBloc extends Bloc<Regmv3FormEvents, Regmv3FormState> {
       'Jaminan Authorized Workshop hanya berlaku untuk usia kendaraan maksimal 15 tahun!',
       'Warna Kendaraan tidak sesuai data master!',
       'Penggunaan Kendaraan tidak sesuai data master!',
-      'Format Plat tidak sesuai! Format : "Kode Nomor Alphabet"',
+      'Format Plat tidak sesuai! Format : "Kode Nomor" atau "Kode Nomor Alphabet"',
       'Nomor Plat harus angka!',
     };
 

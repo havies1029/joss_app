@@ -5,7 +5,6 @@ import 'package:joss_app/models/combobox/combomjabatan_model.dart';
 import 'package:joss_app/models/gen_profile/mrekanpiccrud_model.dart';
 import 'package:joss_app/repositories/gen_profile/mrekanpiccrud_repository.dart';
 
-
 part 'mrekanpiccrud_event.dart';
 part 'mrekanpiccrud_state.dart';
 
@@ -22,13 +21,12 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
     on<MRekanPicCrudResetEvent>((event, emit) {
       emit(state.copyWith(isSaved: false));
     });
-
   }
 
   Future<void> onTambahMRekanPicCrud(
-      MRekanPicCrudTambahEvent event,
-      Emitter<MRekanPicCrudState> emit,
-      ) async {
+    MRekanPicCrudTambahEvent event,
+    Emitter<MRekanPicCrudState> emit,
+  ) async {
     emit(
       state.copyWith(
         isSaving: true,
@@ -65,9 +63,9 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
   }
 
   Future<void> onUbahMRekanPicCrud(
-      MRekanPicCrudUbahEvent event,
-      Emitter<MRekanPicCrudState> emit,
-      ) async {
+    MRekanPicCrudUbahEvent event,
+    Emitter<MRekanPicCrudState> emit,
+  ) async {
     emit(state.copyWith(
       isSaving: true,
       isSaved: false,
@@ -80,12 +78,12 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
 
       emit(state.copyWith(
         isSaving: false,
-        isSaved: result,
-        hasFailure: !result,
-        message: result ? null : 'Gagal menyimpan perubahan data PIC.',
+        isSaved: result.success,
+        hasFailure: !result.success,
+        message: result.success ? null : result.data.toString(),
       ));
 
-      if (result) {
+      if (result.success) {
         debugPrint('[✅ Bloc] Data berhasil diubah dan disimpan');
       } else {
         debugPrint('[❌ Bloc] Gagal menyimpan perubahan');
@@ -109,9 +107,9 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
   }
 
   Future<void> onLihatMRekanPicCrud(
-      MRekanPicCrudLihatEvent event,
-      Emitter<MRekanPicCrudState> emit,
-      ) async {
+    MRekanPicCrudLihatEvent event,
+    Emitter<MRekanPicCrudState> emit,
+  ) async {
     emit(state.copyWith(
       isLoading: true,
       isLoaded: false,
@@ -132,7 +130,6 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
 
   Future<void> onComboMJabatanChanged(
       ComboMJabatanChangedEvent event, Emitter<MRekanPicCrudState> emit) async {
-
     ComboMJabatanModel comboMJabatan = event.comboMJabatan;
     emit(state.copyWith(comboMJabatan: comboMJabatan));
   }
@@ -140,7 +137,6 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
   Future<void> onCheckboxIsDefaultChangedEvent(
       CheckboxIsDefaultChangedEvent event,
       Emitter<MRekanPicCrudState> emit) async {
-
     debugPrint("onCheckboxIsDefaultChangedEvent");
 
     emit(state.copyWith(isFieldIsDefaultChanged: false));

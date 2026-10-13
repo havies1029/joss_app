@@ -1117,6 +1117,7 @@ class _AppState extends State<_App> {
       ],
       child: MaterialApp(
         navigatorKey: _navigatorKey,
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
         debugShowCheckedModeBanner: false,
         title: 'JPS Insurance',
         theme: FlexThemeData.light(

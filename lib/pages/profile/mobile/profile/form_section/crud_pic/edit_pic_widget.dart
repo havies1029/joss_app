@@ -10,8 +10,10 @@ import '../../../../../../blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../blocs/hakakses/hakaksescrud_bloc.dart';
 import '../../../../../../blocs/reguser/reguser_bloc.dart';
+import '../../../../../../blocs/reguser_otp/reguser_otp_bloc.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../helper/international_phone_result.dart';
+import '../../../../../../helper/navigation_keys.dart';
 import '../../../../../../models/combobox/combomjabatan_model.dart';
 import '../../../../../../models/gen_profile/mrekanpiccrud_model.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
@@ -20,6 +22,7 @@ import '../../../../../../repositories/gen_profile/rekanpiccobcari_repository.da
 import '../../../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../../../widgets/apptheme/phone_number_field.dart';
 import '../../../../../base/base_background_sidepage.dart';
+import '../../../../../register/mobile/client/widget/register_otp_popup_widget.dart';
 import 'list_pic_widget.dart';
 
 class EditPicWidget extends StatefulWidget {
@@ -52,6 +55,15 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
   bool _isDefault = false;
   bool _showErrors = false;
+  String _pendingOpenOtpFor = '';
+  String _pendingOtpTarget = '';
+  String _lastHandledHpStatusKey = '';
+  String _emailOtpError = '';
+  String _hpOtpError = '';
+
+  final Map<String, String> _verifiedEmailRequestIds = {};
+  final Map<String, String> _verifiedHpRequestIds = {};
+  final Set<String> _rejectedHpTargets = {};
 
   late final MRekanPicCrudBloc crudBloc;
   late final RekanPicCobCariBloc cobBloc;
@@ -67,6 +79,10 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     cobBloc = context.read<RekanPicCobCariBloc>();
     crudBloc = context.read<MRekanPicCrudBloc>();
     hakaksesCrudBloc = context.read<HakaksesCrudBloc>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
+    });
     Future.delayed(const Duration(milliseconds: 300), () {
       loadData();
     });
@@ -117,6 +133,271 @@ class _EditPicWidgetState extends State<EditPicWidget> {
         detected?.dialCode ?? InternationalPhoneHelper.defaultCountryCode;
   }
 
+  String _emailOtpTarget(String value) {
+    final email = value.trim().toLowerCase();
+    return emailValidatorRegExp.hasMatch(email) ? email : '';
+  }
+
+  String _hpOtpTarget(String value) {
+    final result = InternationalPhoneHelper.normalize(
+      value,
+      countryCode: _hpCountryCode,
+    );
+    return result.isValid ? result.phone ?? '' : '';
+  }
+
+  bool _isEmailChanged() {
+    if (!_payloadInjected) return false;
+    return _email.text.trim().toLowerCase() !=
+        (_initialRecord?.picEmail ?? '').trim().toLowerCase();
+  }
+
+  bool _isHpChanged() {
+    if (!_payloadInjected) return false;
+    return _hpOtpTarget(_hp.text) != (_initialRecord?.picHp ?? '').trim();
+  }
+
+  bool _isEmailVerifiedForCurrent(RegUserOtpState state) {
+    final target = _emailOtpTarget(_email.text);
+    if (target.isEmpty) return false;
+
+    final cachedRequestId = _verifiedEmailRequestIds[target] ?? '';
+    if (cachedRequestId.isNotEmpty) return true;
+
+    return state.isEmailVerified &&
+        state.activeRequestFrom == 'email' &&
+        state.activeTarget.toLowerCase() == target &&
+        state.emailRequestId.isNotEmpty;
+  }
+
+  bool _isHpVerifiedForCurrent(RegUserOtpState state) {
+    final target = _hpOtpTarget(_hp.text);
+    if (target.isEmpty || _rejectedHpTargets.contains(target)) return false;
+
+    final cachedRequestId = _verifiedHpRequestIds[target] ?? '';
+    if (cachedRequestId.isNotEmpty) return true;
+
+    return state.isHpVerified &&
+        !state.isHpStatusChecking &&
+        state.hpRegistrationStatus ==
+            RegUserHpRegistrationStatus.notRegistered &&
+        state.hpStatusTarget == target &&
+        state.hpStatusRequestId.isNotEmpty &&
+        state.hpRequestId == state.hpStatusRequestId;
+  }
+
+  String _emailRequestIdForCurrent(RegUserOtpState state) {
+    final target = _emailOtpTarget(_email.text);
+    if (target.isEmpty) return '';
+
+    return _verifiedEmailRequestIds[target] ??
+        (_isEmailVerifiedForCurrent(state) ? state.emailRequestId : '');
+  }
+
+  String _hpRequestIdForCurrent(RegUserOtpState state) {
+    final target = _hpOtpTarget(_hp.text);
+    if (target.isEmpty) return '';
+
+    return _verifiedHpRequestIds[target] ??
+        (_isHpVerifiedForCurrent(state) ? state.hpRequestId : '');
+  }
+
+  void _sendEmailOtp() {
+    final target = _emailOtpTarget(_email.text);
+    if (target.isEmpty) {
+      setState(() => _emailOtpError = 'Format email tidak valid');
+      _formKey.currentState?.validate();
+      return;
+    }
+
+    setState(() {
+      _emailOtpError = '';
+      _pendingOpenOtpFor = 'email';
+      _pendingOtpTarget = target;
+    });
+    context.read<RegUserOtpBloc>().add(
+          RegUserOtpKirimEvent(target: target, requestFrom: 'email'),
+        );
+  }
+
+  void _sendHpOtp() {
+    final target = _hpOtpTarget(_hp.text);
+    if (target.isEmpty) {
+      setState(() => _hpOtpError = 'Nomor HP tidak valid');
+      _formKey.currentState?.validate();
+      return;
+    }
+
+    setState(() {
+      _hpOtpError = '';
+      _lastHandledHpStatusKey = '';
+      _pendingOpenOtpFor = 'hp';
+      _pendingOtpTarget = target;
+    });
+    context.read<RegUserOtpBloc>().add(
+          RegUserOtpKirimEvent(target: target, requestFrom: 'hp'),
+        );
+  }
+
+  void _handleHpRegistrationStatus(
+    BuildContext context,
+    RegUserOtpState state,
+  ) {
+    if (!_isHpChanged() ||
+        state.isHpStatusChecking ||
+        state.hpRegistrationStatus.isEmpty) {
+      return;
+    }
+
+    final target = state.hpStatusTarget.trim();
+    if (target.isEmpty || target != _hpOtpTarget(_hp.text)) return;
+
+    final status = state.hpRegistrationStatus;
+    final statusKey = '$target;${state.hpStatusRequestId};$status';
+    if (statusKey == _lastHandledHpStatusKey) return;
+    _lastHandledHpStatusKey = statusKey;
+
+    if (status == RegUserHpRegistrationStatus.notRegistered) {
+      final requestId = state.hpStatusRequestId.trim();
+      if (requestId.isEmpty || requestId != state.hpRequestId.trim()) return;
+
+      setState(() {
+        _verifiedHpRequestIds[target] = requestId;
+        _rejectedHpTargets.remove(target);
+        _hpOtpError = '';
+      });
+      return;
+    }
+
+    if (status != RegUserHpRegistrationStatus.registeredLogin &&
+        status != RegUserHpRegistrationStatus.registered &&
+        status != RegUserHpRegistrationStatus.registeredPic) {
+      return;
+    }
+
+    final message = status == RegUserHpRegistrationStatus.registeredPic
+        ? 'No. HP sudah terdaftar di PIC.'
+        : 'No. HP sudah terdaftar.';
+
+    setState(() {
+      _verifiedHpRequestIds.remove(target);
+      _rejectedHpTargets.add(target);
+      _hpOtpError = message;
+      _pendingOpenOtpFor = '';
+      _pendingOtpTarget = '';
+    });
+    context.read<RegUserOtpBloc>().add(const RegUserOtpResetHpEvent());
+    showRootSnackBar(errorSnackBar(message));
+  }
+
+  void _handleOtpStateChanged(BuildContext context, RegUserOtpState state) {
+    _handleHpRegistrationStatus(context, state);
+
+    if (_isEmailChanged() &&
+        state.isEmailVerified &&
+        state.activeRequestFrom == 'email' &&
+        state.activeTarget.isNotEmpty &&
+        state.emailRequestId.isNotEmpty) {
+      final target = state.activeTarget.toLowerCase();
+      if (target == _emailOtpTarget(_email.text) &&
+          _verifiedEmailRequestIds[target] != state.emailRequestId) {
+        setState(() {
+          _verifiedEmailRequestIds[target] = state.emailRequestId;
+          _emailOtpError = '';
+        });
+      }
+    }
+
+    final hpTarget = _hpOtpTarget(_hp.text);
+    final hpStatusFailed = _isHpChanged() &&
+        state.hasFailure &&
+        state.activeRequestFrom == 'hp' &&
+        state.hpStatusRequestId.isNotEmpty &&
+        state.hpStatusTarget == hpTarget &&
+        !state.isHpSending &&
+        !state.isHpValidating;
+    if (hpStatusFailed) {
+      final failureKey = '${state.hpStatusRequestId};FAIL;${state.message}';
+      if (failureKey != _lastHandledHpStatusKey) {
+        _lastHandledHpStatusKey = failureKey;
+        final message = state.hpError.isNotEmpty
+            ? state.hpError
+            : 'Gagal memeriksa status No. HP.';
+        setState(() {
+          _verifiedHpRequestIds.remove(hpTarget);
+          _hpOtpError = message;
+        });
+        showRootSnackBar(errorSnackBar(message));
+      }
+      return;
+    }
+
+    if (_pendingOpenOtpFor.isEmpty ||
+        state.activeRequestFrom != _pendingOpenOtpFor ||
+        state.activeTarget != _pendingOtpTarget) {
+      return;
+    }
+
+    final isEmail = _pendingOpenOtpFor == 'email';
+    final isSending = isEmail ? state.isEmailSending : state.isHpSending;
+    if (isSending) return;
+
+    if (state.hasFailure) {
+      final message = isEmail ? state.emailError : state.hpError;
+      setState(() {
+        if (isEmail) {
+          _emailOtpError = message.isNotEmpty ? message : 'Gagal mengirim OTP.';
+        } else {
+          _hpOtpError = message.isNotEmpty ? message : 'Gagal mengirim OTP.';
+        }
+        _pendingOpenOtpFor = '';
+        _pendingOtpTarget = '';
+      });
+      showRootSnackBar(
+        errorSnackBar(message.isNotEmpty ? message : 'Gagal mengirim OTP.'),
+      );
+      return;
+    }
+
+    final requestId = isEmail ? state.emailRequestId : state.hpRequestId;
+    if (requestId.isEmpty) return;
+
+    final target = _pendingOtpTarget;
+    final requestFrom = _pendingOpenOtpFor;
+    setState(() {
+      _pendingOpenOtpFor = '';
+      _pendingOtpTarget = '';
+    });
+    showRegisterOtpPopup(
+      context,
+      target: target,
+      requestFrom: requestFrom,
+    );
+  }
+
+  bool _validateOtpBeforeSave(RegUserOtpState state) {
+    final emailChanged = _isEmailChanged();
+    final hpChanged = _isHpChanged();
+    final emailVerified = !emailChanged || _isEmailVerifiedForCurrent(state);
+    final hpVerified = !hpChanged || _isHpVerifiedForCurrent(state);
+    if (emailVerified && hpVerified) return true;
+
+    setState(() {
+      _showErrors = true;
+      _emailOtpError = emailVerified ? '' : 'Email belum diverifikasi';
+      _hpOtpError = hpVerified
+          ? ''
+          : state.isHpStatusChecking
+              ? 'Status No. HP masih diperiksa'
+              : 'No. HP belum diverifikasi';
+    });
+    _formKey.currentState?.validate();
+    showRootSnackBar(
+      errorSnackBar('Verifikasi kontak yang diubah terlebih dahulu.'),
+    );
+    return false;
+  }
+
   Future<void> _openCobPicker() async {
     await Navigator.push(
       context,
@@ -156,6 +437,11 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     final hpNormalized = _toNormalizedPhone62(_hp.text.trim());
     final mjabatanId =
         (_jabatan?.mjabatanId ?? _initialRecord?.mjabatanId ?? '').trim();
+    final otpState = context.read<RegUserOtpBloc>().state;
+    if (!_validateOtpBeforeSave(otpState)) return;
+
+    final emailChanged = _isEmailChanged();
+    final hpChanged = _isHpChanged();
 
     final record = MRekanPicCrudModel(
       mrekanpicId: widget.mrekanpicId,
@@ -167,6 +453,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       alamat1: _alamat.text.trim(),
       alamat2: '',
       isDefault: _isDefault,
+      emailReqtokenId: emailChanged ? _emailRequestIdForCurrent(otpState) : '',
+      hpReqtokenId: hpChanged ? _hpRequestIdForCurrent(otpState) : '',
     );
 
     if (_initialRecord != null && _isSameRecord(_initialRecord!, record)) {
@@ -246,6 +534,9 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
     return MultiBlocListener(
       listeners: [
+        BlocListener<RegUserOtpBloc, RegUserOtpState>(
+          listener: _handleOtpStateChanged,
+        ),
         BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
           listenWhen: (prev, curr) {
             return prev.isSaving != curr.isSaving ||
@@ -434,10 +725,22 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                               buildFieldAlamat(),
                               const SizedBox(height: vPadding),
 
-                              buildFieldEmail(),
+                              BlocBuilder<RegUserOtpBloc, RegUserOtpState>(
+                                builder: (context, otpState) {
+                                  return _isEmailChanged()
+                                      ? _buildEmailOtpRow(otpState)
+                                      : buildFieldEmail(otpState);
+                                },
+                              ),
                               const SizedBox(height: vPadding),
 
-                              buildFiledTelp(),
+                              BlocBuilder<RegUserOtpBloc, RegUserOtpState>(
+                                builder: (context, otpState) {
+                                  return _isHpChanged()
+                                      ? _buildHpOtpRow(otpState)
+                                      : buildFiledTelp(otpState);
+                                },
+                              ),
                               const SizedBox(height: vPadding),
 
                               if (mjnsclientId != '10') ...[
@@ -722,11 +1025,25 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     );
   }
 
-  Widget buildFieldEmail() {
+  Widget buildFieldEmail(RegUserOtpState state) {
+    final isVerified = _isEmailChanged() && _isEmailVerifiedForCurrent(state);
+
     return appTextField(
       label: 'Email',
       controller: _email,
       keyboardType: TextInputType.emailAddress,
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'\s')),
+      ],
+      helperText: isVerified ? 'Email ini telah diverifikasi' : null,
+      helperStyle: bodyTextStyle(context, fontSize: 12).copyWith(
+        color: successGreen,
+      ),
+      borderColor: isVerified ? successGreen : null,
+      focusedBorderColor: isVerified ? successGreen : null,
+      suffixIcon: isVerified
+          ? const Icon(Icons.check, color: successGreen, size: 22)
+          : null,
       validator: (v) {
         final email = v?.trim() ?? '';
 
@@ -738,20 +1055,54 @@ class _EditPicWidgetState extends State<EditPicWidget> {
           return 'Format email tidak valid';
         }
 
+        if (_emailOtpError.isNotEmpty) return _emailOtpError;
+
         return null;
+      },
+      onChanged: (value) {
+        final target = _emailOtpTarget(value);
+        final isVerifiedAfterChange =
+            target.isNotEmpty && _verifiedEmailRequestIds.containsKey(target);
+        setState(() {
+          _emailOtpError = '';
+          if (!isVerifiedAfterChange) {
+            _pendingOpenOtpFor = '';
+            _pendingOtpTarget = '';
+          }
+        });
+        if (!isVerifiedAfterChange) {
+          context.read<RegUserOtpBloc>().add(const RegUserOtpResetEmailEvent());
+        }
       },
     );
   }
 
-  Widget buildFiledTelp() {
+  Widget buildFiledTelp(RegUserOtpState state) {
+    final isVerified = _isHpChanged() && _isHpVerifiedForCurrent(state);
+
     return AppPhoneNumberField(
       label: 'No. Telp',
       controller: _hp,
       countryCode: _hpCountryCode,
+      helperText: isVerified ? 'No. HP ini telah diverifikasi' : null,
+      helperStyle: bodyTextStyle(context, fontSize: 12).copyWith(
+        color: successGreen,
+      ),
+      borderColor: isVerified ? successGreen : null,
+      focusedBorderColor: isVerified ? successGreen : null,
+      suffixIcon: isVerified
+          ? const Icon(Icons.check, color: successGreen, size: 22)
+          : null,
       onCountryCodeChanged: (value) {
         setState(() {
           _hpCountryCode = value;
+          _hpOtpError = '';
+          _lastHandledHpStatusKey = '';
         });
+        final target = _hpOtpTarget(_hp.text);
+        if (!_verifiedHpRequestIds.containsKey(target)) {
+          context.read<RegUserOtpBloc>().add(const RegUserOtpResetHpEvent());
+        }
       },
       validator: (v) {
         final telp = v?.trim() ?? '';
@@ -769,7 +1120,87 @@ class _EditPicWidgetState extends State<EditPicWidget> {
           return res.error ?? 'Nomor HP tidak valid';
         }
 
+        if (_hpOtpError.isNotEmpty) return _hpOtpError;
+
         return null;
+      },
+      onChanged: (value) {
+        final target = _hpOtpTarget(value);
+        final isVerifiedAfterChange =
+            target.isNotEmpty && _verifiedHpRequestIds.containsKey(target);
+        setState(() {
+          _hpOtpError = _rejectedHpTargets.contains(target)
+              ? 'No. HP sudah terdaftar.'
+              : '';
+          _lastHandledHpStatusKey = '';
+          if (!isVerifiedAfterChange) {
+            _pendingOpenOtpFor = '';
+            _pendingOtpTarget = '';
+          }
+        });
+        if (!isVerifiedAfterChange) {
+          context.read<RegUserOtpBloc>().add(const RegUserOtpResetHpEvent());
+        }
+      },
+    );
+  }
+
+  Widget _buildEmailOtpRow(RegUserOtpState state) {
+    if (_isEmailVerifiedForCurrent(state)) return buildFieldEmail(state);
+
+    return _buildOtpRow(
+      field: buildFieldEmail(state),
+      isLoading: state.isEmailSending,
+      onPressed: _sendEmailOtp,
+    );
+  }
+
+  Widget _buildHpOtpRow(RegUserOtpState state) {
+    if (_isHpVerifiedForCurrent(state)) return buildFiledTelp(state);
+
+    return _buildOtpRow(
+      field: buildFiledTelp(state),
+      isLoading: state.isHpSending || state.isHpStatusChecking,
+      onPressed: _sendHpOtp,
+    );
+  }
+
+  Widget _buildOtpRow({
+    required Widget field,
+    required bool isLoading,
+    required VoidCallback onPressed,
+  }) {
+    Widget buildButton() {
+      return AppButton.primary(
+        text: 'Kirim OTP',
+        isLoading: isLoading,
+        backgroundColor: isLoading ? secondaryBlackColor : primaryColor,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        onPressed: isLoading ? null : onPressed,
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 340) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              field,
+              const SizedBox(height: 8),
+              buildButton(),
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(flex: 7, child: field),
+            const SizedBox(width: 8),
+            Expanded(flex: 3, child: buildButton()),
+          ],
+        );
       },
     );
   }

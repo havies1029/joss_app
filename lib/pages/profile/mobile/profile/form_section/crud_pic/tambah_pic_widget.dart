@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:joss_app/blocs/reguser_otp/reguser_otp_bloc.dart';
 import 'package:joss_app/pages/profile/mobile/profile/form_section/rekan_pic_widget.dart';
+import 'package:joss_app/pages/register/mobile/client/widget/register_otp_popup_widget.dart';
 import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
 
 import 'package:joss_app/blocs/gen_profile/mrekanpiccrud_bloc.dart';
@@ -13,6 +15,7 @@ import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../helper/international_phone_result.dart';
+import '../../../../../../helper/navigation_keys.dart';
 import '../../../../../../models/combobox/combomjabatan_model.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
 import '../../../../../../repositories/combobox/combomjabatan_repository.dart';
@@ -45,6 +48,15 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
   final bool _isDefault = false;
   bool _saving = false;
   bool _showErrors = false;
+  String _pendingOpenOtpFor = '';
+  String _pendingOtpTarget = '';
+  String _lastHandledHpStatusKey = '';
+  String _emailOtpError = '';
+  String _hpOtpError = '';
+
+  final Map<String, String> _verifiedEmailRequestIds = {};
+  final Map<String, String> _verifiedHpRequestIds = {};
+  final Set<String> _rejectedHpTargets = {};
 
   final _comboKey = GlobalKey<DropdownSearchState<ComboMJabatanModel>>();
   ComboMJabatanModel? _jabatan;
@@ -55,6 +67,10 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
     super.initState();
     crudBloc = context.read<MRekanPicCrudBloc>();
     cobBloc = context.read<RekanPicCobCariBloc>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
+    });
   }
 
   @override
@@ -65,6 +81,251 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
     _jabatanDesc.dispose();
     _alamat1.dispose();
     super.dispose();
+  }
+
+  String _emailOtpTarget(String value) {
+    final email = value.trim().toLowerCase();
+    return emailValidatorRegExp.hasMatch(email) ? email : '';
+  }
+
+  String _hpOtpTarget(String value) {
+    final result = InternationalPhoneHelper.normalize(
+      value,
+      countryCode: _hpCountryCode,
+    );
+    return result.isValid ? result.phone ?? '' : '';
+  }
+
+  bool _isEmailVerifiedForCurrent(RegUserOtpState state) {
+    final target = _emailOtpTarget(_email.text);
+    if (target.isEmpty) return false;
+
+    final cachedRequestId = _verifiedEmailRequestIds[target] ?? '';
+    if (cachedRequestId.isNotEmpty) return true;
+
+    return state.isEmailVerified &&
+        state.activeRequestFrom == 'email' &&
+        state.activeTarget.toLowerCase() == target &&
+        state.emailRequestId.isNotEmpty;
+  }
+
+  bool _isHpVerifiedForCurrent(RegUserOtpState state) {
+    final target = _hpOtpTarget(_hp.text);
+    if (target.isEmpty || _rejectedHpTargets.contains(target)) return false;
+
+    final cachedRequestId = _verifiedHpRequestIds[target] ?? '';
+    if (cachedRequestId.isNotEmpty) return true;
+
+    return state.isHpVerified &&
+        !state.isHpStatusChecking &&
+        state.hpRegistrationStatus ==
+            RegUserHpRegistrationStatus.notRegistered &&
+        state.hpStatusTarget == target &&
+        state.hpStatusRequestId.isNotEmpty &&
+        state.hpRequestId == state.hpStatusRequestId;
+  }
+
+  String _emailRequestIdForCurrent(RegUserOtpState state) {
+    final target = _emailOtpTarget(_email.text);
+    if (target.isEmpty) return '';
+
+    return _verifiedEmailRequestIds[target] ??
+        (_isEmailVerifiedForCurrent(state) ? state.emailRequestId : '');
+  }
+
+  String _hpRequestIdForCurrent(RegUserOtpState state) {
+    final target = _hpOtpTarget(_hp.text);
+    if (target.isEmpty) return '';
+
+    return _verifiedHpRequestIds[target] ??
+        (_isHpVerifiedForCurrent(state) ? state.hpRequestId : '');
+  }
+
+  void _sendEmailOtp() {
+    final target = _emailOtpTarget(_email.text);
+    if (target.isEmpty) {
+      setState(() => _emailOtpError = 'Format email tidak valid');
+      _formKey.currentState?.validate();
+      return;
+    }
+
+    setState(() {
+      _emailOtpError = '';
+      _pendingOpenOtpFor = 'email';
+      _pendingOtpTarget = target;
+    });
+    context.read<RegUserOtpBloc>().add(
+          RegUserOtpKirimEvent(target: target, requestFrom: 'email'),
+        );
+  }
+
+  void _sendHpOtp() {
+    final target = _hpOtpTarget(_hp.text);
+    if (target.isEmpty) {
+      setState(() => _hpOtpError = 'Nomor HP tidak valid');
+      _formKey.currentState?.validate();
+      return;
+    }
+
+    setState(() {
+      _hpOtpError = '';
+      _lastHandledHpStatusKey = '';
+      _pendingOpenOtpFor = 'hp';
+      _pendingOtpTarget = target;
+    });
+    context.read<RegUserOtpBloc>().add(
+          RegUserOtpKirimEvent(target: target, requestFrom: 'hp'),
+        );
+  }
+
+  void _handleHpRegistrationStatus(
+    BuildContext context,
+    RegUserOtpState state,
+  ) {
+    if (state.isHpStatusChecking || state.hpRegistrationStatus.isEmpty) return;
+
+    final target = state.hpStatusTarget.trim();
+    if (target.isEmpty || target != _hpOtpTarget(_hp.text)) return;
+
+    final status = state.hpRegistrationStatus;
+    final statusKey = '$target;${state.hpStatusRequestId};$status';
+    if (statusKey == _lastHandledHpStatusKey) return;
+    _lastHandledHpStatusKey = statusKey;
+
+    if (status == RegUserHpRegistrationStatus.notRegistered) {
+      final requestId = state.hpStatusRequestId.trim();
+      if (requestId.isEmpty || requestId != state.hpRequestId.trim()) return;
+
+      setState(() {
+        _verifiedHpRequestIds[target] = requestId;
+        _rejectedHpTargets.remove(target);
+        _hpOtpError = '';
+      });
+      return;
+    }
+
+    if (status != RegUserHpRegistrationStatus.registeredLogin &&
+        status != RegUserHpRegistrationStatus.registered &&
+        status != RegUserHpRegistrationStatus.registeredPic) {
+      return;
+    }
+
+    final message = status == RegUserHpRegistrationStatus.registeredPic
+        ? 'No. HP sudah terdaftar di PIC.'
+        : 'No. HP sudah terdaftar.';
+
+    setState(() {
+      _verifiedHpRequestIds.remove(target);
+      _rejectedHpTargets.add(target);
+      _hpOtpError = message;
+      _pendingOpenOtpFor = '';
+      _pendingOtpTarget = '';
+    });
+    context.read<RegUserOtpBloc>().add(const RegUserOtpResetHpEvent());
+    showRootSnackBar(errorSnackBar(message));
+  }
+
+  void _handleOtpStateChanged(BuildContext context, RegUserOtpState state) {
+    _handleHpRegistrationStatus(context, state);
+
+    if (state.isEmailVerified &&
+        state.activeRequestFrom == 'email' &&
+        state.activeTarget.isNotEmpty &&
+        state.emailRequestId.isNotEmpty) {
+      final target = state.activeTarget.toLowerCase();
+      if (_verifiedEmailRequestIds[target] != state.emailRequestId) {
+        setState(() {
+          _verifiedEmailRequestIds[target] = state.emailRequestId;
+          _emailOtpError = '';
+        });
+      }
+    }
+
+    final hpTarget = _hpOtpTarget(_hp.text);
+    final hpStatusFailed = state.hasFailure &&
+        state.activeRequestFrom == 'hp' &&
+        state.hpStatusRequestId.isNotEmpty &&
+        state.hpStatusTarget == hpTarget &&
+        !state.isHpSending &&
+        !state.isHpValidating;
+    if (hpStatusFailed) {
+      final failureKey = '${state.hpStatusRequestId};FAIL;${state.message}';
+      if (failureKey != _lastHandledHpStatusKey) {
+        _lastHandledHpStatusKey = failureKey;
+        final message = state.hpError.isNotEmpty
+            ? state.hpError
+            : 'Gagal memeriksa status No. HP.';
+        setState(() {
+          _verifiedHpRequestIds.remove(hpTarget);
+          _hpOtpError = message;
+        });
+        showRootSnackBar(errorSnackBar(message));
+      }
+      return;
+    }
+
+    if (_pendingOpenOtpFor.isEmpty) return;
+    if (state.activeRequestFrom != _pendingOpenOtpFor ||
+        state.activeTarget != _pendingOtpTarget) {
+      return;
+    }
+
+    final isEmail = _pendingOpenOtpFor == 'email';
+    final isSending = isEmail ? state.isEmailSending : state.isHpSending;
+    if (isSending) return;
+
+    if (state.hasFailure) {
+      final message = isEmail ? state.emailError : state.hpError;
+      setState(() {
+        if (isEmail) {
+          _emailOtpError = message.isNotEmpty ? message : 'Gagal mengirim OTP.';
+        } else {
+          _hpOtpError = message.isNotEmpty ? message : 'Gagal mengirim OTP.';
+        }
+        _pendingOpenOtpFor = '';
+        _pendingOtpTarget = '';
+      });
+      showRootSnackBar(
+        errorSnackBar(message.isNotEmpty ? message : 'Gagal mengirim OTP.'),
+      );
+      return;
+    }
+
+    final requestId = isEmail ? state.emailRequestId : state.hpRequestId;
+    if (requestId.isEmpty) return;
+
+    final target = _pendingOtpTarget;
+    final requestFrom = _pendingOpenOtpFor;
+    setState(() {
+      _pendingOpenOtpFor = '';
+      _pendingOtpTarget = '';
+    });
+    showRegisterOtpPopup(
+      context,
+      target: target,
+      requestFrom: requestFrom,
+    );
+  }
+
+  bool _validateOtpBeforeSave(RegUserOtpState state) {
+    final emailVerified = _isEmailVerifiedForCurrent(state);
+    final hpVerified = _isHpVerifiedForCurrent(state);
+    if (emailVerified && hpVerified) return true;
+
+    setState(() {
+      _showErrors = true;
+      _emailOtpError = emailVerified ? '' : 'Email belum diverifikasi';
+      _hpOtpError = hpVerified
+          ? ''
+          : state.isHpStatusChecking
+              ? 'Status No. HP masih diperiksa'
+              : 'No. HP belum diverifikasi';
+    });
+    _formKey.currentState?.validate();
+    showRootSnackBar(
+      errorSnackBar('Verifikasi email dan nomor HP terlebih dahulu.'),
+    );
+    return false;
   }
 
   void _save() {
@@ -91,6 +352,9 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
     );
     final hpNormalized = phoneRes.phone ?? "";
 
+    final otpState = context.read<RegUserOtpBloc>().state;
+    if (!_validateOtpBeforeSave(otpState)) return;
+
     final mjnsclientId = context.read<RegUserBloc>().state.record?.jnsClientId;
 
     final jabatanDesc = (mjnsclientId == '10') ? '' : _jabatanDesc.text.trim();
@@ -104,6 +368,8 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
       alamat1: _alamat1.text.trim(),
       alamat2: "",
       isDefault: _isDefault,
+      emailReqtokenId: _emailRequestIdForCurrent(otpState),
+      hpReqtokenId: _hpRequestIdForCurrent(otpState),
     );
 
     context.read<MRekanPicCrudBloc>().add(
@@ -129,95 +395,102 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-    return BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
-      listener: (context, state) async {
-        if (state.isSaving) {
-          setState(() {
-            _saving = true;
-          });
-          return;
-        }
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<RegUserOtpBloc, RegUserOtpState>(
+          listener: _handleOtpStateChanged,
+        ),
+        BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
+          listener: (context, state) async {
+            if (state.isSaving) {
+              setState(() {
+                _saving = true;
+              });
+              return;
+            }
 
-        if (state.hasFailure) {
-          setState(() {
-            _saving = false;
-          });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            errorSnackBar(
-              state.message?.isNotEmpty == true
-                  ? state.message!
-                  : 'Gagal menyimpan data PIC.',
-            ),
-          );
-          return;
-        }
-
-        if (state.isSaved == true) {
-          try {
-            final picId = (state.savedId ?? '').trim();
-            final cobRepo = RekanPicCobCariRepository();
-
-            final selectedCobItems =
-                context.read<RekanPicCobCariBloc>().state.selectedItems;
-
-            final listCheckbox = selectedCobItems
-                .map(
-                  (e) => RekanPicCobCariCheckboxModel(
-                    mcobId: e.mcobId,
-                    isChecked: e.isChecked,
-                  ),
-                )
-                .toList();
-
-            final cobResult = await cobRepo.rekanPicCobUpdateList(
-              picId,
-              listCheckbox,
-            );
-
-            if (!context.mounted) return;
-
-            if (cobResult.success) {
+            if (state.hasFailure) {
               setState(() {
                 _saving = false;
               });
 
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => PaymentSuccess(
-                    display: 'PIC Berhasil Ditambahkan',
-                    description:
-                        'PIC telah berhasil dibuat dan dapat digunakan sesuai hak akses yang diberikan.',
-                    displayButton: 'Kembali',
-                    onButtonPressed: () {
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (_) => const RekanPicWidgetPage(),
-                        ),
-                        (route) => route.isFirst,
-                      );
-                    },
-                  ),
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(
+                  state.message?.isNotEmpty == true
+                      ? state.message!
+                      : 'Gagal menyimpan data PIC.',
                 ),
               );
-            } else {
-              setState(() {
-                _saving = false;
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                  errorSnackBar('PIC tersimpan, tapi gagal update COB.'));
+              return;
             }
-          } catch (e) {
-            if (!context.mounted) return;
 
-            setState(() {
-              _saving = false;
-            });
-            ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(
-                'PIC tersimpan, tapi terjadi error saat update COB.'));
-          }
-        }
-      },
+            if (state.isSaved == true) {
+              try {
+                final picId = (state.savedId ?? '').trim();
+                final cobRepo = RekanPicCobCariRepository();
+
+                final selectedCobItems =
+                    context.read<RekanPicCobCariBloc>().state.selectedItems;
+
+                final listCheckbox = selectedCobItems
+                    .map(
+                      (e) => RekanPicCobCariCheckboxModel(
+                        mcobId: e.mcobId,
+                        isChecked: e.isChecked,
+                      ),
+                    )
+                    .toList();
+
+                final cobResult = await cobRepo.rekanPicCobUpdateList(
+                  picId,
+                  listCheckbox,
+                );
+
+                if (!context.mounted) return;
+
+                if (cobResult.success) {
+                  setState(() {
+                    _saving = false;
+                  });
+
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => PaymentSuccess(
+                        display: 'PIC Berhasil Ditambahkan',
+                        description:
+                            'PIC telah berhasil dibuat dan dapat digunakan sesuai hak akses yang diberikan.',
+                        displayButton: 'Kembali',
+                        onButtonPressed: () {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (_) => const RekanPicWidgetPage(),
+                            ),
+                            (route) => route.isFirst,
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                } else {
+                  setState(() {
+                    _saving = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      errorSnackBar('PIC tersimpan, tapi gagal update COB.'));
+                }
+              } catch (e) {
+                if (!context.mounted) return;
+
+                setState(() {
+                  _saving = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(
+                    'PIC tersimpan, tapi terjadi error saat update COB.'));
+              }
+            }
+          },
+        ),
+      ],
       child: BaseBackgroundSidePage(
         title: 'Tambah PIC',
         child: LayoutBuilder(
@@ -279,10 +552,17 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                               buildFieldAlamat1(),
                               const SizedBox(height: vPadding),
 
-                              buildFieldEmail(),
-                              const SizedBox(height: vPadding),
-
-                              buildFiledTelp(),
+                              BlocBuilder<RegUserOtpBloc, RegUserOtpState>(
+                                builder: (context, otpState) {
+                                  return Column(
+                                    children: [
+                                      _buildEmailOtpRow(otpState),
+                                      const SizedBox(height: vPadding),
+                                      _buildHpOtpRow(otpState),
+                                    ],
+                                  );
+                                },
+                              ),
                               const SizedBox(height: vPadding),
 
                               if (mjnsclientId != '10') buildFieldjabatanDesc(),
@@ -448,11 +728,25 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
     );
   }
 
-  Widget buildFieldEmail() {
+  Widget buildFieldEmail(RegUserOtpState state) {
+    final isVerified = _isEmailVerifiedForCurrent(state);
+
     return appTextField(
       label: 'Email',
       controller: _email,
       keyboardType: TextInputType.emailAddress,
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'\s')),
+      ],
+      helperText: isVerified ? 'Email ini telah diverifikasi' : null,
+      helperStyle: bodyTextStyle(context, fontSize: 12).copyWith(
+        color: successGreen,
+      ),
+      borderColor: isVerified ? successGreen : null,
+      focusedBorderColor: isVerified ? successGreen : null,
+      suffixIcon: isVerified
+          ? const Icon(Icons.check, color: successGreen, size: 22)
+          : null,
       validator: (v) {
         final email = v?.trim() ?? "";
 
@@ -464,20 +758,54 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
           return 'Format email tidak valid';
         }
 
+        if (_emailOtpError.isNotEmpty) return _emailOtpError;
+
         return null;
+      },
+      onChanged: (value) {
+        final target = _emailOtpTarget(value);
+        final isVerifiedAfterChange =
+            target.isNotEmpty && _verifiedEmailRequestIds.containsKey(target);
+        setState(() {
+          _emailOtpError = '';
+          if (!isVerifiedAfterChange) {
+            _pendingOpenOtpFor = '';
+            _pendingOtpTarget = '';
+          }
+        });
+        if (!isVerifiedAfterChange) {
+          context.read<RegUserOtpBloc>().add(const RegUserOtpResetEmailEvent());
+        }
       },
     );
   }
 
-  Widget buildFiledTelp() {
+  Widget buildFiledTelp(RegUserOtpState state) {
+    final isVerified = _isHpVerifiedForCurrent(state);
+
     return AppPhoneNumberField(
       label: 'No. Telp',
       controller: _hp,
       countryCode: _hpCountryCode,
+      helperText: isVerified ? 'No. HP ini telah diverifikasi' : null,
+      helperStyle: bodyTextStyle(context, fontSize: 12).copyWith(
+        color: successGreen,
+      ),
+      borderColor: isVerified ? successGreen : null,
+      focusedBorderColor: isVerified ? successGreen : null,
+      suffixIcon: isVerified
+          ? const Icon(Icons.check, color: successGreen, size: 22)
+          : null,
       onCountryCodeChanged: (value) {
         setState(() {
           _hpCountryCode = value;
+          _hpOtpError = '';
+          _lastHandledHpStatusKey = '';
         });
+        final target = _hpOtpTarget(_hp.text);
+        if (!_verifiedHpRequestIds.containsKey(target)) {
+          context.read<RegUserOtpBloc>().add(const RegUserOtpResetHpEvent());
+        }
       },
       validator: (v) {
         final telp = v?.trim() ?? "";
@@ -495,7 +823,87 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
           return res.error ?? 'Nomor HP tidak valid';
         }
 
+        if (_hpOtpError.isNotEmpty) return _hpOtpError;
+
         return null;
+      },
+      onChanged: (value) {
+        final target = _hpOtpTarget(value);
+        final isVerifiedAfterChange =
+            target.isNotEmpty && _verifiedHpRequestIds.containsKey(target);
+        setState(() {
+          _hpOtpError = _rejectedHpTargets.contains(target)
+              ? 'No. HP sudah terdaftar.'
+              : '';
+          _lastHandledHpStatusKey = '';
+          if (!isVerifiedAfterChange) {
+            _pendingOpenOtpFor = '';
+            _pendingOtpTarget = '';
+          }
+        });
+        if (!isVerifiedAfterChange) {
+          context.read<RegUserOtpBloc>().add(const RegUserOtpResetHpEvent());
+        }
+      },
+    );
+  }
+
+  Widget _buildEmailOtpRow(RegUserOtpState state) {
+    if (_isEmailVerifiedForCurrent(state)) return buildFieldEmail(state);
+
+    return _buildOtpRow(
+      field: buildFieldEmail(state),
+      isLoading: state.isEmailSending,
+      onPressed: _sendEmailOtp,
+    );
+  }
+
+  Widget _buildHpOtpRow(RegUserOtpState state) {
+    if (_isHpVerifiedForCurrent(state)) return buildFiledTelp(state);
+
+    return _buildOtpRow(
+      field: buildFiledTelp(state),
+      isLoading: state.isHpSending || state.isHpStatusChecking,
+      onPressed: _sendHpOtp,
+    );
+  }
+
+  Widget _buildOtpRow({
+    required Widget field,
+    required bool isLoading,
+    required VoidCallback onPressed,
+  }) {
+    Widget buildButton() {
+      return AppButton.primary(
+        text: 'Kirim OTP',
+        isLoading: isLoading,
+        backgroundColor: isLoading ? secondaryBlackColor : primaryColor,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        onPressed: isLoading ? null : onPressed,
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 340) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              field,
+              const SizedBox(height: 8),
+              buildButton(),
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(flex: 7, child: field),
+            const SizedBox(width: 8),
+            Expanded(flex: 3, child: buildButton()),
+          ],
+        );
       },
     );
   }

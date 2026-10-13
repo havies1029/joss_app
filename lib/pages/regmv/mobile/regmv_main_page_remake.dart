@@ -3509,7 +3509,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   bool _isValidPlatNomor(String value) {
-    return RegExp(r'^[A-Z]{1,2} [0-9]{1,4} [A-Z]{1,3}$')
+    return RegExp(r'^[A-Z]{1,2} [0-9]{1,4}(?: [A-Z]{1,3})?$')
         .hasMatch(value.trim().toUpperCase());
   }
 
