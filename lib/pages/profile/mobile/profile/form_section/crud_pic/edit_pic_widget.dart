@@ -6,15 +6,15 @@ import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/pages/profile/mobile/profile/form_section/rekan_pic_widget.dart';
 import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
 import 'package:joss_app/common/loading_indicator.dart';
+import '../../../../../../blocs/gen_profile/mrekanpic_contact_change_bloc.dart';
 import '../../../../../../blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../blocs/hakakses/hakaksescrud_bloc.dart';
 import '../../../../../../blocs/reguser/reguser_bloc.dart';
-import '../../../../../../blocs/reguser_otp/reguser_otp_bloc.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../helper/international_phone_result.dart';
-import '../../../../../../helper/navigation_keys.dart';
 import '../../../../../../models/combobox/combomjabatan_model.dart';
+import '../../../../../../models/gen_profile/mrekanpic_contact_change_model.dart';
 import '../../../../../../models/gen_profile/mrekanpiccrud_model.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
 import '../../../../../../repositories/combobox/combomjabatan_repository.dart';
@@ -22,8 +22,9 @@ import '../../../../../../repositories/gen_profile/rekanpiccobcari_repository.da
 import '../../../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../../../widgets/apptheme/phone_number_field.dart';
 import '../../../../../base/base_background_sidepage.dart';
-import '../../../../../register/mobile/client/widget/register_otp_popup_widget.dart';
 import 'list_pic_widget.dart';
+import 'mrekanpic_contact_change_otp_popup_widget.dart';
+import 'mrekanpic_contact_change_page.dart';
 
 class EditPicWidget extends StatefulWidget {
   final String mrekanpicId;
@@ -42,6 +43,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
   MRekanPicCrudModel? _initialRecord;
   bool _payloadInjected = false;
+  String _emailChangeRequestId = '';
+  String _hpChangeRequestId = '';
 
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
@@ -55,18 +58,10 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
   bool _isDefault = false;
   bool _showErrors = false;
-  String _pendingOpenOtpFor = '';
-  String _pendingOtpTarget = '';
-  String _lastHandledHpStatusKey = '';
-  String _emailOtpError = '';
-  String _hpOtpError = '';
-
-  final Map<String, String> _verifiedEmailRequestIds = {};
-  final Map<String, String> _verifiedHpRequestIds = {};
-  final Set<String> _rejectedHpTargets = {};
 
   late final MRekanPicCrudBloc crudBloc;
   late final RekanPicCobCariBloc cobBloc;
+  late final MRekanPicContactChangeBloc contactChangeBloc;
   late HakaksesCrudBloc hakaksesCrudBloc;
 
   final _comboKey = GlobalKey<DropdownSearchState<ComboMJabatanModel>>();
@@ -79,10 +74,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     cobBloc = context.read<RekanPicCobCariBloc>();
     crudBloc = context.read<MRekanPicCrudBloc>();
     hakaksesCrudBloc = context.read<HakaksesCrudBloc>();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      context.read<RegUserOtpBloc>().add(const RegUserOtpClearEvent());
-    });
+    contactChangeBloc = MRekanPicContactChangeBloc();
     Future.delayed(const Duration(milliseconds: 300), () {
       loadData();
     });
@@ -108,6 +100,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     _hp.dispose();
     _jabatanDesc.dispose();
     _alamat.dispose();
+    contactChangeBloc.close();
     super.dispose();
   }
 
@@ -133,269 +126,207 @@ class _EditPicWidgetState extends State<EditPicWidget> {
         detected?.dialCode ?? InternationalPhoneHelper.defaultCountryCode;
   }
 
-  String _emailOtpTarget(String value) {
-    final email = value.trim().toLowerCase();
-    return emailValidatorRegExp.hasMatch(email) ? email : '';
-  }
-
-  String _hpOtpTarget(String value) {
+  String _normalizeStoredPhone(String raw) {
     final result = InternationalPhoneHelper.normalize(
-      value,
-      countryCode: _hpCountryCode,
+      raw,
+      countryCode: InternationalPhoneHelper.defaultCountryCode,
     );
-    return result.isValid ? result.phone ?? '' : '';
+    return result.phone ?? '';
   }
 
-  bool _isEmailChanged() {
-    if (!_payloadInjected) return false;
-    return _email.text.trim().toLowerCase() !=
-        (_initialRecord?.picEmail ?? '').trim().toLowerCase();
+  String _maskEmail(String value) {
+    final parts = value.trim().split('@');
+    if (parts.length != 2 || parts.first.isEmpty) return value;
+    return '${parts.first.substring(0, 1)}***@${parts.last}';
   }
 
-  bool _isHpChanged() {
-    if (!_payloadInjected) return false;
-    return _hpOtpTarget(_hp.text) != (_initialRecord?.picHp ?? '').trim();
+  String _maskPhone(String value) {
+    final phone = _normalizeStoredPhone(value);
+    if (phone.length <= 6) return phone;
+    return '${phone.substring(0, 2)}******${phone.substring(phone.length - 4)}';
   }
 
-  bool _isEmailVerifiedForCurrent(RegUserOtpState state) {
-    final target = _emailOtpTarget(_email.text);
-    if (target.isEmpty) return false;
+  Future<int?> _chooseVerificationChannel() {
+    final email = (_initialRecord?.picEmail ?? '').trim().toLowerCase();
+    final phone = _normalizeStoredPhone(_initialRecord?.picHp ?? '');
+    final hasEmail = emailValidatorRegExp.hasMatch(email);
+    final hasPhone = phone.isNotEmpty;
 
-    final cachedRequestId = _verifiedEmailRequestIds[target] ?? '';
-    if (cachedRequestId.isNotEmpty) return true;
-
-    return state.isEmailVerified &&
-        state.activeRequestFrom == 'email' &&
-        state.activeTarget.toLowerCase() == target &&
-        state.emailRequestId.isNotEmpty;
+    return showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => SafeArea(
+        child: Container(
+          decoration: const BoxDecoration(
+            color: formGrey,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(cardBorderRadius),
+            ),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: sGrey,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Text(
+                'Pilih Tujuan OTP',
+                style: headingStyle(sheetContext, fontSize: 18),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Verifikasi perubahan melalui kontak PIC yang saat ini aktif.',
+                style: bodyTextStyle(sheetContext, fontSize: 14).copyWith(
+                  color: hintGrey,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (hasEmail)
+                _buildVerificationOption(
+                  context: sheetContext,
+                  icon: Icons.email_outlined,
+                  title: 'Email',
+                  value: _maskEmail(email),
+                  onTap: () => Navigator.pop(
+                    sheetContext,
+                    MRekanPicContactVerifyVia.email,
+                  ),
+                ),
+              if (hasEmail && hasPhone) const SizedBox(height: 10),
+              if (hasPhone)
+                _buildVerificationOption(
+                  context: sheetContext,
+                  icon: Icons.phone_android_outlined,
+                  title: 'No. HP',
+                  value: _maskPhone(phone),
+                  onTap: () => Navigator.pop(
+                    sheetContext,
+                    MRekanPicContactVerifyVia.phone,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
-  bool _isHpVerifiedForCurrent(RegUserOtpState state) {
-    final target = _hpOtpTarget(_hp.text);
-    if (target.isEmpty || _rejectedHpTargets.contains(target)) return false;
-
-    final cachedRequestId = _verifiedHpRequestIds[target] ?? '';
-    if (cachedRequestId.isNotEmpty) return true;
-
-    return state.isHpVerified &&
-        !state.isHpStatusChecking &&
-        state.hpRegistrationStatus ==
-            RegUserHpRegistrationStatus.notRegistered &&
-        state.hpStatusTarget == target &&
-        state.hpStatusRequestId.isNotEmpty &&
-        state.hpRequestId == state.hpStatusRequestId;
+  Widget _buildVerificationOption({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String value,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: pGrey,
+      borderRadius: BorderRadius.circular(cardBorderRadius),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Icon(icon, color: primaryColor),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: bodyTextStyle(context)),
+                    const SizedBox(height: 2),
+                    Text(
+                      value,
+                      style: bodyTextStyle(context, fontSize: 13).copyWith(
+                        color: hintGrey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: hintGrey),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
-  String _emailRequestIdForCurrent(RegUserOtpState state) {
-    final target = _emailOtpTarget(_email.text);
-    if (target.isEmpty) return '';
+  Future<void> _startContactChange(int changeTypeId) async {
+    if (!_payloadInjected || _initialRecord == null) return;
 
-    return _verifiedEmailRequestIds[target] ??
-        (_isEmailVerifiedForCurrent(state) ? state.emailRequestId : '');
-  }
-
-  String _hpRequestIdForCurrent(RegUserOtpState state) {
-    final target = _hpOtpTarget(_hp.text);
-    if (target.isEmpty) return '';
-
-    return _verifiedHpRequestIds[target] ??
-        (_isHpVerifiedForCurrent(state) ? state.hpRequestId : '');
-  }
-
-  void _sendEmailOtp() {
-    final target = _emailOtpTarget(_email.text);
-    if (target.isEmpty) {
-      setState(() => _emailOtpError = 'Format email tidak valid');
-      _formKey.currentState?.validate();
-      return;
-    }
-
-    setState(() {
-      _emailOtpError = '';
-      _pendingOpenOtpFor = 'email';
-      _pendingOtpTarget = target;
-    });
-    context.read<RegUserOtpBloc>().add(
-          RegUserOtpKirimEvent(target: target, requestFrom: 'email'),
-        );
-  }
-
-  void _sendHpOtp() {
-    final target = _hpOtpTarget(_hp.text);
-    if (target.isEmpty) {
-      setState(() => _hpOtpError = 'Nomor HP tidak valid');
-      _formKey.currentState?.validate();
-      return;
-    }
-
-    setState(() {
-      _hpOtpError = '';
-      _lastHandledHpStatusKey = '';
-      _pendingOpenOtpFor = 'hp';
-      _pendingOtpTarget = target;
-    });
-    context.read<RegUserOtpBloc>().add(
-          RegUserOtpKirimEvent(target: target, requestFrom: 'hp'),
-        );
-  }
-
-  void _handleHpRegistrationStatus(
-    BuildContext context,
-    RegUserOtpState state,
-  ) {
-    if (!_isHpChanged() ||
-        state.isHpStatusChecking ||
-        state.hpRegistrationStatus.isEmpty) {
-      return;
-    }
-
-    final target = state.hpStatusTarget.trim();
-    if (target.isEmpty || target != _hpOtpTarget(_hp.text)) return;
-
-    final status = state.hpRegistrationStatus;
-    final statusKey = '$target;${state.hpStatusRequestId};$status';
-    if (statusKey == _lastHandledHpStatusKey) return;
-    _lastHandledHpStatusKey = statusKey;
-
-    if (status == RegUserHpRegistrationStatus.notRegistered) {
-      final requestId = state.hpStatusRequestId.trim();
-      if (requestId.isEmpty || requestId != state.hpRequestId.trim()) return;
-
-      setState(() {
-        _verifiedHpRequestIds[target] = requestId;
-        _rejectedHpTargets.remove(target);
-        _hpOtpError = '';
-      });
-      return;
-    }
-
-    if (status != RegUserHpRegistrationStatus.registeredLogin &&
-        status != RegUserHpRegistrationStatus.registered &&
-        status != RegUserHpRegistrationStatus.registeredPic) {
-      return;
-    }
-
-    final message = status == RegUserHpRegistrationStatus.registeredPic
-        ? 'No. HP sudah terdaftar di PIC.'
-        : 'No. HP sudah terdaftar.';
-
-    setState(() {
-      _verifiedHpRequestIds.remove(target);
-      _rejectedHpTargets.add(target);
-      _hpOtpError = message;
-      _pendingOpenOtpFor = '';
-      _pendingOtpTarget = '';
-    });
-    context.read<RegUserOtpBloc>().add(const RegUserOtpResetHpEvent());
-    showRootSnackBar(errorSnackBar(message));
-  }
-
-  void _handleOtpStateChanged(BuildContext context, RegUserOtpState state) {
-    _handleHpRegistrationStatus(context, state);
-
-    if (_isEmailChanged() &&
-        state.isEmailVerified &&
-        state.activeRequestFrom == 'email' &&
-        state.activeTarget.isNotEmpty &&
-        state.emailRequestId.isNotEmpty) {
-      final target = state.activeTarget.toLowerCase();
-      if (target == _emailOtpTarget(_email.text) &&
-          _verifiedEmailRequestIds[target] != state.emailRequestId) {
-        setState(() {
-          _verifiedEmailRequestIds[target] = state.emailRequestId;
-          _emailOtpError = '';
-        });
-      }
-    }
-
-    final hpTarget = _hpOtpTarget(_hp.text);
-    final hpStatusFailed = _isHpChanged() &&
-        state.hasFailure &&
-        state.activeRequestFrom == 'hp' &&
-        state.hpStatusRequestId.isNotEmpty &&
-        state.hpStatusTarget == hpTarget &&
-        !state.isHpSending &&
-        !state.isHpValidating;
-    if (hpStatusFailed) {
-      final failureKey = '${state.hpStatusRequestId};FAIL;${state.message}';
-      if (failureKey != _lastHandledHpStatusKey) {
-        _lastHandledHpStatusKey = failureKey;
-        final message = state.hpError.isNotEmpty
-            ? state.hpError
-            : 'Gagal memeriksa status No. HP.';
-        setState(() {
-          _verifiedHpRequestIds.remove(hpTarget);
-          _hpOtpError = message;
-        });
-        showRootSnackBar(errorSnackBar(message));
-      }
-      return;
-    }
-
-    if (_pendingOpenOtpFor.isEmpty ||
-        state.activeRequestFrom != _pendingOpenOtpFor ||
-        state.activeTarget != _pendingOtpTarget) {
-      return;
-    }
-
-    final isEmail = _pendingOpenOtpFor == 'email';
-    final isSending = isEmail ? state.isEmailSending : state.isHpSending;
-    if (isSending) return;
-
-    if (state.hasFailure) {
-      final message = isEmail ? state.emailError : state.hpError;
-      setState(() {
-        if (isEmail) {
-          _emailOtpError = message.isNotEmpty ? message : 'Gagal mengirim OTP.';
-        } else {
-          _hpOtpError = message.isNotEmpty ? message : 'Gagal mengirim OTP.';
-        }
-        _pendingOpenOtpFor = '';
-        _pendingOtpTarget = '';
-      });
-      showRootSnackBar(
-        errorSnackBar(message.isNotEmpty ? message : 'Gagal mengirim OTP.'),
+    final currentValue = changeTypeId == MRekanPicContactChangeType.email
+        ? (_initialRecord!.picEmail ?? '').trim().toLowerCase()
+        : _normalizeStoredPhone(_initialRecord!.picHp ?? '');
+    if (currentValue.isEmpty) {
+      final label = changeTypeId == MRekanPicContactChangeType.email
+          ? 'Email lama'
+          : 'No. HP lama';
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar('$label belum tersedia.'),
       );
       return;
     }
 
-    final requestId = isEmail ? state.emailRequestId : state.hpRequestId;
-    if (requestId.isEmpty) return;
+    final verifyViaId = await _chooseVerificationChannel();
+    if (!mounted || verifyViaId == null) return;
 
-    final target = _pendingOtpTarget;
-    final requestFrom = _pendingOpenOtpFor;
-    setState(() {
-      _pendingOpenOtpFor = '';
-      _pendingOtpTarget = '';
-    });
-    showRegisterOtpPopup(
+    final verified = await showMRekanPicContactChangeOtpPopup(
       context,
-      target: target,
-      requestFrom: requestFrom,
+      bloc: contactChangeBloc,
+      mrekanpicId: widget.mrekanpicId,
+      changeTypeId: changeTypeId,
+      verifyViaId: verifyViaId,
     );
-  }
+    if (!mounted || verified != true) return;
 
-  bool _validateOtpBeforeSave(RegUserOtpState state) {
-    final emailChanged = _isEmailChanged();
-    final hpChanged = _isHpChanged();
-    final emailVerified = !emailChanged || _isEmailVerifiedForCurrent(state);
-    final hpVerified = !hpChanged || _isHpVerifiedForCurrent(state);
-    if (emailVerified && hpVerified) return true;
+    final prepared =
+        await Navigator.of(context).push<MRekanPicPreparedContactChange>(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value(
+          value: contactChangeBloc,
+          child: MRekanPicContactChangePage(
+            changeTypeId: changeTypeId,
+            currentValue: currentValue,
+          ),
+        ),
+      ),
+    );
+    if (!mounted ||
+        prepared == null ||
+        prepared.changeRequestId.trim().isEmpty ||
+        prepared.newValue.trim().isEmpty) {
+      return;
+    }
 
     setState(() {
-      _showErrors = true;
-      _emailOtpError = emailVerified ? '' : 'Email belum diverifikasi';
-      _hpOtpError = hpVerified
-          ? ''
-          : state.isHpStatusChecking
-              ? 'Status No. HP masih diperiksa'
-              : 'No. HP belum diverifikasi';
+      if (changeTypeId == MRekanPicContactChangeType.email) {
+        final email = prepared.newValue.trim().toLowerCase();
+        _email.text = email;
+        _emailChangeRequestId = prepared.changeRequestId.trim();
+      } else {
+        final phone = _normalizeStoredPhone(prepared.newValue);
+        _hpCountryCode = InternationalPhoneHelper.defaultCountryCode;
+        _hp.text = InternationalPhoneHelper.toNationalInput(phone);
+        _hpChangeRequestId = prepared.changeRequestId.trim();
+      }
     });
-    _formKey.currentState?.validate();
-    showRootSnackBar(
-      errorSnackBar('Verifikasi kontak yang diubah terlebih dahulu.'),
-    );
-    return false;
+
+    final message = changeTypeId == MRekanPicContactChangeType.email
+        ? 'Email baru siap disimpan. Tekan Simpan untuk menerapkan perubahan.'
+        : 'No. HP baru siap disimpan. Tekan Simpan untuk menerapkan perubahan.';
+    ScaffoldMessenger.of(context).showSnackBar(successSnackBar(message));
   }
 
   Future<void> _openCobPicker() async {
@@ -437,11 +368,6 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     final hpNormalized = _toNormalizedPhone62(_hp.text.trim());
     final mjabatanId =
         (_jabatan?.mjabatanId ?? _initialRecord?.mjabatanId ?? '').trim();
-    final otpState = context.read<RegUserOtpBloc>().state;
-    if (!_validateOtpBeforeSave(otpState)) return;
-
-    final emailChanged = _isEmailChanged();
-    final hpChanged = _isHpChanged();
 
     final record = MRekanPicCrudModel(
       mrekanpicId: widget.mrekanpicId,
@@ -453,8 +379,10 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       alamat1: _alamat.text.trim(),
       alamat2: '',
       isDefault: _isDefault,
-      emailReqtokenId: emailChanged ? _emailRequestIdForCurrent(otpState) : '',
-      hpReqtokenId: hpChanged ? _hpRequestIdForCurrent(otpState) : '',
+      emailReqtokenId: '',
+      hpReqtokenId: '',
+      emailChangeRequestId: _emailChangeRequestId,
+      hpChangeRequestId: _hpChangeRequestId,
     );
 
     if (_initialRecord != null && _isSameRecord(_initialRecord!, record)) {
@@ -534,9 +462,6 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
     return MultiBlocListener(
       listeners: [
-        BlocListener<RegUserOtpBloc, RegUserOtpState>(
-          listener: _handleOtpStateChanged,
-        ),
         BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
           listenWhen: (prev, curr) {
             return prev.isSaving != curr.isSaving ||
@@ -725,22 +650,10 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                               buildFieldAlamat(),
                               const SizedBox(height: vPadding),
 
-                              BlocBuilder<RegUserOtpBloc, RegUserOtpState>(
-                                builder: (context, otpState) {
-                                  return _isEmailChanged()
-                                      ? _buildEmailOtpRow(otpState)
-                                      : buildFieldEmail(otpState);
-                                },
-                              ),
+                              buildFieldEmail(),
                               const SizedBox(height: vPadding),
 
-                              BlocBuilder<RegUserOtpBloc, RegUserOtpState>(
-                                builder: (context, otpState) {
-                                  return _isHpChanged()
-                                      ? _buildHpOtpRow(otpState)
-                                      : buildFiledTelp(otpState);
-                                },
-                              ),
+                              buildFieldTelp(),
                               const SizedBox(height: vPadding),
 
                               if (mjnsclientId != '10') ...[
@@ -1025,158 +938,50 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     );
   }
 
-  Widget buildFieldEmail(RegUserOtpState state) {
-    final isVerified = _isEmailChanged() && _isEmailVerifiedForCurrent(state);
-
-    return appTextField(
-      label: 'Email',
-      controller: _email,
-      keyboardType: TextInputType.emailAddress,
-      inputFormatters: [
-        FilteringTextInputFormatter.deny(RegExp(r'\s')),
-      ],
-      helperText: isVerified ? 'Email ini telah diverifikasi' : null,
-      helperStyle: bodyTextStyle(context, fontSize: 12).copyWith(
-        color: successGreen,
+  Widget buildFieldEmail() {
+    return _buildContactFieldRow(
+      field: appTextField(
+        label: 'Email',
+        controller: _email,
+        enabled: false,
       ),
-      borderColor: isVerified ? successGreen : null,
-      focusedBorderColor: isVerified ? successGreen : null,
-      suffixIcon: isVerified
-          ? const Icon(Icons.check, color: successGreen, size: 22)
-          : null,
-      validator: (v) {
-        final email = v?.trim() ?? '';
-
-        if (email.isEmpty) {
-          return kEmailNullError;
-        }
-
-        if (!emailValidatorRegExp.hasMatch(email)) {
-          return 'Format email tidak valid';
-        }
-
-        if (_emailOtpError.isNotEmpty) return _emailOtpError;
-
-        return null;
-      },
-      onChanged: (value) {
-        final target = _emailOtpTarget(value);
-        final isVerifiedAfterChange =
-            target.isNotEmpty && _verifiedEmailRequestIds.containsKey(target);
-        setState(() {
-          _emailOtpError = '';
-          if (!isVerifiedAfterChange) {
-            _pendingOpenOtpFor = '';
-            _pendingOtpTarget = '';
-          }
-        });
-        if (!isVerifiedAfterChange) {
-          context.read<RegUserOtpBloc>().add(const RegUserOtpResetEmailEvent());
-        }
-      },
-    );
-  }
-
-  Widget buildFiledTelp(RegUserOtpState state) {
-    final isVerified = _isHpChanged() && _isHpVerifiedForCurrent(state);
-
-    return AppPhoneNumberField(
-      label: 'No. Telp',
-      controller: _hp,
-      countryCode: _hpCountryCode,
-      helperText: isVerified ? 'No. HP ini telah diverifikasi' : null,
-      helperStyle: bodyTextStyle(context, fontSize: 12).copyWith(
-        color: successGreen,
+      buttonText: 'Ubah Email',
+      enabled: _payloadInjected && _email.text.trim().isNotEmpty,
+      onPressed: () => _startContactChange(
+        MRekanPicContactChangeType.email,
       ),
-      borderColor: isVerified ? successGreen : null,
-      focusedBorderColor: isVerified ? successGreen : null,
-      suffixIcon: isVerified
-          ? const Icon(Icons.check, color: successGreen, size: 22)
-          : null,
-      onCountryCodeChanged: (value) {
-        setState(() {
-          _hpCountryCode = value;
-          _hpOtpError = '';
-          _lastHandledHpStatusKey = '';
-        });
-        final target = _hpOtpTarget(_hp.text);
-        if (!_verifiedHpRequestIds.containsKey(target)) {
-          context.read<RegUserOtpBloc>().add(const RegUserOtpResetHpEvent());
-        }
-      },
-      validator: (v) {
-        final telp = v?.trim() ?? '';
-
-        if (telp.isEmpty) {
-          return kPhoneNumberNullError;
-        }
-
-        final res = InternationalPhoneHelper.normalize(
-          telp,
-          countryCode: _hpCountryCode,
-        );
-
-        if (!res.isValid) {
-          return res.error ?? 'Nomor HP tidak valid';
-        }
-
-        if (_hpOtpError.isNotEmpty) return _hpOtpError;
-
-        return null;
-      },
-      onChanged: (value) {
-        final target = _hpOtpTarget(value);
-        final isVerifiedAfterChange =
-            target.isNotEmpty && _verifiedHpRequestIds.containsKey(target);
-        setState(() {
-          _hpOtpError = _rejectedHpTargets.contains(target)
-              ? 'No. HP sudah terdaftar.'
-              : '';
-          _lastHandledHpStatusKey = '';
-          if (!isVerifiedAfterChange) {
-            _pendingOpenOtpFor = '';
-            _pendingOtpTarget = '';
-          }
-        });
-        if (!isVerifiedAfterChange) {
-          context.read<RegUserOtpBloc>().add(const RegUserOtpResetHpEvent());
-        }
-      },
     );
   }
 
-  Widget _buildEmailOtpRow(RegUserOtpState state) {
-    if (_isEmailVerifiedForCurrent(state)) return buildFieldEmail(state);
-
-    return _buildOtpRow(
-      field: buildFieldEmail(state),
-      isLoading: state.isEmailSending,
-      onPressed: _sendEmailOtp,
+  Widget buildFieldTelp() {
+    return _buildContactFieldRow(
+      field: AppPhoneNumberField(
+        label: 'No. Telp',
+        controller: _hp,
+        countryCode: _hpCountryCode,
+        enabled: false,
+        onCountryCodeChanged: (_) {},
+      ),
+      buttonText: 'Ubah No. HP',
+      enabled: _payloadInjected && _hp.text.trim().isNotEmpty,
+      onPressed: () => _startContactChange(
+        MRekanPicContactChangeType.phone,
+      ),
     );
   }
 
-  Widget _buildHpOtpRow(RegUserOtpState state) {
-    if (_isHpVerifiedForCurrent(state)) return buildFiledTelp(state);
-
-    return _buildOtpRow(
-      field: buildFiledTelp(state),
-      isLoading: state.isHpSending || state.isHpStatusChecking,
-      onPressed: _sendHpOtp,
-    );
-  }
-
-  Widget _buildOtpRow({
+  Widget _buildContactFieldRow({
     required Widget field,
-    required bool isLoading,
+    required String buttonText,
+    required bool enabled,
     required VoidCallback onPressed,
   }) {
     Widget buildButton() {
       return AppButton.primary(
-        text: 'Kirim OTP',
-        isLoading: isLoading,
-        backgroundColor: isLoading ? secondaryBlackColor : primaryColor,
+        text: buttonText,
+        backgroundColor: enabled ? primaryColor : secondaryBlackColor,
         padding: const EdgeInsets.symmetric(vertical: 12),
-        onPressed: isLoading ? null : onPressed,
+        onPressed: enabled ? onPressed : null,
       );
     }
 

@@ -3531,7 +3531,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       );
 
   Widget buildFieldSiOther() => appTextField(
-        label: "Total",
+        label: "Lainnya",
         controller: fieldSiOtherController,
         keyboardType: TextInputType.number,
         inputFormatters: [

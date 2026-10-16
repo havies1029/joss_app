@@ -61,7 +61,19 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
           return const Center(child: LoadingIndicator());
         }
 
-        final items = state.items.isNotEmpty ? state.items : _dummyItems();
+        if (state.items.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Center(
+              child: Text(
+                "Tidak terdapat riwayat pembayaran.",
+                style: TextStyle(color: hintGrey),
+              ),
+            ),
+          );
+        }
+
+        final items = state.items;
         return isNarrow ? _buildTableCompact(items) : _buildTableNormal(items);
       },
     );
@@ -280,17 +292,3 @@ class _headerCell extends StatelessWidget {
   }
 }
 
-List<Historybayar2CariModel> _dummyItems() {
-  return List.generate(5, (i) {
-    return Historybayar2CariModel(
-      curr: "IDR",
-      dn1Id: "DN1-DUMMY-$i",
-      nilaiBayar: 1250000.0 * (i + 1),
-      polisNo: "POLIS-00$i",
-      sppa1Id: "SPPA-$i",
-      periodeAkhir: DateTime.now(),
-      periodeMulai: DateTime.now(),
-      aging: 0,
-    );
-  });
-}

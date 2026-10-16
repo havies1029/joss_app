@@ -8,6 +8,8 @@ class MRekanPicCrudModel {
 	String? picNama;
 	String? emailReqtokenId;
 	String? hpReqtokenId;
+	String? emailChangeRequestId;
+	String? hpChangeRequestId;
 
 	String? jabatanDesc;
 	String? mjabatanId;
@@ -24,6 +26,8 @@ class MRekanPicCrudModel {
 		this.picNama,
 		this.emailReqtokenId,
 		this.hpReqtokenId,
+		this.emailChangeRequestId,
+		this.hpChangeRequestId,
 		this.jabatanDesc,
 		this.mjabatanId,
 		this.alamat1,
@@ -45,6 +49,8 @@ class MRekanPicCrudModel {
 			picNama: data['picNama'] ?? '',
 			emailReqtokenId: data['emailReqtokenId'] ?? '',
 			hpReqtokenId: data['hpReqtokenId'] ?? '',
+			emailChangeRequestId: data['emailChangeRequestId'] ?? '',
+			hpChangeRequestId: data['hpChangeRequestId'] ?? '',
 			jabatanDesc: data['jabatanDesc'] ?? '',
 			mjabatanId: data['mjabatanId']??'',
 			alamat1: data['alamat1'] ?? '',
@@ -61,6 +67,8 @@ class MRekanPicCrudModel {
 		'picNama': picNama,
 		'emailReqtokenId': emailReqtokenId,
 		'hpReqtokenId': hpReqtokenId,
+		'emailChangeRequestId': emailChangeRequestId,
+		'hpChangeRequestId': hpChangeRequestId,
 		'jabatanDesc': jabatanDesc,
 		'mjabatanId': mjabatanId,
 		'alamat1': alamat1,

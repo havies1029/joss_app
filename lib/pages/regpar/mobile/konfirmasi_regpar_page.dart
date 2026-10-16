@@ -1253,7 +1253,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
             _buildDetailRow("Bangunan:", toCurrency(data.siBuilding)),
             _buildDetailRow("Inventaris:", toCurrency(data.siContent)),
             _buildDetailRow("Stok:", toCurrency(data.siStock)),
-            _buildDetailRow("Total:", toCurrency(data.siOther)),
+            _buildDetailRow("Lainnya:", toCurrency(data.siOther)),
           ],
         ],
       ),
