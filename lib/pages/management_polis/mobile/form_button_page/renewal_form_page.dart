@@ -52,7 +52,7 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
   var fieldPeriodeMulaiController =
       TextEditingController(text: DateTime.now().toIso8601String());
   var fieldPremiController = TextEditingController();
-  var fieldSppa1IdController = TextEditingController();
+  var fieldPolis1IdController = TextEditingController();
   var fieldStatusEndorsController = TextEditingController();
   var fieldTsiController = TextEditingController();
 
@@ -305,15 +305,15 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
     );
   }
 
-  Widget buildFieldSppa1Id() {
+  Widget buildFieldPolis1Id() {
     return appTextField(
-      controller: fieldSppa1IdController,
+      controller: fieldPolis1IdController,
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: kStringNullError);
         }
       },
-      label: 'SPPA ID',
+      label: 'Polis ID',
     );
   }
 
@@ -393,7 +393,7 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
     _dismissDialog();
     final record = Regrenew1FormModel(
       isUbah: false,
-      sppa1Id: widget.polisId,
+      polis1Id: widget.polisId,
       notePerubahan: fieldNotePerubahanController.text,
     );
 

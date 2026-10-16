@@ -19,7 +19,8 @@ class FabActionExecutor {
   const FabActionExecutor(this.policy);
 
   String _cobId(BuildContext c) => c.read<CobManPolBloc>().state.selectedCOBId;
-  String _statusId(BuildContext c) => c.read<StatusAsetCariBloc>().state.selectedStatusId;
+  String _statusId(BuildContext c) =>
+      c.read<StatusAsetCariBloc>().state.selectedStatusId;
 
   void _snack(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(infoSnackBar(message));
@@ -187,9 +188,8 @@ class FabActionExecutor {
       return;
     }
 
-    final isTahapanAction =
-        actionType == ActionType.perpanjangan ||
-            actionType == ActionType.aktifkanKembali;
+    final isTahapanAction = actionType == ActionType.perpanjangan ||
+        actionType == ActionType.aktifkanKembali;
 
     if (isTahapanAction) {
       if (!_guardTahapan(
@@ -254,7 +254,7 @@ class FabActionExecutor {
     }
   }
 
-  String _sppa1IdFromItem(String cobId, dynamic item) {
+  String _polisIdFromItem(String cobId, dynamic item) {
     try {
       // ignore: avoid_dynamic_calls
       return switch (cobId) {
@@ -278,9 +278,10 @@ class FabActionExecutor {
     }
   }
 
-  void _openEndorse(BuildContext c, String cobId, dynamic item, VoidCallback? done) {
-    final sppa1Id = _sppa1IdFromItem(cobId, item);
-    if (sppa1Id.isEmpty) return;
+  void _openEndorse(
+      BuildContext c, String cobId, dynamic item, VoidCallback? done) {
+    final polisId = _polisIdFromItem(cobId, item);
+    if (polisId.isEmpty) return;
 
     Navigator.push(
       c,
@@ -288,17 +289,17 @@ class FabActionExecutor {
         builder: (_) => EndorseFormPage(
           viewMode: "tambah",
           recordId: "",
-          sppaId: sppa1Id,
+          polisId: polisId,
           cobId: cobId,
-          sppa2Id: "",
         ),
       ),
     ).then((_) => done?.call());
   }
 
-  void _openRenewal(BuildContext c, String cobId, dynamic item, VoidCallback? done) {
-    final sppa1Id = _sppa1IdFromItem(cobId, item);
-    if (sppa1Id.isEmpty) return;
+  void _openRenewal(
+      BuildContext c, String cobId, dynamic item, VoidCallback? done) {
+    final polisId = _polisIdFromItem(cobId, item);
+    if (polisId.isEmpty) return;
 
     Navigator.push(
       c,
@@ -306,16 +307,17 @@ class FabActionExecutor {
         builder: (_) => RenewalFormPage(
           viewMode: "tambah",
           recordId: "",
-          polisId: sppa1Id,
+          polisId: polisId,
           cobId: cobId,
         ),
       ),
     ).then((_) => done?.call());
   }
 
-  void _openReactive(BuildContext c, String cobId, dynamic item, VoidCallback? done) {
-    final sppa1Id = _sppa1IdFromItem(cobId, item);
-    if (sppa1Id.isEmpty) return;
+  void _openReactive(
+      BuildContext c, String cobId, dynamic item, VoidCallback? done) {
+    final polisId = _polisIdFromItem(cobId, item);
+    if (polisId.isEmpty) return;
 
     Navigator.push(
       c,
@@ -323,14 +325,15 @@ class FabActionExecutor {
         builder: (_) => ReaktifFormPage(
           viewMode: "tambah",
           recordId: "",
-          polisId: sppa1Id,
+          polisId: polisId,
           cobId: cobId,
         ),
       ),
     ).then((_) => done?.call());
   }
 
-  void _navigateToDetail(BuildContext context, dynamic item, VoidCallback? onComplete) {
+  void _navigateToDetail(
+      BuildContext context, dynamic item, VoidCallback? onComplete) {
     final cobId = _cobId(context);
 
     Navigator.push(
@@ -408,8 +411,8 @@ class FabActionExecutor {
     }
 
     c.read<SppaDownloadPolisBloc>().add(
-      DownloadFileEvent(ePolisId: id, cob: 'PAR'),
-    );
+          DownloadFileEvent(ePolisId: id, cob: 'PAR'),
+        );
   }
 
   void _downloadEq(BuildContext c, dynamic item) {
@@ -421,11 +424,12 @@ class FabActionExecutor {
     }
 
     c.read<SppaDownloadPolisBloc>().add(
-      DownloadFileEvent(ePolisId: id, cob: 'EQ'),
-    );
+          DownloadFileEvent(ePolisId: id, cob: 'EQ'),
+        );
   }
 
-  void _handleAlwaysEnabled(BuildContext context, ActionType type, VoidCallback? onComplete) {
+  void _handleAlwaysEnabled(
+      BuildContext context, ActionType type, VoidCallback? onComplete) {
     switch (type) {
       case ActionType.beliPolis:
         Navigator.push(

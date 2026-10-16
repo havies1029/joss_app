@@ -13,7 +13,6 @@ import '../pages/management_polis/mobile/form_button_page/reactive_form_page.dar
 import '../pages/management_polis/mobile/form_button_page/renewal_form_page.dart';
 import '../widgets/apptheme/hubungi_cs.dart';
 
-
 class FabActionHelper {
   static String _cobId(BuildContext c) =>
       c.read<CobManPolBloc>().state.selectedCOBId;
@@ -99,7 +98,6 @@ class FabActionHelper {
     isEnabled: true,
   );
 
-
   static final List<ActionType> alwaysEnabledActions = [
     ActionType.beliPolis,
     ActionType.hubungiJps,
@@ -113,7 +111,7 @@ class FabActionHelper {
 
   static final Map<String, List<ActionType>> statusIdEnabledMatrix = {
     "10001": <ActionType>[ActionType.endorse],
-    "10002": <ActionType>[ActionType.lacakPolis],        // <— lacak cuma di sini
+    "10002": <ActionType>[ActionType.lacakPolis], // <— lacak cuma di sini
     "10003": <ActionType>[ActionType.aktifkanKembali],
     "10004": <ActionType>[ActionType.perpanjangan],
   };
@@ -193,8 +191,8 @@ class FabActionHelper {
     if (selectedItems.isEmpty) {
       return masterActions
           .map((a) => a.copyWith(
-        isEnabled: alwaysEnabledActions.contains(a.type),
-      ))
+                isEnabled: alwaysEnabledActions.contains(a.type),
+              ))
           .toList();
     }
 
@@ -206,12 +204,12 @@ class FabActionHelper {
         statusIdEnabledMatrix[statusId] ?? const <ActionType>[];
 
     final lacakEnabled =
-    (allowedByStatus.contains(ActionType.lacakPolis) && _canLacak(item))
-        ? <ActionType>[ActionType.lacakPolis]
-        : const <ActionType>[];
+        (allowedByStatus.contains(ActionType.lacakPolis) && _canLacak(item))
+            ? <ActionType>[ActionType.lacakPolis]
+            : const <ActionType>[];
 
     final allowedByStatusNoLacak =
-    allowedByStatus.where((t) => t != ActionType.lacakPolis).toList();
+        allowedByStatus.where((t) => t != ActionType.lacakPolis).toList();
 
     final allowed = <ActionType>{
       ...alwaysEnabledActions,
@@ -237,8 +235,6 @@ class FabActionHelper {
 
     return base;
   }
-
-
 
   static void handleAction({
     required BuildContext context,
@@ -289,7 +285,7 @@ class FabActionHelper {
     }
   }
 
-  static String _sppa1IdFromItem(String cobId, dynamic item) {
+  static String _polisIdFromItem(String cobId, dynamic item) {
     return switch (cobId) {
       "10002" => item.asetParId,
       "10003" => item.asetMvId,
@@ -302,8 +298,8 @@ class FabActionHelper {
 
   static void _openEndorse(
       BuildContext c, String cobId, dynamic item, VoidCallback? done) {
-    final sppa1Id = _sppa1IdFromItem(cobId, item);
-    if (sppa1Id.isEmpty) return;
+    final polisId = _polisIdFromItem(cobId, item);
+    if (polisId.isEmpty) return;
 
     Navigator.push(
       c,
@@ -311,9 +307,8 @@ class FabActionHelper {
         builder: (_) => EndorseFormPage(
           viewMode: "tambah",
           recordId: "",
-          sppaId: sppa1Id,
+          polisId: polisId,
           cobId: cobId,
-          sppa2Id: item.sppa2Id ?? "",
         ),
       ),
     ).then((_) => done?.call());
@@ -321,8 +316,8 @@ class FabActionHelper {
 
   static void _openRenewal(
       BuildContext c, String cobId, dynamic item, VoidCallback? done) {
-    final sppa1Id = _sppa1IdFromItem(cobId, item);
-    if (sppa1Id.isEmpty) return;
+    final polisId = _polisIdFromItem(cobId, item);
+    if (polisId.isEmpty) return;
 
     Navigator.push(
       c,
@@ -330,7 +325,7 @@ class FabActionHelper {
         builder: (_) => RenewalFormPage(
           viewMode: "tambah",
           recordId: "",
-          polisId: sppa1Id,
+          polisId: polisId,
           cobId: cobId,
         ),
       ),
@@ -339,8 +334,8 @@ class FabActionHelper {
 
   static void _openReactive(
       BuildContext c, String cobId, dynamic item, VoidCallback? done) {
-    final sppa1Id = _sppa1IdFromItem(cobId, item);
-    if (sppa1Id.isEmpty) return;
+    final polisId = _polisIdFromItem(cobId, item);
+    if (polisId.isEmpty) return;
 
     Navigator.push(
       c,
@@ -348,7 +343,7 @@ class FabActionHelper {
         builder: (_) => ReaktifFormPage(
           viewMode: "tambah",
           recordId: "",
-          polisId: sppa1Id,
+          polisId: polisId,
           cobId: cobId,
         ),
       ),
@@ -376,13 +371,15 @@ class FabActionHelper {
 
   static void _downloadPar(BuildContext c, dynamic item) {
     if (item.filePolisParId.isEmpty) return;
-    c.read<SppaDownloadPolisBloc>()
+    c
+        .read<SppaDownloadPolisBloc>()
         .add(DownloadFileEvent(ePolisId: item.filePolisParId, cob: 'PAR'));
   }
 
   static void _downloadEq(BuildContext c, dynamic item) {
     if (item.filePolisEqId.isEmpty) return;
-    c.read<SppaDownloadPolisBloc>()
+    c
+        .read<SppaDownloadPolisBloc>()
         .add(DownloadFileEvent(ePolisId: item.filePolisEqId, cob: 'PAR'));
   }
 
@@ -470,7 +467,6 @@ extension ActionMenuItemCopy on ActionMenuItem {
     );
   }
 }
-
 
 /*
 class FabActionHelper {

@@ -18,19 +18,17 @@ import '../../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
 class EndorseFormPage extends StatefulWidget {
   final String viewMode;
   final String recordId;
-  final String sppaId;
+  final String polisId;
   final String cobId;
   final String? pageTitle;
-  final String sppa2Id;
 
   const EndorseFormPage({
     super.key,
     required this.viewMode,
     required this.recordId,
-    required this.sppaId,
+    required this.polisId,
     required this.cobId,
     this.pageTitle,
-    required this.sppa2Id,
   });
 
   @override
@@ -52,7 +50,7 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
   var fieldPeriodeMulaiController =
       TextEditingController(text: DateTime.now().toIso8601String());
   var fieldPremiController = TextEditingController();
-  var fieldSppa1IdController = TextEditingController();
+  var fieldPolis1IdController = TextEditingController();
   var fieldStatusEndorsController = TextEditingController();
   var fieldTsiController = TextEditingController();
 
@@ -76,9 +74,9 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
     Future.delayed(const Duration(milliseconds: 500), () {
       loadData();
 
-      fieldSppa1IdController.text = widget.sppaId;
+      fieldPolis1IdController.text = widget.polisId;
 
-      debugPrint("✅ [Endorse] SPPA ID dari BLoC: ${widget.sppaId}");
+      debugPrint("[Endorse] Polis ID dari BLoC: ${widget.polisId}");
     });
   }
 
@@ -317,15 +315,15 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
     );
   }
 
-  Widget buildFieldSppa1Id() {
+  Widget buildFieldPolis1Id() {
     return appTextField(
-      controller: fieldSppa1IdController,
+      controller: fieldPolis1IdController,
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: kStringNullError);
         }
       },
-      label: 'SPPA ID',
+      label: 'Polis ID',
     );
   }
 
@@ -423,7 +421,7 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
     _dismissDialog();
     final record = Regendors1FormModel(
       notePerubahan: fieldNotePerubahanController.text,
-      sppa1Id: widget.sppaId,
+      polis1Id: widget.polisId,
       regendors1Id: "",
     );
     regendors1FormBloc.add(Regendors1FormTambahEvent(record: record));

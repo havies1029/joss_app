@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
@@ -108,15 +110,37 @@ class Calpar1ListBloc extends Bloc<Calpar1ListEvents, Calpar1ListState> {
 			processMessage: "",
 		));
 
-		Calpar1ListRepository repo = Calpar1ListRepository();
-		final result = await repo.calpar2Regpar(event.calpar1Id);
+		try {
+			Calpar1ListRepository repo = Calpar1ListRepository();
+			final result = await repo
+					.calpar2Regpar(event.calpar1Id)
+					.timeout(const Duration(seconds: 12));
+			final processMessage = result.data.toString().trim();
+			final isSuccess = result.success &&
+					processMessage.isNotEmpty &&
+					processMessage.toLowerCase() != "null";
 
-		emit(state.copyWith(
-			isProcessing: false,
-			isProcessed: true,
-			hasFailure: !result.success,
-			processMessage: result.data.toString(),
-		));
+			emit(state.copyWith(
+				isProcessing: false,
+				isProcessed: isSuccess,
+				hasFailure: !isSuccess,
+				processMessage: isSuccess ? processMessage : "",
+			));
+		} on TimeoutException {
+			emit(state.copyWith(
+				isProcessing: false,
+				isProcessed: false,
+				hasFailure: true,
+				processMessage: "",
+			));
+		} catch (_) {
+			emit(state.copyWith(
+				isProcessing: false,
+				isProcessed: false,
+				hasFailure: true,
+				processMessage: "",
+			));
+		}
 	}
 
 

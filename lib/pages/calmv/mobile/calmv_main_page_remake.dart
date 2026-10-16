@@ -400,12 +400,27 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
             },
           ),
           BlocListener<Calmv1ListBloc, Calmv1ListState>(
-            listenWhen: (prev, curr) {
-              return prev.processMessage != curr.processMessage &&
-                  curr.processMessage.isNotEmpty;
-            },
+            listenWhen: (prev, curr) =>
+                prev.isProcessing && !curr.isProcessing,
             listener: (context, state) {
               _hideGlobalLoading();
+
+              final processMessage = state.processMessage.trim();
+              final hasValidResult = !state.hasFailure &&
+                  state.isProcessed &&
+                  processMessage.isNotEmpty;
+
+              if (!hasValidResult) {
+                context
+                    .read<Calmv1ListBloc>()
+                    .add(ClearProcessMessageEvent());
+                ScaffoldMessenger.of(context).showSnackBar(
+                  errorSnackBar(
+                    "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
+                  ),
+                );
+                return;
+              }
 
               final calmv1Id =
                   context.read<Calmv1CrudBloc>().state.record?.calmv1Id ?? "";
@@ -416,7 +431,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => RegmvFormMainRemake(
-                    regmv1Id: state.processMessage,
+                    regmv1Id: processMessage,
                     calmv1Id: calmv1Id,
                   ),
                 ),
@@ -937,6 +952,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   bool _isHitungPremiLoading = false;
+  int _hitungPremiAttempt = 0;
   bool _calmv1SaveStartedForHitungPremi = false;
   bool _calmv2SaveStartedForHitungPremi = false;
 
@@ -957,6 +973,28 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
     setState(() {
       _isHitungPremiLoading = false;
+    });
+  }
+
+  void _startHitungPremiTimeout() {
+    final attempt = ++_hitungPremiAttempt;
+
+    Future.delayed(const Duration(seconds: 12), () {
+      if (!mounted ||
+          attempt != _hitungPremiAttempt ||
+          !_isHitungPremiLoading) {
+        return;
+      }
+
+      setState(() {
+        _isHitungPremiLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(
+          "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
+        ),
+      );
     });
   }
 
@@ -992,6 +1030,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     }
 
     _beginHitungPremiUiLock();
+    _startHitungPremiTimeout();
 
     draftForm1ToBloc(context);
     draftForm2ToBloc(context);

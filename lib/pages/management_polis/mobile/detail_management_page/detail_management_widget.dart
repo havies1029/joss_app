@@ -47,8 +47,6 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
   List<dynamic> _items = const [];
 
   late final Map<String, dynamic> _dataMap;
-  late final String _sppa1Id;
-
   late final String _prosesSource; // "E" | "R" | "A" | ""
   late final String _prosesId;
   late final String _prosesRemarks;
@@ -78,8 +76,6 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
     super.initState();
 
     _dataMap = _toMap(widget.data);
-    _sppa1Id = extractAssetIdByCob(_dataMap, widget.cobId);
-
     _prosesSource = _dataMap["prosesSource"]?.toString() ?? "";
     _prosesId = _dataMap["prosesId"]?.toString() ?? "";
     _prosesRemarks = _dataMap["prosesRemarks"]?.toString() ?? "";
@@ -126,12 +122,13 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
 
     if (cleanSource == "E") {
       resolvedId =
-          context.read<Regendors1FormBloc>().state.record?.sppa1Id ?? "";
+          context.read<Regendors1FormBloc>().state.record?.regendors1Id ?? "";
     } else if (cleanSource == "A") {
-      resolvedId = context.read<Regreaktif1Bloc>().state.record?.sppa1Id ?? "";
+      resolvedId =
+          context.read<Regreaktif1Bloc>().state.record?.regreaktif1Id ?? "";
     } else if (cleanSource == "R") {
       resolvedId =
-          context.read<Regrenew1FormBloc>().state.record?.sppa1Id ?? "";
+          context.read<Regrenew1FormBloc>().state.record?.regrenew1Id ?? "";
     } else if (cleanSource == "O") {
       resolvedId =
           context.read<Regother1CrudBloc>().state.record?.regother1Id ?? "";
@@ -277,16 +274,6 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
     }
 
     return -1;
-  }
-
-  String extractAssetIdByCob(Map<String, dynamic> dataMap, String cobId) {
-    return switch (cobId) {
-      "10002" => dataMap["asetParId"]?.toString() ?? "",
-      "10003" => dataMap["asetMvId"]?.toString() ?? "",
-      "10004" => dataMap["asetHullId"]?.toString() ?? "",
-      "10005" => dataMap["asethealthId"]?.toString() ?? "",
-      _ => dataMap["asetOthersId"]?.toString() ?? "",
-    };
   }
 
   @override

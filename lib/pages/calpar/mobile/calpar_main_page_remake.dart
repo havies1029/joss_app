@@ -613,12 +613,27 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
             },
           ),
           BlocListener<Calpar1ListBloc, Calpar1ListState>(
-            listenWhen: (prev, curr) {
-              return prev.processMessage != curr.processMessage &&
-                  curr.processMessage.isNotEmpty;
-            },
+            listenWhen: (prev, curr) =>
+                prev.isProcessing && !curr.isProcessing,
             listener: (context, state) {
               _hideGlobalLoading();
+
+              final processMessage = state.processMessage.trim();
+              final hasValidResult = !state.hasFailure &&
+                  state.isProcessed &&
+                  processMessage.isNotEmpty;
+
+              if (!hasValidResult) {
+                context
+                    .read<Calpar1ListBloc>()
+                    .add(ClearProcessMessageEvent());
+                ScaffoldMessenger.of(context).showSnackBar(
+                  errorSnackBar(
+                    "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
+                  ),
+                );
+                return;
+              }
 
               final calpar1 =
                   context.read<Calpar1CrudBloc>().state.record?.calpar1Id ?? "";
@@ -629,7 +644,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => RegparFormMainRemake(
-                    regpar1Id: state.processMessage,
+                    regpar1Id: processMessage,
                     calpar1Id: calpar1Id,
                   ),
                 ),
@@ -1394,6 +1409,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   }
 
   bool _isHitungPremiLoading = false;
+  int _hitungPremiAttempt = 0;
   bool _calpar1SaveStartedForHitungPremi = false;
   bool _calpar2SaveStartedForHitungPremi = false;
   bool _calpar3SaveStartedForHitungPremi = false;
@@ -1416,6 +1432,28 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
     setState(() {
       _isHitungPremiLoading = false;
+    });
+  }
+
+  void _startHitungPremiTimeout() {
+    final attempt = ++_hitungPremiAttempt;
+
+    Future.delayed(const Duration(seconds: 12), () {
+      if (!mounted ||
+          attempt != _hitungPremiAttempt ||
+          !_isHitungPremiLoading) {
+        return;
+      }
+
+      setState(() {
+        _isHitungPremiLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(
+          "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
+        ),
+      );
     });
   }
 
@@ -1458,6 +1496,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     }
 
     _beginHitungPremiUiLock();
+    _startHitungPremiTimeout();
 
     draftForm1ToBloc(context);
     draftForm2ToBloc(context);

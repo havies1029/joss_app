@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
@@ -106,16 +108,37 @@ class Calmv1ListBloc extends Bloc<Calmv1ListEvents, Calmv1ListState> {
 		));
 
 
-		Calmv1ListRepository repo = Calmv1ListRepository();
-		final result = await repo.calmv2Regmv(event.calmv1Id);
+		try {
+			Calmv1ListRepository repo = Calmv1ListRepository();
+			final result = await repo
+					.calmv2Regmv(event.calmv1Id)
+					.timeout(const Duration(seconds: 12));
+			final processMessage = result.data.toString().trim();
+			final isSuccess = result.success &&
+					processMessage.isNotEmpty &&
+					processMessage.toLowerCase() != "null";
 
-
-		emit(state.copyWith(
-			isProcessing: false,
-			isProcessed: true,
-			hasFailure: !result.success,
-			processMessage: result.data.toString(),
-		));
+			emit(state.copyWith(
+				isProcessing: false,
+				isProcessed: isSuccess,
+				hasFailure: !isSuccess,
+				processMessage: isSuccess ? processMessage : "",
+			));
+		} on TimeoutException {
+			emit(state.copyWith(
+				isProcessing: false,
+				isProcessed: false,
+				hasFailure: true,
+				processMessage: "",
+			));
+		} catch (_) {
+			emit(state.copyWith(
+				isProcessing: false,
+				isProcessed: false,
+				hasFailure: true,
+				processMessage: "",
+			));
+		}
 	}
 
 

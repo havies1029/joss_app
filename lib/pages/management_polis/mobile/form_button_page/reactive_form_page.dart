@@ -52,7 +52,7 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
   var fieldPeriodeMulaiController =
       TextEditingController(text: DateTime.now().toIso8601String());
   var fieldPremiController = TextEditingController();
-  var fieldSppa1IdController = TextEditingController();
+  var fieldPolis1IdController = TextEditingController();
   var fieldStatusEndorsController = TextEditingController();
   var fieldTsiController = TextEditingController();
 
@@ -303,15 +303,15 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
     );
   }
 
-  Widget buildFieldSppa1Id() {
+  Widget buildFieldPolis1Id() {
     return appTextField(
-      controller: fieldSppa1IdController,
+      controller: fieldPolis1IdController,
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: kStringNullError);
         }
       },
-      label: 'SPPA ID',
+      label: 'Polis ID',
     );
   }
 
@@ -422,7 +422,7 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
     _dismissDialog();
     final record = Regreaktif1Model(
       isUbah: false,
-      sppa1Id: widget.polisId,
+      polis1Id: widget.polisId,
       notePerubahan: fieldNotePerubahanController.text,
     );
 
