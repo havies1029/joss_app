@@ -1219,7 +1219,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
         barrierDismissible: true, // klik luar = close
         barrierColor:
             Colors.black.withOpacity(0.6), // background gelap transparan
-        builder: (context) => RegisterClientPopUp(
+        builder: (_) => RegisterClientPopUp(
           header: 'Data Klien Belum Terdaftar!',
           description:
               'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
@@ -1252,7 +1252,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
             context: context,
             barrierDismissible: true,
             barrierColor: Colors.black.withOpacity(0.6),
-            builder: (context) => RegisterClientPopUp(
+            builder: (_) => RegisterClientPopUp(
               header: 'Isi Data Pribadi Anda',
               description:
                   'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
@@ -1279,7 +1279,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
             context: context,
             barrierDismissible: true,
             barrierColor: Colors.black.withOpacity(0.6),
-            builder: (context) => RegisterClientPopUp(
+            builder: (_) => RegisterClientPopUp(
               header: 'Isi Data Pribadi Anda',
               description:
                   'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',

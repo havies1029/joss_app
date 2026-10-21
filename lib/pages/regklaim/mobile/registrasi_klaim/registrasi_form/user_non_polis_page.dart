@@ -478,7 +478,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       context: context,
       barrierDismissible: true,
       barrierColor: Colors.black.withOpacity(0.6),
-      builder: (context) => RegisterClientPopUp(
+      builder: (_) => RegisterClientPopUp(
         header: 'Isi Data Pribadi Anda',
         description:
             'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
@@ -501,7 +501,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       context: context,
       barrierDismissible: true,
       barrierColor: Colors.black.withOpacity(0.6),
-      builder: (context) => RegisterClientPopUp(
+      builder: (_) => RegisterClientPopUp(
         header: 'Isi Data Perusahaan Anda',
         description:
             'Lengkapi data perusahaan Anda terlebih dahulu untuk melanjutkan proses ini.',

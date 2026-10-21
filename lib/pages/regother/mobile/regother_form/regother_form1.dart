@@ -492,7 +492,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
           context: context,
           barrierDismissible: true,
           barrierColor: Colors.black.withOpacity(0.6),
-          builder: (context) => RegisterClientPopUp(
+          builder: (_) => RegisterClientPopUp(
             header: 'Isi Data Pribadi Anda',
             description:
                 'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
@@ -525,7 +525,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
           context: context,
           barrierDismissible: true,
           barrierColor: Colors.black.withOpacity(0.6),
-          builder: (context) => RegisterClientPopUp(
+          builder: (_) => RegisterClientPopUp(
             header: 'Isi Data Perusahaan Anda',
             description:
                 'Lengkapi data perusahaan Anda terlebih dahulu untuk melanjutkan proses ini.',

@@ -11,7 +11,6 @@ import 'package:joss_app/models/combobox/combombidang_model.dart';
 
 import '../../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../helper/image_uploader.dart';
 import '../../../../../../repositories/combobox/combombentukcst_repository.dart';
@@ -40,7 +39,7 @@ class MRekanGeneralCmpPopUpPage extends StatefulWidget {
 class MRekanGeneralCmpPopUpPageFormState
     extends State<MRekanGeneralCmpPopUpPage> {
   late final MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
-  late RegUserBloc regUserBloc;
+  late final MRekan1CrudBloc mRekan1CrudBloc;
 
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
@@ -58,15 +57,18 @@ class MRekanGeneralCmpPopUpPageFormState
   final fieldIdKlienController = TextEditingController();
 
   bool _isFirstLoad = true;
+  bool _isClosing = false;
+  bool _saveResultHandled = false;
 
   @override
   void initState() {
     super.initState();
     mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
+    mRekan1CrudBloc = context.read<MRekan1CrudBloc>();
     mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudResetStatusEvent());
-    regUserBloc = context.read<RegUserBloc>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       loadData();
     });
   }
@@ -79,35 +81,11 @@ class MRekanGeneralCmpPopUpPageFormState
     super.dispose();
   }
 
-  void _handleClose() {
-    // if (widget.popTwice) {
-    //   Navigator.pop(context);
-    //   Navigator.pop(context);
-    // } else {
-    //   Navigator.pop(context);
-    // }
-    final navigator = Navigator.of(context);
-    debugPrint("reguserbloc requestform : ${regUserBloc.state.requestFrom}");
+  void _handleClose({bool saved = false}) {
+    if (!mounted || _isClosing) return;
 
-    if (regUserBloc.state.requestFrom.isNotEmpty &&
-        regUserBloc.state.requestFrom != 'daftarclient_page' &&
-        regUserBloc.state.requestFrom != 'regother_page') {
-      debugPrint("navigator3x");
-      navigator.pop();
-      navigator.pop();
-      regUserBloc.add(ClearRequestFromEvent());
-    } else if (regUserBloc.state.requestFrom == 'regother_page') {
-      debugPrint("navigator2x");
-      navigator.pop();
-      navigator.pop();
-      regUserBloc.add(ClearRequestFromEvent());
-    } else if (regUserBloc.state.requestFrom == 'daftarclient_page') {
-      debugPrint("navigator1x");
-      navigator.pop();
-    } else {
-      navigator.pop();
-      debugPrint("navigator1x");
-    }
+    _isClosing = true;
+    Navigator.of(context).pop(saved);
   }
 
   @override
@@ -213,18 +191,10 @@ class MRekanGeneralCmpPopUpPageFormState
                               if (!state.isSaved) return;
 
                               if (!state.hasFailure) {
-                                context
-                                    .read<MRekan1CrudBloc>()
-                                    .add(MRekan1CrudReloadEvent());
+                                if (_saveResultHandled) return;
+                                _saveResultHandled = true;
 
-                                if (regUserBloc.state.requestFrom ==
-                                    'daftarclient_page') {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    successSnackBar(
-                                      "Informasi klien berhasil disimpan!",
-                                    ),
-                                  );
-                                }
+                                mRekan1CrudBloc.add(MRekan1CrudReloadEvent());
 
                                 mRekanGeneralCmpCrudBloc.add(
                                   MRekanGeneralCmpCrudResetStatusEvent(),
@@ -234,8 +204,9 @@ class MRekanGeneralCmpPopUpPageFormState
                                   MRekanGeneralCmpCrudLihatEvent(),
                                 );
 
-                                _handleClose();
+                                _handleClose(saved: true);
                               } else {
+                                if (!mounted || _isClosing) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   errorSnackBar("Data gagal disimpan!"),
                                 );

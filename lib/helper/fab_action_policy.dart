@@ -21,7 +21,7 @@ class FabActionPolicy {
 
   static const Map<String, Set<ActionType>> statusIdEnabledMatrix = {
     "10001": {ActionType.endorse, ActionType.unduhPolis},
-    "10002": {ActionType.lacakPolis, ActionType.unduhPolis},
+    "10002": {ActionType.lacakPolis},
     "10003": {ActionType.aktifkanKembali},
     "10004": {ActionType.perpanjangan, ActionType.endorse},
   };
@@ -235,8 +235,9 @@ class FabActionPolicy {
       renewalFlag: canRenewal,
     );
 
-    final downloadAllowedByStatus =
-        allowedByStatus.contains(ActionType.unduhPolis);
+    // Dokumen polis hanya boleh ditampilkan dari tab Aktif. Guard eksplisit
+    // ini juga melindungi PAR/EQ apabila matrix aksi berubah di kemudian hari.
+    final downloadAllowedByStatus = statusId == "10001";
 
     if (downloadAllowedByStatus) {
       if (cobId == "10002") {

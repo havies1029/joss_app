@@ -914,6 +914,7 @@ class _AppState extends State<_App> {
   final GlobalKey<NavigatorState> _navigatorKey = rootNavigatorKey;
   late RegUserBloc _regUserBloc;
   String _pendingFlowRequestFrom = '';
+  bool _isGeneralDataPopupOpen = false;
 
   @override
   void initState() {
@@ -974,10 +975,14 @@ class _AppState extends State<_App> {
     required String loadedMjenisClient,
     required bool isDataComplete,
   }) {
-    if (_pendingFlowRequestFrom.isEmpty) return;
+    if (_pendingFlowRequestFrom.isEmpty || _isGeneralDataPopupOpen) return;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _pendingFlowRequestFrom.isEmpty) return;
+      if (!mounted ||
+          _pendingFlowRequestFrom.isEmpty ||
+          _isGeneralDataPopupOpen) {
+        return;
+      }
 
       final rootContext = _navigatorKey.currentContext;
       if (rootContext == null) {
@@ -1015,28 +1020,52 @@ class _AppState extends State<_App> {
 
       debugPrint("[RegisterFlow] general incomplete; show popup");
       _showGeneralDataPopup(loadedMjenisClient);
-      _pendingFlowRequestFrom = '';
     });
   }
 
-  void _showGeneralDataPopup(String? mjenisClient) {
+  Future<void> _showGeneralDataPopup(String? mjenisClient) async {
+    if (_isGeneralDataPopupOpen) return;
+
     final popupContext = _navigatorKey.currentContext;
     if (popupContext == null) return;
 
-    if (mjenisClient == '10') {
-      debugPrint("[RegisterFlow] show general IDV popup");
-      showDialog(
-        context: popupContext,
-        useRootNavigator: true,
-        builder: (_) => const MRekanGeneralIdvPopUpPage(),
-      );
-    } else if (mjenisClient == '20') {
-      debugPrint("[RegisterFlow] show general CMP popup");
-      showDialog(
-        context: popupContext,
-        useRootNavigator: true,
-        builder: (_) => const MRekanGeneralCmpPopUpPage(),
-      );
+    _isGeneralDataPopupOpen = true;
+    bool? saved;
+
+    try {
+      if (mjenisClient == '10') {
+        debugPrint("[RegisterFlow] show general IDV popup");
+        saved = await showDialog<bool>(
+          context: popupContext,
+          useRootNavigator: true,
+          builder: (_) => const MRekanGeneralIdvPopUpPage(),
+        );
+      } else if (mjenisClient == '20') {
+        debugPrint("[RegisterFlow] show general CMP popup");
+        saved = await showDialog<bool>(
+          context: popupContext,
+          useRootNavigator: true,
+          builder: (_) => const MRekanGeneralCmpPopUpPage(),
+        );
+      }
+    } finally {
+      _isGeneralDataPopupOpen = false;
+    }
+
+    if (!mounted || _pendingFlowRequestFrom.isEmpty) return;
+
+    final requestFrom = _pendingFlowRequestFrom;
+    debugPrint(
+      "[RegisterFlow] general popup closed: "
+      "requestFrom=$requestFrom saved=${saved == true}",
+    );
+    _popPendingContinuationRoute();
+
+    // CALMV/CALPAR historically kept requestFrom until their page listener
+    // resumed the flow. The page-local pending flag now owns that behavior,
+    // so the global value must not leak into a later popup.
+    if (requestFrom == 'calpar_page' || requestFrom == 'calmv_page') {
+      _regUserBloc.add(const ClearRequestFromEvent());
     }
   }
 
@@ -1073,6 +1102,8 @@ class _AppState extends State<_App> {
                 if (nav == null) return;
 
                 if (state.authenticatedFrom == 'daftarclient_page') {
+                  _pendingFlowRequestFrom = '';
+                  _regUserBloc.add(const ClearRequestFromEvent());
                   while (nav.canPop()) {
                     nav.pop();
                   }

@@ -192,20 +192,23 @@ class _RincianTablePageState extends State<RincianTablePage> {
       itemBuilder: (context, index) {
         final header = visibleHeaders[index];
         final filteredDetails = _filteredDetails(header.details);
+        final isLastSection = index == visibleHeaders.length - 1;
+        final bottomSpacing =
+            widget.showFooter || !isLastSection ? vPadding : 0.0;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeaderTitle(context, header),
-            const SizedBox(height: hPadding),
-            isNarrow
-                ? _buildDetailTableCompact(filteredDetails)
-                : _buildDetailTableNormal(filteredDetails),
-            if (widget.showFooter) ...[
-              _buildFooterTable(header.footers),
-              const SizedBox(height: vPadding),
+        return Padding(
+          padding: EdgeInsets.only(bottom: bottomSpacing),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeaderTitle(context, header),
+              const SizedBox(height: hPadding),
+              isNarrow
+                  ? _buildDetailTableCompact(filteredDetails)
+                  : _buildDetailTableNormal(filteredDetails),
+              if (widget.showFooter) _buildFooterTable(header.footers),
             ],
-          ],
+          ),
         );
       },
     );
