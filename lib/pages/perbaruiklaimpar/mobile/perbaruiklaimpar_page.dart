@@ -48,24 +48,33 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
         );
   }
 
-  Future<void> _autoSaveSection(int? index) async {
-    if (index == null) return;
+  Future<bool> _autoSaveSection(int? index) async {
+    if (index == null || index != 0) return true;
 
     switch (index) {
       case 0:
-        final klaimState = context.read<KlaimparklaimcrudBloc>().state;
+        final bloc = context.read<KlaimparklaimcrudBloc>();
+        final record = klaimPageKey.currentState?.buildRecordForSave(
+          validateAll: false,
+        );
 
-        if (klaimState.isDirty) {
-          context.read<KlaimparklaimcrudBloc>().add(
-                KlaimparklaimcrudAutoSaveEvent(),
-              );
-
-          await Future.delayed(const Duration(milliseconds: 150));
+        if (record == null) {
+          _openAccordion(0);
+          _showMessage('Nomor telepon PIC belum valid');
+          return false;
         }
-        break;
+
+        if (!bloc.state.isDirty) return true;
+
+        final success = await bloc.saveRecord(record);
+        if (!success) {
+          _openAccordion(0);
+          _showMessage('Penyimpanan data klaim gagal');
+        }
+        return success;
 
       default:
-        break;
+        return true;
     }
   }
 
@@ -73,22 +82,28 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
       int index, KlaimparaccordionState acc) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    await _autoSaveSection(acc.openedIndex);
+    final saved = await _autoSaveSection(acc.openedIndex);
+    if (!saved) return;
 
     _openAccordion(index);
   }
 
-  Future<void> _handlePerbarui(KlaimparaccordionState acc) async {
+  Future<void> _handlePerbarui() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    await _autoSaveSection(acc.openedIndex);
-    await Future.delayed(const Duration(milliseconds: 200));
+    final record = klaimPageKey.currentState?.buildRecordForSave();
+    if (record == null) {
+      _openAccordion(0);
+      _showMessage('Form data klaim belum valid');
+      return;
+    }
+
+    final success =
+        await context.read<KlaimparklaimcrudBloc>().saveRecord(record);
 
     if (!mounted) return;
 
-    final klaimState = context.read<KlaimparklaimcrudBloc>().state;
-
-    if (klaimState.hasFailure) {
+    if (!success) {
       _openAccordion(0);
       _showMessage('Penyimpanan data klaim gagal');
       return;
@@ -115,20 +130,7 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
       title: widget.cobGroupNama,
       child: Container(
         color: secondaryBlackColor,
-        child: BlocConsumer<KlaimparaccordionBloc, KlaimparaccordionState>(
-          listener: (context, state) async {
-            if (state.previousIndex == null ||
-                state.previousIndex == state.openedIndex) {
-              return;
-            }
-
-            FocusManager.instance.primaryFocus?.unfocus();
-            await Future.delayed(const Duration(milliseconds: 50));
-
-            if (!mounted) return;
-
-            await _autoSaveSection(state.previousIndex);
-          },
+        child: BlocBuilder<KlaimparaccordionBloc, KlaimparaccordionState>(
           builder: (context, acc) {
             return SingleChildScrollView(
               child: Column(
@@ -206,9 +208,8 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                             KlaimparklaimcrudState>(
                           builder: (context, state) {
                             return AppButton.primary(
-                              onPressed: state.isSaving
-                                  ? null
-                                  : () => _handlePerbarui(acc),
+                              onPressed:
+                                  state.isSaving ? null : _handlePerbarui,
                               text: 'Perbarui',
                               isLoading: state.isSaving,
                               backgroundColor: state.isSaving

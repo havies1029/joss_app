@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/models/perbaruiklaimpar/klaimparklaimcrud_model.dart';
 import 'package:joss_app/repositories/combobox/combomjenisrugi_repository.dart';
 import 'package:joss_app/blocs/perbaruiklaimpar/klaimparklaimcrud_bloc.dart';
 import 'package:joss_app/models/combobox/combomjenisrugi_model.dart';
@@ -131,11 +132,7 @@ class KlaimparklaimcrudFormPageFormState
 
     final telp = fieldPicTelpController.text.trim();
     if (telp.isNotEmpty) {
-      final phoneRes = InternationalPhoneHelper.normalize(
-        telp,
-        countryCode: fieldPicTelpCountryCode,
-        required: false,
-      );
+      final phoneRes = _normalizePicTelp(telp);
       if (!phoneRes.isValid) {
         setErr('form.picTelp', phoneRes.error ?? "Nomor telepon tidak valid");
         ok = false;
@@ -203,11 +200,7 @@ class KlaimparklaimcrudFormPageFormState
       picEmail: fieldPicEmailController.text.trim(),
     ));
 
-    final phoneRes = InternationalPhoneHelper.normalize(
-      fieldPicTelpController.text.trim(),
-      countryCode: fieldPicTelpCountryCode,
-      required: false,
-    );
+    final phoneRes = _normalizePicTelp();
 
     klaimparklaimcrudBloc.add(FieldPicTelpChangedEvent(
       picTelp: phoneRes.phone ?? '',
@@ -247,6 +240,77 @@ class KlaimparklaimcrudFormPageFormState
     }
 
     return ok;
+  }
+
+  InternationalPhoneResult _normalizePicTelp([String? rawValue]) {
+    return InternationalPhoneHelper.normalize(
+      rawValue ?? fieldPicTelpController.text,
+      countryCode: fieldPicTelpCountryCode,
+      required: false,
+    );
+  }
+
+  void _handlePicTelpChanged(String value) {
+    final phoneRes = _normalizePicTelp(value);
+
+    if (!phoneRes.isValid) {
+      setErr(
+        'form.picTelp',
+        phoneRes.error ?? 'Nomor telepon tidak valid',
+      );
+      return;
+    }
+
+    clearErr('form.picTelp');
+    klaimparklaimcrudBloc.add(
+      FieldPicTelpChangedEvent(picTelp: phoneRes.phone ?? ''),
+    );
+  }
+
+  KlaimparklaimcrudModel? buildRecordForSave({
+    bool validateAll = true,
+  }) {
+    final currentRecord = klaimparklaimcrudBloc.state.record;
+    if (currentRecord == null) return null;
+
+    if (validateAll) {
+      final isValid = validateForm();
+      widget.formKey.currentState?.validate();
+      if (!isValid) return null;
+    }
+
+    final phoneRes = _normalizePicTelp();
+    if (!phoneRes.isValid) {
+      setErr(
+        'form.picTelp',
+        phoneRes.error ?? 'Nomor telepon tidak valid',
+      );
+      widget.formKey.currentState?.validate();
+      return null;
+    }
+
+    clearErr('form.picTelp');
+
+    return currentRecord.copyWith(
+      dol: _parseOptionalDate(fieldDolController.text),
+      isPolisJps: isPolisJps,
+      keterangan: fieldKeteranganController.text.trim(),
+      laporAsuransi: isPolisJps
+          ? null
+          : _parseOptionalDate(fieldLaporAsuransiController.text),
+      laporJps: _parseOptionalDate(fieldLaporJpsController.text),
+      penyebab: fieldPenyebabController.text.trim(),
+      picEmail: fieldPicEmailController.text.trim(),
+      picJabatan: fieldPicJabatanController.text.trim(),
+      picNama: fieldPicNamaController.text.trim(),
+      picTelp: phoneRes.phone ?? '',
+      mjenisrugiId:
+          fieldComboMJenisrugi?.mjenisrugiId ?? currentRecord.mjenisrugiId,
+      comboMJenisrugi: fieldComboMJenisrugi ?? currentRecord.comboMJenisrugi,
+      currId: fieldComboRMatauang?.rmatauangKode ?? currentRecord.currId,
+      comboRMatauang: fieldComboRMatauang ?? currentRecord.comboRMatauang,
+      klaimAmount: parseAmount(fieldKlaimAmountController.text),
+    );
   }
 
   @override
@@ -557,40 +621,11 @@ class KlaimparklaimcrudFormPageFormState
         setState(() {
           fieldPicTelpCountryCode = value;
         });
-        clearErr('form.picTelp');
+        _handlePicTelpChanged(fieldPicTelpController.text);
       },
       errorText: err('form.picTelp'),
       validator: (_) => err('form.picTelp'),
-      onChanged: (value) {
-        final telp = value.trim();
-
-        if (telp.isEmpty) {
-          clearErr('form.picTelp');
-        } else {
-          final phoneRes = InternationalPhoneHelper.normalize(
-            telp,
-            countryCode: fieldPicTelpCountryCode,
-            required: false,
-          );
-          if (phoneRes.isValid) {
-            clearErr('form.picTelp');
-          } else if (err('form.picTelp') != null) {
-            setErr(
-                'form.picTelp', phoneRes.error ?? "Nomor telepon tidak valid");
-          }
-        }
-
-        klaimparklaimcrudBloc.add(
-          FieldPicTelpChangedEvent(
-            picTelp: InternationalPhoneHelper.normalize(
-                  value,
-                  countryCode: fieldPicTelpCountryCode,
-                  required: false,
-                ).phone ??
-                '',
-          ),
-        );
-      },
+      onChanged: _handlePicTelpChanged,
     );
   }
 

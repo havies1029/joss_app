@@ -18,8 +18,12 @@ class KlaimparklaimcrudTambahEvent extends KlaimparklaimcrudEvents {
 
 class KlaimparklaimcrudUbahEvent extends KlaimparklaimcrudEvents {
   final KlaimparklaimcrudModel record;
+  final Completer<bool>? completion;
 
-  const KlaimparklaimcrudUbahEvent({required this.record});
+  const KlaimparklaimcrudUbahEvent({
+    required this.record,
+    this.completion,
+  });
 
   @override
   List<Object> get props => [record];

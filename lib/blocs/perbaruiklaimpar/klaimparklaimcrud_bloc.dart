@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/models/combobox/combomjenisrugi_model.dart';
@@ -36,6 +38,15 @@ class KlaimparklaimcrudBloc
     on<KlaimparklaimcrudAutoSaveEvent>(onAutoSave);
   }
 
+  Future<bool> saveRecord(KlaimparklaimcrudModel record) {
+    final completion = Completer<bool>();
+    add(KlaimparklaimcrudUbahEvent(
+      record: record,
+      completion: completion,
+    ));
+    return completion.future;
+  }
+
   Future<void> onTambahKlaimparklaimcrud(
     KlaimparklaimcrudTambahEvent event,
     Emitter<KlaimparklaimcrudState> emit,
@@ -56,15 +67,37 @@ class KlaimparklaimcrudBloc
     KlaimparklaimcrudUbahEvent event,
     Emitter<KlaimparklaimcrudState> emit,
   ) async {
-    emit(state.copyWith(isSaving: true, isSaved: false));
+    if (state.isSaving) {
+      event.completion?.complete(false);
+      return;
+    }
 
-    final hasFailure = !await repository.klaimparklaimcrudUbah(event.record);
+    emit(state.copyWith(
+      isSaving: true,
+      isSaved: false,
+      hasFailure: false,
+      record: event.record,
+    ));
+
+    var success = false;
+    try {
+      success = await repository.klaimparklaimcrudUbah(event.record);
+    } catch (_) {
+      success = false;
+    }
 
     emit(state.copyWith(
       isSaving: false,
       isSaved: true,
-      hasFailure: hasFailure,
+      hasFailure: !success,
+      isDirty: !success,
+      record: event.record,
+      isComplete: _isComplete(event.record),
     ));
+
+    if (event.completion?.isCompleted == false) {
+      event.completion!.complete(success);
+    }
   }
 
   Future<void> onHapusKlaimparklaimcrud(
