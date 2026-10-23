@@ -8,6 +8,8 @@ class DetailPolisTable<T> extends StatefulWidget {
   final VoidCallback? onLoadMore;
   final bool isLoadingMore;
   final String emptyText;
+  final ValueChanged<T>? onRowTap;
+  final bool Function(T item)? rowTapEnabled;
 
   final double narrowBreakpoint;
   final double headerHeight;
@@ -21,6 +23,8 @@ class DetailPolisTable<T> extends StatefulWidget {
     this.onLoadMore,
     this.isLoadingMore = false,
     this.emptyText = 'Data polis tidak ditemukan.',
+    this.onRowTap,
+    this.rowTapEnabled,
     this.narrowBreakpoint = 900,
     this.headerHeight = 52,
     this.rowHeight = 52,
@@ -271,12 +275,19 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
     int index, {
     required bool compact,
   }) {
+    final canTap =
+        widget.onRowTap != null && (widget.rowTapEnabled?.call(item) ?? true);
+
     return TableRow(
       decoration: BoxDecoration(
         color: index.isEven ? pGrey : formGrey,
       ),
       children: [
-        _cellCenter((index + 1).toString()),
+        _rowTapTarget(
+          item,
+          enabled: canTap,
+          child: _cellCenter((index + 1).toString()),
+        ),
         ...widget.columns.map(
           (col) {
             final value = col.valueGetter(item);
@@ -291,17 +302,42 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
             }
 
             if (col.right) {
-              return _cellRight(value);
+              return _rowTapTarget(
+                item,
+                enabled: canTap,
+                child: _cellRight(value),
+              );
             }
 
-            return _cellText(
-              value,
-              compact: compact,
-              center: col.center,
+            return _rowTapTarget(
+              item,
+              enabled: canTap,
+              child: _cellText(
+                value,
+                compact: compact,
+                center: col.center,
+              ),
             );
           },
         ),
       ],
+    );
+  }
+
+  Widget _rowTapTarget(
+    T item, {
+    required bool enabled,
+    required Widget child,
+  }) {
+    if (!enabled) return child;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => widget.onRowTap?.call(item),
+        child: child,
+      ),
     );
   }
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../../common/constants.dart';
 import '../../../../../models/gen_aset_par/sppa2parcari_model.dart';
+import '../../history_endors/history_endors_par_popup.dart';
 import '../template_polis_table/detail_polis_table.dart';
 
 class DetailPolisParTableWidget extends StatefulWidget {
@@ -22,8 +22,7 @@ class DetailPolisParTableWidget extends StatefulWidget {
       _DetailPolisParTableWidgetState();
 }
 
-class _DetailPolisParTableWidgetState
-    extends State<DetailPolisParTableWidget> {
+class _DetailPolisParTableWidgetState extends State<DetailPolisParTableWidget> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
 
   @override
@@ -33,6 +32,12 @@ class _DetailPolisParTableWidgetState
       onLoadMore: widget.onLoadMore,
       isLoadingMore: widget.isLoadingMore,
       emptyText: 'Data polis tidak ditemukan.',
+      rowTapEnabled: (item) =>
+          item.isEndors && item.sppa2parId.trim().isNotEmpty,
+      onRowTap: (item) => showHistoryEndorsParPopup(
+        context,
+        polis2Id: item.sppa2parId,
+      ),
       columns: [
         DetailPolisColumn<Sppa2parCariModel>(
           title: 'LOKASI',
@@ -57,8 +62,7 @@ class _DetailPolisParTableWidgetState
         ),
         DetailPolisColumn<Sppa2parCariModel>(
           title: 'DESKRIPSI',
-          valueGetter: (d) =>
-          d.okupasiDesc.isNotEmpty ? d.okupasiDesc : '-',
+          valueGetter: (d) => d.okupasiDesc.isNotEmpty ? d.okupasiDesc : '-',
           normalFlex: 2.4,
           compactMinWidth: 160,
           compactMaxWidth: 260,

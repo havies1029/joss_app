@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../../common/constants.dart';
 import '../../../../../models/asetothers/sppa2otherscari_model.dart';
+import '../../history_endors/history_endors_others_popup.dart';
 import '../template_polis_table/detail_polis_table.dart';
 
 class DetailPolisOthersTableWidget extends StatefulWidget {
@@ -45,6 +45,12 @@ class _DetailPolisOthersTableWidgetState
       onLoadMore: widget.onLoadMore,
       isLoadingMore: widget.isLoadingMore,
       emptyText: "Data polis tidak ditemukan.",
+      rowTapEnabled: (item) =>
+          item.isEndors && item.sppa2othersId.trim().isNotEmpty,
+      onRowTap: (item) => showHistoryEndorsOthersPopup(
+        context,
+        polis2Id: item.sppa2othersId,
+      ),
       columns: [
         DetailPolisColumn<Sppa2othersCariModel>(
           title: "INFO",

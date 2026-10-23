@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../../models/gen_aset_health/sppa2healthcari_model.dart';
+import '../../history_endors/history_endors_health_popup.dart';
 import '../template_polis_table/detail_polis_table.dart';
 
 class DetailPolisHealthTableWidget extends StatefulWidget {
@@ -22,7 +23,6 @@ class DetailPolisHealthTableWidget extends StatefulWidget {
 
 class _DetailPolisHealthTableWidgetState
     extends State<DetailPolisHealthTableWidget> {
-
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
 
   // @override
@@ -44,6 +44,12 @@ class _DetailPolisHealthTableWidgetState
       onLoadMore: widget.onLoadMore,
       isLoadingMore: widget.isLoadingMore,
       emptyText: "Data polis tidak ditemukan.",
+      rowTapEnabled: (item) =>
+          item.isEndors && item.sppa2healthId.trim().isNotEmpty,
+      onRowTap: (item) => showHistoryEndorsHealthPopup(
+        context,
+        polis2Id: item.sppa2healthId,
+      ),
       columns: [
         DetailPolisColumn<Sppa2healthCariModel>(
           title: "NAMA",

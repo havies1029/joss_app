@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../../models/gen_aset_hull/sppa2hullcari_model.dart';
+import '../../history_endors/history_endors_hull_popup.dart';
 import '../template_polis_table/detail_polis_table.dart';
 
 class DetailPolisHullTableWidget extends StatefulWidget {
@@ -43,6 +44,12 @@ class _DetailPolisHullTableWidgetState
       onLoadMore: widget.onLoadMore,
       isLoadingMore: widget.isLoadingMore,
       emptyText: "Data polis tidak ditemukan.",
+      rowTapEnabled: (item) =>
+          item.isEndors && item.sppa2hullId.trim().isNotEmpty,
+      onRowTap: (item) => showHistoryEndorsHullPopup(
+        context,
+        polis2Id: item.sppa2hullId,
+      ),
       columns: [
         DetailPolisColumn<Sppa2hullCariModel>(
           title: "NAMA KAPAL",

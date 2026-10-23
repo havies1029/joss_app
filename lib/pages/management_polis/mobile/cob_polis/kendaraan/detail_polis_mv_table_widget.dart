@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../../common/constants.dart';
 import '../../../../../models/gen_aset_mv/sppa2mvcari_model.dart';
+import '../../history_endors/history_endors_mv_popup.dart';
 import '../template_polis_table/detail_polis_table.dart';
 
 class DetailPolisMvTableWidget extends StatefulWidget {
@@ -42,10 +42,7 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
       d.merk,
       d.jenisMv,
       d.modelMv,
-    ].where((e) =>
-    e
-        .trim()
-        .isNotEmpty).join(" - ");
+    ].where((e) => e.trim().isNotEmpty).join(" - ");
 
     return value.isNotEmpty ? value : "-";
   }
@@ -57,6 +54,12 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
       onLoadMore: widget.onLoadMore,
       isLoadingMore: widget.isLoadingMore,
       emptyText: "Data polis tidak ditemukan.",
+      rowTapEnabled: (item) =>
+          item.isEndors && item.sppa2mvId.trim().isNotEmpty,
+      onRowTap: (item) => showHistoryEndorsMvPopup(
+        context,
+        polis2Id: item.sppa2mvId,
+      ),
       columns: [
         DetailPolisColumn<Sppa2mvCariModel>(
           title: "NO PLAT",
