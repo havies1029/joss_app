@@ -19,6 +19,7 @@ class AppPhoneNumberField extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final ValueChanged<String>? onChanged;
   final bool enabled;
+  final bool countryPickerEnabled;
 
   const AppPhoneNumberField({
     super.key,
@@ -36,6 +37,7 @@ class AppPhoneNumberField extends StatelessWidget {
     this.validator,
     this.onChanged,
     this.enabled = true,
+    this.countryPickerEnabled = true,
   });
 
   OutlineInputBorder _border(Color color) {
@@ -74,7 +76,7 @@ class AppPhoneNumberField extends StatelessWidget {
         ),
         prefixIcon: _PhoneCountryPrefix(
           country: country,
-          enabled: isEnabled,
+          enabled: isEnabled && countryPickerEnabled,
           onChanged: onCountryCodeChanged,
         ),
         prefixIconConstraints: const BoxConstraints(
@@ -129,8 +131,10 @@ class _PhoneCountryPrefix extends StatelessWidget {
                 country.displayText,
                 style: inputTextStyle(context, color: primaryLightColor),
               ),
-              const SizedBox(width: 5),
-              SvgPicture.asset('assets/icons/dropdown.svg', width: 10),
+              if (enabled) ...[
+                const SizedBox(width: 5),
+                SvgPicture.asset('assets/icons/dropdown.svg', width: 10),
+              ],
               const SizedBox(width: 8),
               Container(width: 1, height: 22, color: sGrey),
               const SizedBox(width: 8),

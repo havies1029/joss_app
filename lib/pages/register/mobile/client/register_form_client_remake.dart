@@ -357,6 +357,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
           isCompanyClient ? "Masukkan No. Telp Perusahaan" : "Masukkan No. HP",
       controller: fieldTeleponController,
       countryCode: fieldTeleponCountryCode,
+      countryPickerEnabled: false,
       onCountryCodeChanged: (value) {
         setState(() {
           fieldTeleponCountryCode = value;

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:joss_app/common/loading_indicator.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../blocs/layanan/mlayanan1cari_bloc.dart';
@@ -670,6 +671,10 @@ class _RincianPageState extends State<RincianPage> {
     return text.isEmpty ? "-" : text;
   }
 
+  String formatAmount(num? value) {
+    return NumberFormat('#,##0.00', 'id_ID').format(value ?? 0);
+  }
+
   String formatPeriode(DateTime? mulai, DateTime? akhir) {
     if (mulai == null && akhir == null) return '-';
     return "${formatDateNullable(mulai)} - ${formatDateNullable(akhir)}";
@@ -681,8 +686,8 @@ class _RincianPageState extends State<RincianPage> {
       "No": d.rownumber,
       "No Polis": textOrDash(d.noPolis),
       "Periode": formatPeriode(d.polisMulai, d.polisAkhir),
-      "Curr": d.currSimbol,
-      "DN OS": d.dnOs,
+      "Mata Uang": textOrDash(d.currSimbol),
+      "DN OS": formatAmount(d.dnOs),
       "Aging": d.aging,
     };
   }

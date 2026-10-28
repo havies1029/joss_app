@@ -66,37 +66,48 @@ class _HistoryEndorsPopupState extends State<HistoryEndorsPopup> {
 
     return Dialog(
       insetPadding: EdgeInsets.symmetric(
-        horizontal: screen.width < 600 ? 12 : 32,
+        horizontal: screen.width < 600 ? 12 : 40,
         vertical: 24,
       ),
       backgroundColor: pGrey,
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: const BorderSide(color: sGrey),
       ),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1180),
-        child: SizedBox(
-          width: double.infinity,
-          height: screen.height * 0.82,
-          child: Column(
-            children: [
-              _buildHeader(context),
-              if (widget.cob.supportsPagination) _buildSearch(),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: BlocBuilder<PolisEndorsHistoryBloc,
-                      PolisEndorsHistoryState>(
-                    builder: (context, state) {
-                      if (state.status == ListStatus.initial ||
-                          (state.isFetching && state.items.isEmpty)) {
-                        return const Center(child: LoadingIndicator());
-                      }
+        constraints: BoxConstraints(
+          maxWidth: 980,
+          maxHeight: screen.height * 0.82,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildHeader(context),
+            if (widget.cob.supportsPagination) _buildSearch(),
+            Flexible(
+              fit: FlexFit.loose,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  hPadding * 1.5,
+                  hPadding,
+                  hPadding * 1.5,
+                  hPadding * 1.5,
+                ),
+                child: BlocBuilder<PolisEndorsHistoryBloc,
+                    PolisEndorsHistoryState>(
+                  builder: (context, state) {
+                    if (state.status == ListStatus.initial ||
+                        (state.isFetching && state.items.isEmpty)) {
+                      return _statePanel(
+                        const LoadingIndicator(),
+                      );
+                    }
 
-                      if (state.status == ListStatus.failure &&
-                          state.items.isEmpty) {
-                        return _messageState(
+                    if (state.status == ListStatus.failure &&
+                        state.items.isEmpty) {
+                      return _statePanel(
+                        _messageState(
                           context,
                           state.errorMessage.isEmpty
                               ? 'Gagal memuat riwayat endorsement.'
@@ -105,62 +116,57 @@ class _HistoryEndorsPopupState extends State<HistoryEndorsPopup> {
                                   '',
                                 ),
                           showRetry: true,
-                        );
-                      }
-
-                      if (state.items.isEmpty) {
-                        return _messageState(
-                          context,
-                          'Belum ada riwayat endorsement.',
-                        );
-                      }
-
-                      return Align(
-                        alignment: Alignment.topCenter,
-                        child: TemplateEndorsTable(
-                          items: state.items,
-                          columns: widget.columns,
-                          isLoadingMore: state.isFetching,
-                          onLoadMore: widget.cob.supportsPagination
-                              ? () {
-                                  if (!state.hasReachedMax &&
-                                      !state.isFetching) {
-                                    context.read<PolisEndorsHistoryBloc>().add(
-                                          const FetchPolisEndorsHistoryEvent(),
-                                        );
-                                  }
-                                }
-                              : null,
                         ),
                       );
-                    },
-                  ),
+                    }
+
+                    if (state.items.isEmpty) {
+                      return _statePanel(
+                        _messageState(
+                          context,
+                          'Belum ada riwayat endorsement.',
+                        ),
+                      );
+                    }
+
+                    return Align(
+                      alignment: Alignment.topCenter,
+                      child: TemplateEndorsTable(
+                        items: state.items,
+                        columns: widget.columns,
+                        isLoadingMore: state.isFetching,
+                        onLoadMore: widget.cob.supportsPagination
+                            ? () {
+                                if (!state.hasReachedMax && !state.isFetching) {
+                                  context.read<PolisEndorsHistoryBloc>().add(
+                                        const FetchPolisEndorsHistoryEvent(),
+                                      );
+                                }
+                              }
+                            : null,
+                      ),
+                    );
+                  },
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(8),
-          topRight: Radius.circular(8),
-        ),
-        border: Border(bottom: BorderSide(color: sGrey)),
-      ),
-      child: Row(
+    return SizedBox(
+      height: 49,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          const SizedBox(width: 36),
-          Expanded(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 52),
             child: Text(
               widget.title,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: bodyTextStyle(
@@ -169,10 +175,21 @@ class _HistoryEndorsPopupState extends State<HistoryEndorsPopup> {
               ),
             ),
           ),
-          IconButton(
-            tooltip: 'Tutup',
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.close, color: Colors.white70, size: 20),
+          Align(
+            alignment: Alignment.centerRight,
+            child: IconButton(
+              tooltip: 'Tutup',
+              onPressed: () => Navigator.of(context).pop(),
+              icon: const Icon(
+                Icons.close,
+                color: primaryLightColor,
+                size: 20,
+              ),
+            ),
+          ),
+          const Align(
+            alignment: Alignment.bottomCenter,
+            child: Divider(height: 1, color: sGrey),
           ),
         ],
       ),
@@ -181,7 +198,12 @@ class _HistoryEndorsPopupState extends State<HistoryEndorsPopup> {
 
   Widget _buildSearch() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+      padding: const EdgeInsets.fromLTRB(
+        hPadding * 1.5,
+        hPadding,
+        hPadding * 1.5,
+        0,
+      ),
       child: TextField(
         controller: _searchController,
         onChanged: _onSearchChanged,
@@ -207,6 +229,14 @@ class _HistoryEndorsPopupState extends State<HistoryEndorsPopup> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _statePanel(Widget child) {
+    return SizedBox(
+      width: double.infinity,
+      height: 180,
+      child: Center(child: child),
     );
   }
 

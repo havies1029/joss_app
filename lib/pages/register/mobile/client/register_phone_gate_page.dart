@@ -391,6 +391,7 @@ class _RegisterPhoneGatePageState extends State<RegisterPhoneGatePage> {
       hint: 'Masukkan No. Hp',
       controller: _phoneController,
       countryCode: _countryCode,
+      countryPickerEnabled: false,
       onCountryCodeChanged: (value) {
         setState(() {
           _countryCode = value;
