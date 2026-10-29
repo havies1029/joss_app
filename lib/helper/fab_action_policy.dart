@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:joss_app/models/policy_action_availability.dart';
 import '../pages/management_polis/floating_action_menu_widget.dart';
 
 class FabActionPolicy {
@@ -92,13 +93,25 @@ class FabActionPolicy {
   };
 
   bool _canReaktif(Object item) {
-    final raw = _readBool(item, "isReaktif");
-    return raw == false;
+    if (item is PolicyActionAvailability) {
+      return item.effectiveCanReaktif;
+    }
+
+    final explicit = _readBool(item, "canReaktif");
+    if (explicit != null) return explicit;
+
+    return !(_readBool(item, "isReaktif") ?? false);
   }
 
   bool _canRenewal(Object item) {
-    final raw = _readBool(item, "isRenewal");
-    return raw == false;
+    if (item is PolicyActionAvailability) {
+      return item.effectiveCanRenewal;
+    }
+
+    final explicit = _readBool(item, "canRenewal");
+    if (explicit != null) return explicit;
+
+    return !(_readBool(item, "isRenewal") ?? false);
   }
 
   bool? _readBool(Object item, String key) {
@@ -107,16 +120,60 @@ class FabActionPolicy {
       final raw = switch (key) {
         "isReaktif" => dyn.isReaktif,
         "isRenewal" => dyn.isRenewal,
+        "canReaktif" => dyn.canReaktif,
+        "canRenewal" => dyn.canRenewal,
         _ => null,
       };
-      return raw is bool ? raw : null;
+      return policyNullableBoolFromJson(raw);
     } catch (_) {
       if (item is Map) {
-        final raw = item[key];
-        return raw is bool ? raw : null;
+        return policyNullableBoolFromJson(item[key]);
       }
       return null;
     }
+  }
+
+  String _blockedReason(Object item, ActionType actionType) {
+    String reason = '';
+
+    if (item is PolicyActionAvailability) {
+      reason = switch (actionType) {
+        ActionType.aktifkanKembali => item.reaktifBlockedReason,
+        ActionType.perpanjangan => item.renewalBlockedReason,
+        _ => '',
+      };
+    } else {
+      final key = switch (actionType) {
+        ActionType.aktifkanKembali => 'reaktifBlockedReason',
+        ActionType.perpanjangan => 'renewalBlockedReason',
+        _ => '',
+      };
+
+      if (key.isNotEmpty) {
+        try {
+          final dyn = item as dynamic;
+          reason = switch (key) {
+            'reaktifBlockedReason' =>
+              (dyn.reaktifBlockedReason ?? '').toString(),
+            'renewalBlockedReason' =>
+              (dyn.renewalBlockedReason ?? '').toString(),
+            _ => '',
+          };
+        } catch (_) {
+          if (item is Map) reason = (item[key] ?? '').toString();
+        }
+      }
+    }
+
+    if (reason.trim().isNotEmpty) return reason.trim();
+
+    return switch (actionType) {
+      ActionType.aktifkanKembali =>
+        'Polis tidak dapat diaktifkan kembali pada kondisi ini.',
+      ActionType.perpanjangan =>
+        'Polis tidak dapat diperpanjang pada kondisi ini.',
+      _ => '',
+    };
   }
 
   String _prosesSource(Object item) {
@@ -163,17 +220,22 @@ class FabActionPolicy {
         masterActions.any((a) => a.type == ActionType.perpanjangan);
 
     _dbg("========== FAB RENEWAL DEBUG ==========");
-    _dbg("cobId=$cobId | statusId=$statusId | selectedType=${selectedItem.runtimeType}");
+    _dbg(
+        "cobId=$cobId | statusId=$statusId | selectedType=${selectedItem.runtimeType}");
     _dbg("hasRenewalInMaster=$hasRenewalInMaster");
-    _dbg("allowedByCob has renewal=${allowedByCob.contains(ActionType.perpanjangan)}");
+    _dbg(
+        "allowedByCob has renewal=${allowedByCob.contains(ActionType.perpanjangan)}");
     _dbg("allowedByStatus=$allowedByStatus");
-    _dbg("allowedByStatus has renewal=${allowedByStatus.contains(ActionType.perpanjangan)}");
+    _dbg(
+        "allowedByStatus has renewal=${allowedByStatus.contains(ActionType.perpanjangan)}");
     _dbg("allowedTypes=$allowedTypes");
-    _dbg("allowedTypes has renewal=${allowedTypes.contains(ActionType.perpanjangan)}");
+    _dbg(
+        "allowedTypes has renewal=${allowedTypes.contains(ActionType.perpanjangan)}");
     _dbg("rawIsRenewal=$rawIsRenewal | rawType=${rawIsRenewal.runtimeType}");
     _dbg("parsed renewalFlag=$renewalFlag");
     _dbg("base types=${base.map((e) => e.type).toList()}");
-    _dbg("base has renewal=${base.any((e) => e.type == ActionType.perpanjangan)}");
+    _dbg(
+        "base has renewal=${base.any((e) => e.type == ActionType.perpanjangan)}");
     _dbg("======================================");
   }
 
@@ -192,6 +254,7 @@ class FabActionPolicy {
             (a) => a.copyWith(
               isEnabled: a.type == ActionType.beliPolis ||
                   a.type == ActionType.hubungiJps,
+              disabledReason: '',
             ),
           )
           .toList();
@@ -203,9 +266,8 @@ class FabActionPolicy {
     final allowedByStatus =
         statusIdEnabledMatrix[statusId] ?? const <ActionType>{};
 
-    final lacakAllowed =
-        allowedByStatus.contains(ActionType.lacakPolis) &&
-            _canLacak(selectedItem);
+    final lacakAllowed = allowedByStatus.contains(ActionType.lacakPolis) &&
+        _canLacak(selectedItem);
 
     final allowedTypes = <ActionType>{
       ...alwaysEnabled,
@@ -214,14 +276,18 @@ class FabActionPolicy {
     };
 
     final base = masterActions
-        .where((a) => allowedByCob.contains(a.type) && allowedTypes.contains(a.type))
+        .where((a) =>
+            allowedByCob.contains(a.type) && allowedTypes.contains(a.type))
         .map((a) {
       final enabled = switch (a.type) {
         ActionType.aktifkanKembali => canReaktif,
         ActionType.perpanjangan => canRenewal,
         _ => true,
       };
-      return a.copyWith(isEnabled: enabled);
+      return a.copyWith(
+        isEnabled: enabled,
+        disabledReason: enabled ? '' : _blockedReason(selectedItem, a.type),
+      );
     }).toList();
 
     _dbgRenewal(
@@ -245,15 +311,27 @@ class FabActionPolicy {
         final eqId = _filePolisEqId(selectedItem);
 
         if (allowedByCob.contains(ActionType.lihatPolisPar)) {
-          base.add(downloadParItem.copyWith(isEnabled: parId.isNotEmpty));
+          base.add(downloadParItem.copyWith(
+            isEnabled: parId.isNotEmpty,
+            disabledReason:
+                parId.isEmpty ? 'Dokumen polis PAR belum tersedia.' : '',
+          ));
         }
         if (allowedByCob.contains(ActionType.lihatPolisEq)) {
-          base.add(downloadEqItem.copyWith(isEnabled: eqId.isNotEmpty));
+          base.add(downloadEqItem.copyWith(
+            isEnabled: eqId.isNotEmpty,
+            disabledReason:
+                eqId.isEmpty ? 'Dokumen polis EQ belum tersedia.' : '',
+          ));
         }
       } else {
         final fileId = _filePolisId(selectedItem);
         if (allowedByCob.contains(ActionType.lihatPolis)) {
-          base.add(downloadPolisItem.copyWith(isEnabled: fileId.isNotEmpty));
+          base.add(downloadPolisItem.copyWith(
+            isEnabled: fileId.isNotEmpty,
+            disabledReason:
+                fileId.isEmpty ? 'Dokumen polis belum tersedia.' : '',
+          ));
         }
       }
     }
@@ -294,10 +372,29 @@ class FabActionPolicy {
     required Object? selectedItem,
     required ActionType actionType,
   }) {
-    final actions =
-        computeActions(cobId: cobId, statusId: statusId, selectedItem: selectedItem);
-    final found = actions.where((a) => a.type == actionType).toList();
-    if (found.isEmpty) return false;
-    return found.first.isEnabled;
+    return resolveAction(
+          cobId: cobId,
+          statusId: statusId,
+          selectedItem: selectedItem,
+          actionType: actionType,
+        )?.isEnabled ??
+        false;
+  }
+
+  ActionMenuItem? resolveAction({
+    required String cobId,
+    required String statusId,
+    required Object? selectedItem,
+    required ActionType actionType,
+  }) {
+    final actions = computeActions(
+      cobId: cobId,
+      statusId: statusId,
+      selectedItem: selectedItem,
+    );
+    for (final action in actions) {
+      if (action.type == actionType) return action;
+    }
+    return null;
   }
 }

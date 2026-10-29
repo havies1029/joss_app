@@ -6,12 +6,6 @@ import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/pages/management_polis/mobile/theme/polis_success.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 
-import '../../../../blocs/asetothers/asetotherscari_bloc.dart';
-import '../../../../blocs/gen_aset_health/asethealthcari_bloc.dart';
-import '../../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
-import '../../../../blocs/gen_aset_mv/asetmvcari_bloc.dart';
-import '../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
-import '../../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
 import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../blocs/regreaktif/regreaktif1_bloc.dart';
 import '../../../../models/regreaktif/regreaktif1_model.dart';
@@ -63,24 +57,20 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
     regreaktif1Bloc = context.read<Regreaktif1Bloc>();
   }
 
-  bool _isAjukanLoading = false;
-
-  dynamic _selectedItemByCob(BuildContext context, String cobId) {
-    return switch (cobId) {
-      "10001" => null,
-      "10002" => context.read<AsetParCariBloc>().state.selectedItem,
-      "10003" => context.read<AsetMvCariBloc>().state.selectedItem,
-      "10004" => context.read<AsethullCariBloc>().state.selectedItem,
-      "10005" => context.read<AsetHealthCariBloc>().state.selectedItem,
-      "10006" => context.read<AsetothersCariBloc>().state.selectedItem,
-      _ => null,
-    };
-  }
+  bool _isSubmitRequested = false;
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<Regreaktif1Bloc, Regreaktif1State>(
+      listenWhen: (previous, current) {
+        final becameSaved =
+            !previous.isSaved && current.isSaved && !current.hasFailure;
+        final becameFailed = !previous.hasFailure && current.hasFailure;
+        return becameSaved || becameFailed;
+      },
       builder: (context, state) {
+        final isSubmitting = state.isSaving || _isSubmitRequested;
+
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(
             viewInsets: EdgeInsets.zero,
@@ -96,30 +86,18 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
                 ),
                 child: AppButton.primary(
                   text: 'Ajukan Perubahan',
-                  isLoading: _isAjukanLoading,
+                  isLoading: isSubmitting,
                   backgroundColor:
-                      _isAjukanLoading ? secondaryBlackColor : primaryColor,
-                  onPressed: _isAjukanLoading
+                      isSubmitting ? secondaryBlackColor : primaryColor,
+                  onPressed: isSubmitting
                       ? null
-                      : () async {
+                      : () {
                           final okForm1 = validateForm1();
                           if (!okForm1) {
                             return;
                           }
 
-                          setState(() {
-                            _isAjukanLoading = true;
-                          });
-
                           _showPengajuanDialog(context);
-
-                          await Future.delayed(const Duration(seconds: 2));
-
-                          if (mounted) {
-                            setState(() {
-                              _isAjukanLoading = false;
-                            });
-                          }
                         },
                 ),
               ),
@@ -162,28 +140,38 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
         );
       },
       listener: (context, state) async {
-        if (!state.isSaved || state.hasFailure) return;
-
-        final cobId = context.read<CobManPolBloc>().state.selectedCOBId;
-        final selectedItem = _selectedItemByCob(context, cobId);
-
-        if (selectedItem == null) {
+        if (state.hasFailure) {
+          if (mounted) {
+            setState(() {
+              _isSubmitRequested = false;
+            });
+          }
           ScaffoldMessenger.of(context).showSnackBar(
-              infoSnackBar("Data belum dipilih / tidak ditemukan"));
+            infoSnackBar("Pengajuan gagal dikirim. Silakan coba kembali."),
+          );
           return;
         }
 
+        if (!state.isSaved) return;
         if (!context.mounted) return;
 
-        Navigator.push(
+        final formRoute = ModalRoute.of(context);
+
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => PolisSuccess(
               purpose: "A",
               display: "Pengajuan berhasil dikirim",
+              cobId: widget.cobId,
             ),
           ),
         );
+
+        if (!context.mounted) return;
+        if (formRoute?.isCurrent == true) {
+          Navigator.of(context).pop(true);
+        }
       },
     );
   }
@@ -374,17 +362,13 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
                 AppButton.primary(
                     text: 'Ajukan Sekarang',
                     backgroundColor: const Color(0xFF0ED7FF),
-                    onPressed: onSaveForm),
+                    onPressed: () => onSaveForm(context)),
               ],
             ),
           ),
         );
       },
     );
-  }
-
-  void _dismissDialog() {
-    Navigator.pop(context);
   }
 
   bool validateForm1() {
@@ -418,12 +402,19 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
     });
   }
 
-  void onSaveForm() {
-    _dismissDialog();
+  void onSaveForm(BuildContext dialogContext) {
+    if (_isSubmitRequested || regreaktif1Bloc.state.isSaving) return;
+
+    setState(() {
+      _isSubmitRequested = true;
+    });
+
+    Navigator.of(dialogContext).pop();
+
     final record = Regreaktif1Model(
       isUbah: false,
       polis1Id: widget.polisId,
-      notePerubahan: fieldNotePerubahanController.text,
+      notePerubahan: fieldNotePerubahanController.text.trim(),
     );
 
     regreaktif1Bloc.add(Regreaktif1TambahEvent(record: record));

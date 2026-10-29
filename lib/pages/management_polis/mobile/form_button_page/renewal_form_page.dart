@@ -6,12 +6,6 @@ import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/pages/management_polis/mobile/theme/polis_success.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 
-import '../../../../blocs/asetothers/asetotherscari_bloc.dart';
-import '../../../../blocs/gen_aset_health/asethealthcari_bloc.dart';
-import '../../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
-import '../../../../blocs/gen_aset_mv/asetmvcari_bloc.dart';
-import '../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
-import '../../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
 import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../blocs/regrenewal/regrenew1form_bloc.dart';
 import '../../../../models/regrenewal/regrenew1form_model.dart';
@@ -56,19 +50,7 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
   var fieldStatusEndorsController = TextEditingController();
   var fieldTsiController = TextEditingController();
 
-  bool _isAjukanLoading = false;
-
-  dynamic _selectedItemByCob(BuildContext context, String cobId) {
-    return switch (cobId) {
-      "10001" => null,
-      "10002" => context.read<AsetParCariBloc>().state.selectedItem,
-      "10003" => context.read<AsetMvCariBloc>().state.selectedItem,
-      "10004" => context.read<AsethullCariBloc>().state.selectedItem,
-      "10005" => context.read<AsetHealthCariBloc>().state.selectedItem,
-      "10006" => context.read<AsetothersCariBloc>().state.selectedItem,
-      _ => null,
-    };
-  }
+  bool _isSubmitRequested = false;
 
   @override
   void initState() {
@@ -82,7 +64,15 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
     regrenewal1FormBloc = BlocProvider.of<Regrenew1FormBloc>(context);
 
     return BlocConsumer<Regrenew1FormBloc, Regrenew1FormState>(
+      listenWhen: (previous, current) {
+        final becameSaved =
+            !previous.isSaved && current.isSaved && !current.hasFailure;
+        final becameFailed = !previous.hasFailure && current.hasFailure;
+        return becameSaved || becameFailed;
+      },
       builder: (context, state) {
+        final isSubmitting = state.isSaving || _isSubmitRequested;
+
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(
             viewInsets: EdgeInsets.zero,
@@ -98,30 +88,18 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
                 ),
                 child: AppButton.primary(
                   text: 'Ajukan Perubahan',
-                  isLoading: _isAjukanLoading,
+                  isLoading: isSubmitting,
                   backgroundColor:
-                      _isAjukanLoading ? secondaryBlackColor : primaryColor,
-                  onPressed: _isAjukanLoading
+                      isSubmitting ? secondaryBlackColor : primaryColor,
+                  onPressed: isSubmitting
                       ? null
-                      : () async {
+                      : () {
                           final okForm1 = validateForm1();
                           if (!okForm1) {
                             return;
                           }
 
-                          setState(() {
-                            _isAjukanLoading = true;
-                          });
-
                           _showPengajuanDialog(context);
-
-                          await Future.delayed(const Duration(seconds: 2));
-
-                          if (mounted) {
-                            setState(() {
-                              _isAjukanLoading = false;
-                            });
-                          }
                         },
                 ),
               ),
@@ -164,28 +142,38 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
         );
       },
       listener: (context, state) async {
-        if (!state.isSaved || state.hasFailure) return;
-
-        final cobId = context.read<CobManPolBloc>().state.selectedCOBId;
-        final selectedItem = _selectedItemByCob(context, cobId);
-
-        if (selectedItem == null) {
+        if (state.hasFailure) {
+          if (mounted) {
+            setState(() {
+              _isSubmitRequested = false;
+            });
+          }
           ScaffoldMessenger.of(context).showSnackBar(
-              infoSnackBar("Data belum dipilih / tidak ditemukan"));
+            infoSnackBar("Pengajuan gagal dikirim. Silakan coba kembali."),
+          );
           return;
         }
 
+        if (!state.isSaved) return;
         if (!context.mounted) return;
 
-        Navigator.push(
+        final formRoute = ModalRoute.of(context);
+
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => PolisSuccess(
               purpose: "R",
               display: "Pengajuan berhasil dikirim",
+              cobId: widget.cobId,
             ),
           ),
         );
+
+        if (!context.mounted) return;
+        if (formRoute?.isCurrent == true) {
+          Navigator.of(context).pop(true);
+        }
       },
     );
   }
@@ -376,7 +364,7 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
                 AppButton.primary(
                     text: 'Ajukan Sekarang',
                     backgroundColor: const Color(0xFF0ED7FF),
-                    onPressed: onSaveForm),
+                    onPressed: () => onSaveForm(context)),
               ],
             ),
           ),
@@ -385,16 +373,19 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
     );
   }
 
-  void _dismissDialog() {
-    Navigator.pop(context);
-  }
+  void onSaveForm(BuildContext dialogContext) {
+    if (_isSubmitRequested || regrenewal1FormBloc.state.isSaving) return;
 
-  void onSaveForm() {
-    _dismissDialog();
+    setState(() {
+      _isSubmitRequested = true;
+    });
+
+    Navigator.of(dialogContext).pop();
+
     final record = Regrenew1FormModel(
       isUbah: false,
       polis1Id: widget.polisId,
-      notePerubahan: fieldNotePerubahanController.text,
+      notePerubahan: fieldNotePerubahanController.text.trim(),
     );
 
     regrenewal1FormBloc.add(Regrenew1FormTambahEvent(record: record));

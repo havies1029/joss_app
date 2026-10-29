@@ -32,73 +32,6 @@ class FabActionExecutor {
     );
   }
 
-  bool? _boolFlag(Object item, String field) {
-    try {
-      final dyn = item as dynamic;
-      final raw = switch (field) {
-        'isReaktif' => dyn.isReaktif,
-        'isRenewal' => dyn.isRenewal,
-        _ => null,
-      };
-
-      if (raw == null) return null;
-      if (raw is bool) return raw;
-      return raw.toString().toLowerCase() == 'true';
-    } catch (_) {
-      if (item is Map) {
-        final raw = item[field];
-        if (raw == null) return null;
-        if (raw is bool) return raw;
-        return raw.toString().toLowerCase() == 'true';
-      }
-      return null;
-    }
-  }
-
-  bool? _readBool(Object item, String field) {
-    try {
-      final dyn = item as dynamic;
-      final raw = switch (field) {
-        'isReaktif' => dyn.isReaktif,
-        'isRenewal' => dyn.isRenewal,
-        _ => null,
-      };
-      return raw is bool ? raw : null;
-    } catch (_) {
-      if (item is Map) {
-        final raw = item[field];
-        return raw is bool ? raw : null;
-      }
-      return null;
-    }
-  }
-
-  bool _guardTahapan({
-    required BuildContext context,
-    required ActionType actionType,
-    required Object selectedItem,
-  }) {
-    bool? flag;
-
-    if (actionType == ActionType.aktifkanKembali) {
-      flag = _readBool(selectedItem, 'isReaktif');
-      if (flag == true) {
-        _snack(context, "Polis sudah pernah diaktivasi sebelumnya.");
-        return false;
-      }
-    }
-
-    if (actionType == ActionType.perpanjangan) {
-      flag = _readBool(selectedItem, 'isRenewal');
-      if (flag == true) {
-        _snack(context, "Polis sudah pernah diperpanjang sebelumnya.");
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   // void run({
   //   required BuildContext context,
   //   required ActionType actionType,
@@ -188,34 +121,31 @@ class FabActionExecutor {
       return;
     }
 
-    final isTahapanAction = actionType == ActionType.perpanjangan ||
-        actionType == ActionType.aktifkanKembali;
-
-    if (isTahapanAction) {
-      if (!_guardTahapan(
-        context: context,
-        actionType: actionType,
-        selectedItem: selectedItem,
-      )) {
-        return;
-      }
-    }
-
-    if (_isDownloadAction(actionType) &&
-        !_hasDownloadFileId(selectedItem, actionType)) {
-      _emptyDataSnack(context);
-      return;
-    }
-
-    final allowed = policy.isActionAllowed(
+    final actionDecision = policy.resolveAction(
       cobId: cobId,
       statusId: statusId,
       selectedItem: selectedItem,
       actionType: actionType,
     );
 
-    if (!allowed) {
+    if (actionDecision == null) {
       _snack(context, "Aksi tidak tersedia untuk kondisi ini.");
+      return;
+    }
+
+    if (!actionDecision.isEnabled) {
+      final reason = actionDecision.disabledReason.trim();
+      if (reason.isNotEmpty) {
+        _snack(context, reason);
+      } else {
+        _snack(context, "Aksi tidak tersedia untuk kondisi ini.");
+      }
+      return;
+    }
+
+    if (_isDownloadAction(actionType) &&
+        !_hasDownloadFileId(selectedItem, actionType)) {
+      _emptyDataSnack(context);
       return;
     }
 

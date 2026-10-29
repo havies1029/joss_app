@@ -9,15 +9,20 @@
   import '../../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
   import '../../../../blocs/gen_aset_mv/asetmvcari_bloc.dart';
   import '../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
-  import '../../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
   import 'package:confetti/confetti.dart';
 
   import '../detail_management_page/detail_management_widget.dart';
 
   class PolisSuccess extends StatefulWidget {
     final String display;
+    final String cobId;
     final String? purpose;
-    const PolisSuccess({super.key, required this.display, this.purpose});
+    const PolisSuccess({
+      super.key,
+      required this.display,
+      required this.cobId,
+      this.purpose,
+    });
 
     @override
     State<PolisSuccess> createState() => _PolisSuccessState();
@@ -106,30 +111,43 @@
                           borderside: BorderSide(color: sGrey),
                           width: 245,
                           onPressed: () {
-                            final cobId = context.read<CobManPolBloc>().state.selectedCOBId;
-                            // final cobOthers = context.read<Regother1CrudBloc>().state.selectedCOBId;
-
                             dynamic selectedItem;
-                            switch (cobId) {
+                            switch (widget.cobId) {
                               case "10002":
-                                selectedItem = context.read<AsetParCariBloc>().state.selectedItem;
+                                selectedItem = context
+                                    .read<AsetParCariBloc>()
+                                    .state
+                                    .selectedItem;
                                 break;
                               case "10003":
-                                selectedItem = context.read<AsetMvCariBloc>().state.selectedItem;
+                                selectedItem = context
+                                    .read<AsetMvCariBloc>()
+                                    .state
+                                    .selectedItem;
                                 break;
                               case "10004":
-                                selectedItem = context.read<AsethullCariBloc>().state.selectedItem;
+                                selectedItem = context
+                                    .read<AsethullCariBloc>()
+                                    .state
+                                    .selectedItem;
                                 break;
                               case "10005":
-                                selectedItem = context.read<AsetHealthCariBloc>().state.selectedItem;
+                                selectedItem = context
+                                    .read<AsetHealthCariBloc>()
+                                    .state
+                                    .selectedItem;
                                 break;
                               default:
-                                selectedItem = context.read<AsetothersCariBloc>().state.selectedItem;
+                                selectedItem = context
+                                    .read<AsetothersCariBloc>()
+                                    .state
+                                    .selectedItem;
                             }
 
                             if (selectedItem == null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Data polis tidak ditemukan")),
+                                SnackBar(
+                                    content: Text("Data polis tidak ditemukan")),
                               );
                               return;
                             }
@@ -139,7 +157,7 @@
                               MaterialPageRoute(
                                 builder: (_) => DetailManagementPolisPage(
                                   data: selectedItem,
-                                  cobId: cobId,
+                                  cobId: widget.cobId,
                                   statusId: "",
                                   jenisProses: widget.purpose,
                                 ),

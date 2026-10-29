@@ -27,6 +27,7 @@ class ActionMenuItem {
   final List<Color> gradientColors;
   final Color borderColor;
   final bool isEnabled;
+  final String disabledReason;
 
   const ActionMenuItem({
     required this.type,
@@ -35,6 +36,7 @@ class ActionMenuItem {
     required this.gradientColors,
     required this.borderColor,
     this.isEnabled = true,
+    this.disabledReason = '',
   });
 
   ActionMenuItem copyWith({
@@ -44,6 +46,7 @@ class ActionMenuItem {
     List<Color>? gradientColors,
     Color? borderColor,
     bool? isEnabled,
+    String? disabledReason,
   }) {
     return ActionMenuItem(
       type: type ?? this.type,
@@ -52,6 +55,7 @@ class ActionMenuItem {
       gradientColors: gradientColors ?? this.gradientColors,
       borderColor: borderColor ?? this.borderColor,
       isEnabled: isEnabled ?? this.isEnabled,
+      disabledReason: disabledReason ?? this.disabledReason,
     );
   }
 }
@@ -206,13 +210,8 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
 
   Widget _buildActionButton(ActionMenuItem action) {
     final isDisabled = !action.isEnabled;
-    final canTriggerGuardWhenDisabled = isDisabled &&
-        (action.type == ActionType.perpanjangan ||
-            action.type == ActionType.aktifkanKembali ||
-            action.type == ActionType.unduhPolis ||
-            action.type == ActionType.lihatPolis ||
-            action.type == ActionType.lihatPolisPar ||
-            action.type == ActionType.lihatPolisEq);
+    final canExplainDisabled =
+        isDisabled && action.disabledReason.trim().isNotEmpty;
     return Opacity(
       opacity: isDisabled ? 0.55 : 1,
       child: Row(
@@ -276,7 +275,7 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
                 //         debugPrint('FAB ITEM CLICK => callback sent to parent');
                 //
                 //       },
-                onTap: (isDisabled && !canTriggerGuardWhenDisabled)
+                onTap: (isDisabled && !canExplainDisabled)
                     ? null
                     : () {
                         debugPrint(

@@ -324,7 +324,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
           break;
 
         case "A": // Reaktif
-          targetStatusId = "10003";
+          targetStatusId = "10002";
           break;
 
         default:
